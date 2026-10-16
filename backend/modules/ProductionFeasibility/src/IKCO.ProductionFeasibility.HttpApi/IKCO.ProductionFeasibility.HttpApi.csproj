@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>IKCO.ProductionFeasibility</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Volo.Abp.AspNetCore.Mvc" Version="$(AbpVersion)" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="$(SwashbuckleVersion)" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\IKCO.ProductionFeasibility.Application.Contracts\IKCO.ProductionFeasibility.Application.Contracts.csproj" />
+  </ItemGroup>
+</Project>

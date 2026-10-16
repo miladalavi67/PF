@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>IKCO.ProductionFeasibility</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Volo.Abp.Ddd.Domain" Version="$(AbpVersion)" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\IKCO.ProductionFeasibility.Domain.Shared\IKCO.ProductionFeasibility.Domain.Shared.csproj" />
+  </ItemGroup>
+</Project>

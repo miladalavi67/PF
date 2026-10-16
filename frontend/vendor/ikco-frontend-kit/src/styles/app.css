@@ -1,0 +1,25 @@
+@import url("./font.css");
+
+/*scroll styles*/
+body::-webkit-scrollbar {
+    width: 8px;
+}
+body::-webkit-scrollbar-track {
+    background-color: #eee;
+}
+body::-webkit-scrollbar-thumb {
+    background-color: #797474;
+    border-radius: 16px;
+    width: 8px;
+}
+.scroll-thin::-webkit-scrollbar {
+    height: 8px;
+}
+.scroll-thin::-webkit-scrollbar-track {
+    background-color: #eee;
+}
+.scroll-thin::-webkit-scrollbar-thumb {
+    background-color: #c4c0c0;
+    border-radius: 16px;
+}
+/*end scroll styles*/

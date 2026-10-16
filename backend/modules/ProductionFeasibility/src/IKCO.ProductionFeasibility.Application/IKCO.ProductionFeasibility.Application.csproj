@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>IKCO.ProductionFeasibility</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Volo.Abp.Ddd.Application" Version="$(AbpVersion)" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\IKCO.ProductionFeasibility.Application.Contracts\IKCO.ProductionFeasibility.Application.Contracts.csproj" />
+    <ProjectReference Include="..\IKCO.ProductionFeasibility.Domain\IKCO.ProductionFeasibility.Domain.csproj" />
+  </ItemGroup>
+</Project>

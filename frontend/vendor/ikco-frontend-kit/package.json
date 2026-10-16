@@ -1,0 +1,27 @@
+{
+  "name": "@ikco/frontend-kit",
+  "version": "1.2.9-local",
+  "private": true,
+  "description": "Local stand-in for @ikco/frontend-kit (offline development only). Replace with the registry package on the IKCO network.",
+  "type": "module",
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^7.3.1",
+    "@mui/material": "^7.3.1",
+    "@mui/x-data-grid": "^7.24.0",
+    "@mui/x-date-pickers": "^8.11.0",
+    "moment-jalaali": "^0.10.4",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-hot-toast": "^2.6.0",
+    "react-router-dom": "^7.8.1",
+    "zustand": "^5.0.8"
+  }
+}

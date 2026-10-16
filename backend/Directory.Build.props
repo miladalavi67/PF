@@ -1,0 +1,16 @@
+<Project>
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <AbpVersion>10.6.0</AbpVersion>
+    <!-- بسته‌های سازمانی موجود در PFWorkspace؛ IKCO.Infrastructure 2.0.5 به IKCO.Auth 2.0.4 وابسته است -->
+    <IkcoAuthVersion>2.0.4</IkcoAuthVersion>
+    <IkcoInfrastructureVersion>2.0.5</IkcoInfrastructureVersion>
+    <!-- هم‌نسخه با Swashbuckle.AspNetCore که Volo.Abp.Swashbuckle 10.6 استفاده می‌کند -->
+    <SwashbuckleVersion>10.2.3</SwashbuckleVersion>
+  </PropertyGroup>
+</Project>

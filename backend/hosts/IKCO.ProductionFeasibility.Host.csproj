@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <RootNamespace>IKCO.ProductionFeasibility.Host</RootNamespace>
+    <UserSecretsId>ikco-productionfeasibility-host</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Volo.Abp.Autofac" Version="$(AbpVersion)" />
+    <PackageReference Include="Volo.Abp.Swashbuckle" Version="$(AbpVersion)" />
+    <PackageReference Include="Volo.Abp.AspNetCore.Serilog" Version="$(AbpVersion)" />
+    <PackageReference Include="IKCO.Infrastructure" Version="$(IkcoInfrastructureVersion)" />
+    <PackageReference Include="IKCO.Auth" Version="$(IkcoAuthVersion)" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="$(SwashbuckleVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\modules\ProductionFeasibility\src\IKCO.ProductionFeasibility.Application\IKCO.ProductionFeasibility.Application.csproj" />
+    <ProjectReference Include="..\modules\ProductionFeasibility\src\IKCO.ProductionFeasibility.HttpApi\IKCO.ProductionFeasibility.HttpApi.csproj" />
+    <ProjectReference Include="..\modules\ProductionFeasibility\src\IKCO.ProductionFeasibility.EntityFrameworkCore\IKCO.ProductionFeasibility.EntityFrameworkCore.csproj" />
+  </ItemGroup>
+
+</Project>
