@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using IKCO.ProductionFeasibility.Common;
@@ -88,6 +88,20 @@ public partial class BodyCriticalsRepository : PfDapperRepository<PfDbContext>, 
             .VarChar("@IdString", idString, -1)
             .Int("@UserId", userId);
         return await QueryFirstOrDefaultAsync<GlobalResultDto>("PF.S_DisableCriticalParts", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Command);
+    }
+
+    public async Task InsertDisableReasonAsync(int eventTypeId, int criticalPartId, string note, int userId)
+    {
+        var parameters = new SpParameters()
+            .Int("@CriticalPartTypeId", eventTypeId)
+            .Int("@AttributeId", 4)
+            .Int("@ChangeRecId", criticalPartId)
+            .NVarChar("@OldValue", null, 500)
+            .NVarChar("@NewValue", null, 500)
+            .VarChar("@RequestNo", null, 50)
+            .NVarChar("@Note", note, 500)
+            .Int("@UserId", userId);
+        await ExecuteAsync("PF.InsertEventLog", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Command);
     }
 
     public async Task<TabularResult> GetCriticalPartInfoAsync(int criticalPartsId)

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -140,6 +140,13 @@ public class BodyCriticalsDisableCriticalPartsInput
     [Required(AllowEmptyStrings = false)]
     [MinLength(1)]
     public List<int> Ids { get; set; } = new();
+
+    /// <summary>نوع بحران (کلید رویدادنگاری)؛ همراه با دلیل ثبت می‌شود</summary>
+    public int EventTypeId { get; set; }
+
+    /// <summary>دلیل حذف بحران؛ در فرم ویندوزی با پسوند «(حذف بحران)» در لاگ ثبت می‌شد</summary>
+    [MaxLength(500)]
+    public string? Reason { get; set; }
 
 }
 

@@ -1,8 +1,6 @@
 import {
   IkcoAlert,
   IkcoButton,
-  IkcoCard,
-  IkcoCardActions,
   IkcoCardContent as DialogContent,
   IkcoDataGrid,
   IkcoDialog,
@@ -17,17 +15,18 @@ import {
   IkcoTypography,
   type IkcoGridColDef,
 } from "@ikco/frontend-kit";
-import { useCan, useMFENavigate } from "@ikco/mfe-core";
+import { useCan } from "@ikco/mfe-core";
 import { DirectionsCar, Search } from "@mui/icons-material";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
-import { useQuery } from "../../hooks/useQueryString";
-import { getMechPartsBodyProperties } from "../../server/services/mechPartsService";
-import { getSyncSetsById, getSyncSetsNotEnteredIndicatorCarsCount, getSyncSetsSaloons, updateSyncSetsSaloonIndicatorCar } from "../../server/services/syncSetsService";
-import type { ITabularResult } from "../../types/Common";
-import { ApiPermissions } from "../../types/permissions";
-import { columnHeaders } from "../../utils/columnHeaders";
-import { resultColumns, tabularRows, type IGridRow } from "../../utils/tabularUtility";
+import FormDialog from "../../../components/FormDialog";
+import { getMechPartsBodyProperties } from "../../../server/services/mechPartsService";
+import { getSyncSetsById, getSyncSetsNotEnteredIndicatorCarsCount, getSyncSetsSaloons, updateSyncSetsSaloonIndicatorCar } from "../../../server/services/syncSetsService";
+import type { ITabularResult } from "../../../types/Common";
+import { ApiPermissions } from "../../../types/permissions";
+import { columnHeaders } from "../../../utils/columnHeaders";
+import { resultColumns, tabularRows, type IGridRow } from "../../../utils/tabularUtility";
+import ActionBar from "../../../components/ActionBar";
 
 const PLANT_ID = 1;
 
@@ -38,14 +37,11 @@ const num = (row: IGridRow | null, ...keys: string[]) => {
 };
 
 /**
- * تعیین خودروی شاخص سالن‌های یک بحران سنکرون (frmCriticalPartSetIndicatorCars). بحران با ?id= باز می‌شود؛
+ * تعیین خودروی شاخص سالن‌های یک بحران سنکرون (frmCriticalPartSetIndicatorCars)، modal دکمه «بدنه (های) شاخص» فرم بحران سنکرون؛
  * برای هر سالن شماره بدنه شاخص وارد و پس از یافتن مشخصات بدنه با S_CriticalPartsSetSaloonUpdate ثبت می‌شود
  * (ثبت، بحران را فعال و تعداد بدنه‌های پس از خودروی شاخص را بازمحاسبه می‌کند).
  */
-export default function SyncIndicatorCars() {
-  const query = useQuery();
-  const setId = Number(query.get("id") ?? 0);
-  const navigate = useMFENavigate();
+export default function SyncIndicatorCarsDialog({ open, close, setId }: { open: boolean; close: (open: boolean) => void; setId: number }) {
   const canUpdate = useCan(ApiPermissions.syncSets.update);
   const [header, setHeader] = useState<ITabularResult | null>(null);
   const [saloons, setSaloons] = useState<ITabularResult | null>(null);
@@ -72,8 +68,8 @@ export default function SyncIndicatorCars() {
   }, [setId]);
 
   useEffect(() => {
-    void load();
-  }, [load]);
+    if (open) void load();
+  }, [open, load]);
 
   const rows = useMemo(() => tabularRows(saloons), [saloons]);
   const baseColumns = useMemo(() => resultColumns(saloons, columnHeaders), [saloons]);
@@ -130,21 +126,14 @@ export default function SyncIndicatorCars() {
     }
   };
 
-  if (!setId) {
-    return <IkcoAlert status="warning" severity="warning">بحران سنکرون مشخص نشده است؛ این صفحه از «مدیریت بحران‌های سنکرون» باز می‌شود.</IkcoAlert>;
-  }
-
   return (
+    <FormDialog open={open} close={close} title={`تعریف بدنه‌های شاخص موجود در سالن‌های مشترک اقلام بحرانی سنکرون — Id ${setId}`} maxWidth="lg">
     <IkcoStack spacing={2}>
-      <IkcoTypography variant="h6">{`تعیین خودروی شاخص سالن‌ها — بحران سنکرون شماره ${setId}`}</IkcoTypography>
       {headerRow && <IkcoAlert status="info" severity="info">{`ست: ${String(headerRow["SetDescF"] ?? headerRow["DescF"] ?? headerRow["Code"] ?? "-")}`}</IkcoAlert>}
       {missing !== null && missing > 0 && <IkcoAlert status="warning" severity="warning">{`برای ${missing} سالن خودروی شاخص تعیین نشده است؛ تا تعیین آن، محاسبه امکان تولید برای این سالن‌ها انجام نمی‌شود.`}</IkcoAlert>}
-      <IkcoCard>
-        <IkcoCardActions>
-          <IkcoButton onClick={() => navigate(`synchron/sets?id=${setId}`)}>بازگشت به بحران</IkcoButton>
+      <ActionBar>
           <IkcoButton onClick={() => void load()}>بازخوانی</IkcoButton>
-        </IkcoCardActions>
-      </IkcoCard>
+        </ActionBar>
 
       <IkcoDataGrid columns={columns} rows={rows} loading={loading} getRowId={(r) => r.__rowId} autoHeight />
 
@@ -167,5 +156,6 @@ export default function SyncIndicatorCars() {
         </IkcoDialogActions>
       </IkcoDialog>
     </IkcoStack>
+    </FormDialog>
   );
 }

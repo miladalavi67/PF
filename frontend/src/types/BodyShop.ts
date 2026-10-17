@@ -118,6 +118,10 @@ export const bodyCriticalsCreateProductsInputRules: Partial<Record<keyof IBodyCr
 export interface IBodyCriticalsDisableCriticalPartsInput {
   /** شناسه بحران‌ها */
   ids: number[];
+  /** نوع بحران (کلید رویدادنگاری)؛ همراه با دلیل ثبت می‌شود */
+  eventTypeId?: number;
+  /** دلیل حذف بحران؛ در فرم ویندوزی با پسوند «(حذف بحران)» در لاگ ثبت می‌شد */
+  reason?: string | null;
 }
 
 /** قواعد اعتبارسنجی IBodyCriticalsDisableCriticalPartsInput (برگرفته از ویژگی‌های اعتبارسنجی DTO در Backend) */

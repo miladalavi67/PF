@@ -1,39 +1,46 @@
 import {
-  IkcoAlert,
   IkcoButton,
-  IkcoCard,
-  IkcoCardActions,
-  IkcoCardContent,
   IkcoCheckbox,
+  IkcoChip,
   IkcoDataGrid,
   IkcoGrid,
+  IkcoIconButton,
   IkcoStack,
+  IkcoTextArea,
   IkcoTextField,
   IkcoTypography,
   type IkcoGridColDef,
 } from "@ikco/frontend-kit";
-import { PermissionGuard, useMFENavigate } from "@ikco/mfe-core";
-import { Add, Remove, Search } from "@mui/icons-material";
+import { PermissionGuard } from "@ikco/mfe-core";
+import { AddCircle, ArrowDownward, ArrowUpward, Cancel, FileUpload, History, Save, Search, Tag } from "@mui/icons-material";
 import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+import BodyInfoStrip, { bodyInfoCells } from "../../components/BodyInfoStrip";
+import SectionPanel from "../../components/SectionPanel";
+import TabularDialog from "../../components/TabularDialog";
 import { useQuery } from "../../hooks/useQueryString";
 import {
   createBodyCriticalsCriticalPart,
   createBodyCriticalsProducts,
   getBodyCriticalsBodyInfo,
   getBodyCriticalsCriticalPartInfo,
+  getBodyCriticalsEventLog,
   getBodyCriticalsPartDescription,
   getBodyCriticalsPartProducts,
   updateBodyCriticalsCriticalPart,
 } from "../../server/services/bodyCriticalsService";
 import { getBodyReportsCriticalPartProducts } from "../../server/services/bodyReportsService";
-import { ApiPermissions } from "../../types/permissions";
 import type { IBodyInfoRow, IPartProductRow } from "../../types/BodyShop";
 import { bodyCriticalsCreateCriticalPartInputRules, bodyCriticalsUpdateCriticalPartInputRules } from "../../types/BodyShop";
-import { resultColumns, tabularRows, type IGridRow } from "../../utils/tabularUtility";
-import { columnHeaders } from "../../utils/columnHeaders";
 import type { ITabularResult } from "../../types/Common";
+import { ApiPermissions } from "../../types/permissions";
+import { columnHeaders } from "../../utils/columnHeaders";
+import { resultColumns, tabularRows, type IGridRow } from "../../utils/tabularUtility";
+import BodyCriticalSearchDialog from "./dialogs/BodyCriticalSearchDialog";
+import BodyExcelImportDialog from "./dialogs/BodyExcelImportDialog";
+import BodyPreAssignCountDialog from "./dialogs/BodyPreAssignCountDialog";
+import ActionBar from "../../components/ActionBar";
 
 interface FormValues {
   bodyNumber: string;
@@ -74,16 +81,34 @@ const productColumns: IkcoGridColDef<IPartProductRow>[] = [
   { field: "quantity", headerName: "ضریب مصرف", width: 110, type: "number" },
 ];
 
+/** وضعیت‌های فرم ویندوزی (formState): عادی ← جدید ← بدنه معتبر ← قطعه معتبر */
+type Flow = "normal" | "create" | "body" | "part";
+
+const flowLabels: Record<Flow, string> = {
+  normal: "حالت عادی (برای شروع «جدید» را انتخاب کنید)",
+  create: "ثبت جدید: شماره بدنه را وارد کنید",
+  body: "بدنه تایید شد: شماره فنی را وارد کنید",
+  part: "قطعه تایید شد: محصولات و مشخصات را ثبت کنید",
+};
+
+interface Props {
+  /** شناسه بحران برای ویرایش؛ در غیر این صورت از پارامتر ?id= آدرس خوانده می‌شود */
+  editId?: number;
+  /** پس از ذخیره ویرایش (هنگامی که فرم داخل modal باز شده است) */
+  onDone?: () => void;
+}
+
 /**
- * ثبت و ویرایش بحران بدنه‌سازی (frmBodyCriticalParts). جریان: شماره بدنه ← اطلاعات و خط بدنه‌سازی؛ شماره فنی ← شرح و محصولات BOM
- * همان خط؛ انتخاب کلاس‌ها؛ ثبت (S_CreateCriticalParts_V3 و سپس S_CreateCritocalPartsProduct). در حالت ویرایش (?id=) فقط
- * مشخصات بحران قابل ویرایش است (S_Web_UpdateCriticalParts).
+ * ثبت بحران بدنه‌سازی (frmBodyCriticalParts). جریان: شماره بدنه ← مشخصات بدنه شاخص؛ شماره فنی ← شرح و محصولات BOM همان خط؛
+ * انتقال کلاس‌ها به «محصولات انتخاب‌شده» با فلش‌ها؛ ذخیره (S_CreateCriticalParts_V3 و سپس S_CreateCritocalPartsProduct).
+ * در حالت ویرایش فقط مشخصات بحران قابل ویرایش است (S_Web_UpdateCriticalParts). «ایجاد با اکسل»، «جستجوی اقلام بحرانی»، «لاگ» و
+ * «تعداد بدنه‌های پیش‌تخصیص‌شده» به صورت modal باز می‌شوند.
  */
-export default function BodyCriticalRegister() {
+export default function BodyCriticalRegister({ editId: editIdProp, onDone }: Props = {}) {
   const query = useQuery();
-  const editId = Number(query.get("id") ?? 0);
+  const [pickedId, setPickedId] = useState(0);
+  const editId = pickedId || editIdProp || Number(query.get("id") ?? 0);
   const isEdit = editId > 0;
-  const navigate = useMFENavigate();
   const { control, register, handleSubmit, reset, getValues, setValue, formState: { errors } } = useForm<FormValues>({ defaultValues: emptyForm });
 
   const [body, setBody] = useState<IBodyInfoRow | null>(null);
@@ -96,6 +121,14 @@ export default function BodyCriticalRegister() {
   const [loadingBody, setLoadingBody] = useState(false);
   const [loadingPart, setLoadingPart] = useState(false);
   const [saloonCode, setSaloonCode] = useState("");
+  const [dialog, setDialog] = useState<"excel" | "search" | "log" | "count" | null>(null);
+  const [flow, setFlow] = useState<Flow>("normal");
+  const [loadedPart, setLoadedPart] = useState("");
+  // در حالت ویرایش، فرم مستقیماً در وضعیت «قطعه معتبر» است (PartNoValidate)
+  const stage: Flow = isEdit ? "part" : flow;
+  const bodyOpen = stage === "create";
+  const partOpen = stage === "body" || stage === "part";
+  const productsOpen = stage === "part";
 
   useEffect(() => {
     if (!isEdit) return;
@@ -127,6 +160,18 @@ export default function BodyCriticalRegister() {
   const existingColumns = useMemo(() => resultColumns(existing, columnHeaders), [existing]);
   const existingRows: IGridRow[] = useMemo(() => tabularRows(existing), [existing]);
 
+  const clearForm = () => {
+    reset(emptyForm);
+    setBody(null);
+    setBom([]);
+    setChosen([]);
+    setExisting(null);
+    setSaloonCode("");
+    setPickedId(0);
+    setLoadedPart("");
+    setFlow("normal");
+  };
+
   const loadBody = async () => {
     const bodyNumber = getValues("bodyNumber").trim();
     if (!bodyNumber) return;
@@ -134,7 +179,8 @@ export default function BodyCriticalRegister() {
     try {
       const info = await getBodyCriticalsBodyInfo({ bodyNumber });
       if (!info || typeof info !== "object") {
-        setBody(null);
+        // مطابق uctBodyInfo_CompeleteBodyNo: بدنه نامعتبر = وضعیت Cancel (پاک‌سازی فرم)
+        clearForm();
         toast.error("بدنه یافت نشد یا به خط بدنه‌سازی آن دسترسی ندارید");
         return;
       }
@@ -142,6 +188,7 @@ export default function BodyCriticalRegister() {
       setBom([]);
       setChosen([]);
       setSaloonCode(info.saloonDescF ?? info.saloon ?? "");
+      setFlow("body");
     } finally {
       setLoadingBody(false);
     }
@@ -149,10 +196,7 @@ export default function BodyCriticalRegister() {
 
   const loadPart = async () => {
     const partNo = getValues("partNo").trim();
-    if (!partNo || !body?.b_VIN_BIWSiteID) {
-      toast.error("ابتدا بدنه را مشخص کنید");
-      return;
-    }
+    if (!partNo || !body?.b_VIN_BIWSiteID || !partOpen || partNo === loadedPart) return;
     setLoadingPart(true);
     try {
       const desc = await getBodyCriticalsPartDescription({ partNo });
@@ -162,9 +206,21 @@ export default function BodyCriticalRegister() {
       }
       setValue("partDesc", desc.slice(0, 100));
       const products = await getBodyCriticalsPartProducts({ partNo, biwSiteId: body.b_VIN_BIWSiteID });
-      if (products.items.length === 0) toast("موردی یافت نشد");
+      if (products.items.length === 0) {
+        // مطابق uctPartNo_txtPartNoKeyDown: بدون محصول، شماره فنی پاک و فرم به حالت «بدنه معتبر» برمی‌گردد
+        toast("موردی یافت نشد");
+        setValue("partNo", "");
+        setValue("partDesc", "");
+        setLoadedPart("");
+        setBom([]);
+        setChosen([]);
+        setFlow("body");
+        return;
+      }
       setBom(products.items);
       setChosen([]);
+      setLoadedPart(partNo);
+      setFlow("part");
     } finally {
       setLoadingPart(false);
     }
@@ -201,7 +257,8 @@ export default function BodyCriticalRegister() {
           letterNo: v.letterNo || null,
         });
         toast.success("ویرایش با موفقیت انجام شد");
-        navigate("body-shop/search");
+        onDone?.();
+        if (!editIdProp) clearForm();
         return;
       }
       if (!body || !body.b_VIN_BIWSiteID) {
@@ -231,152 +288,190 @@ export default function BodyCriticalRegister() {
         items: chosen.map((r) => ({ carClassId: r.carClassId, usageFactor: r.quantity })),
       });
       toast.success(created.message ?? "ثبت با موفقیت انجام شد");
-      reset(emptyForm);
-      setBody(null);
-      setBom([]);
-      setChosen([]);
+      clearForm();
     } finally {
       setSaving(false);
     }
   };
 
-  const size = { xl: 3, lg: 3, md: 4, sm: 6, xs: 12 };
   const rules = isEdit ? bodyCriticalsUpdateCriticalPartInputRules : bodyCriticalsCreateCriticalPartInputRules;
+  const cells = bodyInfoCells(body ? body : saloonCode ? { saloonDescF: saloonCode } : null);
 
   return (
     <IkcoStack spacing={2}>
-      <IkcoTypography variant="h6">{isEdit ? "ویرایش بحران بدنه‌سازی" : "ثبت بحران بدنه‌سازی"}</IkcoTypography>
+      <IkcoStack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
+        <IkcoTypography variant="h6">{isEdit ? "ویرایش بحران بدنه‌سازی" : "ثبت بحران"}</IkcoTypography>
+        <IkcoChip label={flowLabels[stage]} status={stage === "normal" ? "default" : stage === "part" ? "success" : "info"} size="small" />
+      </IkcoStack>
 
-      <IkcoCard>
-        <IkcoCardContent>
-          <IkcoGrid container spacing={2} alignItems="center">
-            <IkcoGrid size={size}>
-              <IkcoTextField label="شماره بدنه" disabled={isEdit} {...register("bodyNumber", { required: "شماره بدنه الزامی است", maxLength: { value: 8, message: "حداکثر ۸ کاراکتر" } })} error={!!errors.bodyNumber} helperText={errors.bodyNumber?.message} />
+      <SectionPanel title="مشخصات بدنه شاخص" disabled={!bodyOpen}>
+        <Controller
+          name="bodyNumber"
+          control={control}
+          rules={{ required: !isEdit ? "شماره بدنه الزامی است" : false, maxLength: { value: 8, message: "حداکثر ۸ کاراکتر" } }}
+          render={({ field }) => <BodyInfoStrip bodyNumber={field.value} onBodyNumberChange={field.onChange} onSearch={() => void loadBody()} cells={cells} disabled={!bodyOpen} loading={loadingBody} />}
+        />
+        {errors.bodyNumber && <IkcoTypography color="error">{errors.bodyNumber.message}</IkcoTypography>}
+        {body && (
+          <IkcoGrid container spacing={1}>
+            <IkcoGrid size={{ xs: 6, md: 3 }}>
+              <IkcoTextField label="تاریخ ثبت پیش تخصیص" value={body.stepDate ?? ""} disabled />
             </IkcoGrid>
-            {!isEdit && (
-              <IkcoGrid size={size}>
-                <IkcoButton variant="outlined" startIcon={<Search />} loading={loadingBody} onClick={loadBody}>
-                  دریافت اطلاعات بدنه
-                </IkcoButton>
-              </IkcoGrid>
-            )}
-            {(body || isEdit) && (
-              <IkcoGrid size={{ xs: 12, md: 8 }}>
-                <IkcoAlert status="info" severity="info">
-                  {body
-                    ? `سالن: ${body.saloonDescF ?? body.saloon ?? "-"} | مرحله: ${body.stepDescF ?? "-"} | ${body.stepDate ?? ""} ${body.stepTime ?? ""} | ${body.carAttribute ?? ""} | رنگ: ${body.color ?? "-"}`
-                    : `سالن: ${saloonCode || "-"}`}
-                </IkcoAlert>
-              </IkcoGrid>
-            )}
+            <IkcoGrid size={{ xs: 6, md: 3 }}>
+              <IkcoTextField label="سال ساخت بدنه" value={(body.carAttribute ?? "").slice(0, 4)} disabled />
+            </IkcoGrid>
           </IkcoGrid>
-        </IkcoCardContent>
-      </IkcoCard>
+        )}
+      </SectionPanel>
 
-      <IkcoCard>
-        <IkcoCardContent>
-          <IkcoGrid container spacing={2} alignItems="center">
-            <IkcoGrid size={size}>
-              <IkcoTextField label="شماره فنی" disabled={isEdit || (!body && !isEdit)} {...register("partNo", { ...bodyCriticalsCreateCriticalPartInputRules.partNo, required: "شماره فنی الزامی است" })} error={!!errors.partNo} helperText={errors.partNo?.message} />
-            </IkcoGrid>
-            {!isEdit && (
-              <IkcoGrid size={size}>
-                <IkcoButton variant="outlined" startIcon={<Search />} loading={loadingPart} disabled={!body} onClick={loadPart}>
-                  بررسی شماره فنی و دریافت محصولات
-                </IkcoButton>
-              </IkcoGrid>
-            )}
-            <IkcoGrid size={{ xs: 12, md: 6 }}>
-              <IkcoTextField label="شرح قطعه" disabled {...register("partDesc")} />
-            </IkcoGrid>
-            <IkcoGrid size={size}>
-              <IkcoTextField label="گروه قطعه" {...register("partGroup", { ...rules.partGroup, required: "گروه قطعه الزامی است" })} error={!!errors.partGroup} helperText={errors.partGroup?.message} />
-            </IkcoGrid>
-            <IkcoGrid size={size}>
-              <IkcoTextField label="موجودی گروهی" type="number" disabled={isEdit} {...register("totalStock", { required: !isEdit ? "موجودی را وارد کنید" : false, min: { value: 0, message: "نامعتبر" } })} error={!!errors.totalStock} helperText={errors.totalStock?.message} />
-            </IkcoGrid>
-            <IkcoGrid size={size}>
-              <IkcoTextField label="موجودی خام" type="number" {...register("rawStock", { required: "موجودی را وارد کنید", min: { value: 0, message: "نامعتبر" } })} error={!!errors.rawStock} helperText={errors.rawStock?.message} />
-            </IkcoGrid>
-            <IkcoGrid size={size}>
-              <IkcoTextField label="شماره فنی جایگزین" {...register("alterNativePartNo", rules.alterNativePartNo)} error={!!errors.alterNativePartNo} helperText={errors.alterNativePartNo?.message} />
-            </IkcoGrid>
-            <IkcoGrid size={size}>
-              <IkcoTextField label="توضیحات قطعه" {...register("criticalPartNote", rules.criticalPartNote)} error={!!errors.criticalPartNote} helperText={errors.criticalPartNote?.message} />
-            </IkcoGrid>
-            <IkcoGrid size={size}>
-              <IkcoTextField label="شماره نامه" {...register("letterNo", rules.letterNo)} error={!!errors.letterNo} helperText={errors.letterNo?.message} />
-            </IkcoGrid>
-            <IkcoGrid size={size}>
-              <IkcoTextField label="توضیحات وضعیت تولید" {...register("productionStateNote", rules.productionStateNote)} error={!!errors.productionStateNote} helperText={errors.productionStateNote?.message} />
-            </IkcoGrid>
-            {!isEdit && (
-              <IkcoGrid size={size}>
-                <Controller name="isOutOfSAP" control={control} render={({ field }) => <IkcoCheckbox label="خارج از SAP" checked={field.value} onChange={(_, c) => field.onChange(c)} />} />
-              </IkcoGrid>
-            )}
-          </IkcoGrid>
-        </IkcoCardContent>
-      </IkcoCard>
-
-      {!isEdit && (
-        <IkcoGrid container spacing={2}>
-          <IkcoGrid size={{ xs: 12, md: 6 }}>
-            <IkcoStack spacing={1}>
-              <IkcoTypography variant="subtitle1">محصولات مصرف‌کننده شماره فنی (BOM)</IkcoTypography>
-              <IkcoDataGrid
-                columns={productColumns}
-                rows={bom}
-                getRowId={(r) => r.rowNo}
-                checkboxSelection
-                disableRowSelectionOnClick
-                rowSelectionModel={bomSel}
-                onRowSelectionModelChange={(m) => setBomSel(m as number[])}
-                autoHeight
+      <SectionPanel title="قطعه کسری" disabled={!partOpen}>
+        <IkcoGrid container spacing={2} alignItems="flex-start">
+          <IkcoGrid size={{ xs: 12, sm: 6, md: 4 }}>
+            <IkcoStack direction="row" spacing={1} alignItems="flex-start">
+              <IkcoTextField
+                label="شماره فنی"
+                disabled={isEdit || !partOpen}
+                {...register("partNo", { ...bodyCriticalsCreateCriticalPartInputRules.partNo, required: "شماره فنی الزامی است" })}
+                error={!!errors.partNo}
+                helperText={errors.partNo?.message}
+                onBlur={() => !isEdit && void loadPart()}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !isEdit) void loadPart();
+                }}
               />
-              <IkcoButton variant="outlined" startIcon={<Add />} disabled={bomSel.length === 0} onClick={addProducts}>
-                افزودن محصولات انتخاب‌شده
-              </IkcoButton>
+              {!isEdit && (
+                <IkcoIconButton disabled={!partOpen} onClick={() => void loadPart()} aria-label="بررسی شماره فنی">
+                  <Search />
+                </IkcoIconButton>
+              )}
             </IkcoStack>
           </IkcoGrid>
-          <IkcoGrid size={{ xs: 12, md: 6 }}>
-            <IkcoStack spacing={1}>
-              <IkcoTypography variant="subtitle1">محصولات انتخاب‌شده برای بحران</IkcoTypography>
-              <IkcoDataGrid
-                columns={productColumns}
-                rows={chosen}
-                getRowId={(r) => r.rowNo}
-                checkboxSelection
-                disableRowSelectionOnClick
-                rowSelectionModel={chosenSel}
-                onRowSelectionModelChange={(m) => setChosenSel(m as number[])}
-                autoHeight
-              />
-              <IkcoButton variant="outlined" startIcon={<Remove />} disabled={chosenSel.length === 0} onClick={removeProducts}>
-                حذف از لیست انتخاب‌شده‌ها
-              </IkcoButton>
-            </IkcoStack>
+          <IkcoGrid size={{ xs: 12, sm: 6, md: 4 }}>
+            <IkcoTextField label="شرح شماره فنی" disabled {...register("partDesc")} />
+          </IkcoGrid>
+          <IkcoGrid size={{ xs: 12, sm: 4, md: 4 }}>
+            <IkcoTextField label="گروه قطعه" disabled={!partOpen} {...register("partGroup", { ...rules.partGroup, required: "گروه قطعه را وارد نمایید" })} error={!!errors.partGroup} helperText={errors.partGroup?.message} />
+          </IkcoGrid>
+          <IkcoGrid size={{ xs: 6, sm: 4, md: 3 }}>
+            <IkcoTextField label="موجودی قطعه" type="number" disabled={!partOpen} {...register("rawStock", { required: "موجودی قطعه را وارد نمایید", min: { value: 0, message: "نامعتبر" } })} error={!!errors.rawStock} helperText={errors.rawStock?.message} />
+          </IkcoGrid>
+          <IkcoGrid size={{ xs: 6, sm: 4, md: 3 }}>
+            <IkcoTextField label="موجودی مجموعه" type="number" disabled={isEdit || !partOpen} {...register("totalStock", { required: !isEdit ? "موجودی قطعه را وارد نمایید" : false, min: { value: 0, message: "نامعتبر" } })} error={!!errors.totalStock} helperText={errors.totalStock?.message} />
+          </IkcoGrid>
+          <IkcoGrid size={{ xs: 12, sm: 6, md: 3 }}>
+            <IkcoTextField label="شماره نامه" disabled={!productsOpen} {...register("letterNo", rules.letterNo)} error={!!errors.letterNo} helperText={errors.letterNo?.message} />
+          </IkcoGrid>
+          {!isEdit && (
+            <IkcoGrid size={{ xs: 12, sm: 6, md: 3 }}>
+              <Controller name="isOutOfSAP" control={control} render={({ field }) => <IkcoCheckbox label="خارج از SAP" disabled={!partOpen} checked={field.value} onChange={(_, c) => field.onChange(c)} />} />
+            </IkcoGrid>
+          )}
+          <IkcoGrid size={{ xs: 12, md: 4 }}>
+            <IkcoTextArea label="آلترناتیوها" rows={2} disabled={!partOpen} {...register("alterNativePartNo", rules.alterNativePartNo)} error={!!errors.alterNativePartNo} helperText={errors.alterNativePartNo?.message} />
+          </IkcoGrid>
+          <IkcoGrid size={{ xs: 12, md: 4 }}>
+            <IkcoTextArea label="توضیحات شماره فنی" rows={2} disabled={!partOpen} {...register("criticalPartNote", rules.criticalPartNote)} error={!!errors.criticalPartNote} helperText={errors.criticalPartNote?.message} />
+          </IkcoGrid>
+          <IkcoGrid size={{ xs: 12, md: 4 }}>
+            <IkcoTextArea label="توضیحات بحران" rows={2} disabled={!productsOpen} {...register("productionStateNote", rules.productionStateNote)} error={!!errors.productionStateNote} helperText={errors.productionStateNote?.message} />
           </IkcoGrid>
         </IkcoGrid>
+      </SectionPanel>
+
+      {!isEdit && (
+        <SectionPanel
+          title="محصولات"
+          disabled={!productsOpen}
+          aside={
+            <IkcoStack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+              <IkcoChip label={`BOM: ${bom.length}`} size="small" />
+              <IkcoChip label={`انتخاب‌شده: ${chosen.length}`} status={chosen.length > 0 ? "success" : "default"} size="small" />
+            </IkcoStack>
+          }
+        >
+          <IkcoTypography variant="subtitle2">محصولات مرتبط در BOM</IkcoTypography>
+          <IkcoDataGrid
+            columns={productColumns}
+            rows={bom}
+            loading={loadingPart}
+            getRowId={(r) => r.rowNo}
+            checkboxSelection
+            disableRowSelectionOnClick
+            rowSelectionModel={bomSel}
+            onRowSelectionModelChange={(m) => setBomSel(m as number[])}
+            autoHeight
+          />
+          <IkcoStack direction="row" spacing={1} justifyContent="center" flexWrap="wrap" useFlexGap>
+            <IkcoButton variant="contained" startIcon={<ArrowDownward />} disabled={!productsOpen || bomSel.length === 0} onClick={addProducts}>
+              افزودن به انتخاب‌شده‌ها
+            </IkcoButton>
+            <IkcoButton variant="outlined" color="error" startIcon={<ArrowUpward />} disabled={!productsOpen || chosenSel.length === 0} onClick={removeProducts}>
+              بازگرداندن به BOM
+            </IkcoButton>
+          </IkcoStack>
+          <IkcoTypography variant="subtitle2">محصولات انتخاب شده</IkcoTypography>
+          <IkcoDataGrid
+            columns={productColumns}
+            rows={chosen}
+            getRowId={(r) => r.rowNo}
+            checkboxSelection
+            disableRowSelectionOnClick
+            rowSelectionModel={chosenSel}
+            onRowSelectionModelChange={(m) => setChosenSel(m as number[])}
+            autoHeight
+          />
+        </SectionPanel>
       )}
 
       {isEdit && existing && (
-        <IkcoStack spacing={1}>
-          <IkcoTypography variant="subtitle1">محصولات ثبت‌شده بحران</IkcoTypography>
+        <SectionPanel title="محصولات ثبت‌شده بحران">
           <IkcoDataGrid columns={existingColumns} rows={existingRows} getRowId={(r) => r.__rowId} autoHeight />
-        </IkcoStack>
+        </SectionPanel>
       )}
 
-      <IkcoCard>
-        <IkcoCardActions>
-          <PermissionGuard can={isEdit ? ApiPermissions.bodyCriticals.update : ApiPermissions.bodyCriticals.create} fallback={<IkcoTypography color="error">شما به این عملیات دسترسی ندارید.</IkcoTypography>}>
-            <IkcoButton variant="contained" loading={saving} onClick={handleSubmit(onSubmit)}>
-              {isEdit ? "ذخیره ویرایش" : "ثبت بحران"}
+      <ActionBar>
+        <IkcoButton startIcon={<AddCircle />} disabled={stage !== "normal"} onClick={() => setFlow("create")}>
+          جدید
+        </IkcoButton>
+        {!isEdit && (
+          <PermissionGuard can={ApiPermissions.bodyCriticals.create}>
+            <IkcoButton startIcon={<FileUpload />} disabled={stage !== "normal"} onClick={() => setDialog("excel")}>
+              ایجاد با اکسل
             </IkcoButton>
           </PermissionGuard>
-          <IkcoButton onClick={() => navigate("body-shop/search")}>جستجوی اقلام بحرانی</IkcoButton>
-        </IkcoCardActions>
-      </IkcoCard>
+        )}
+        <PermissionGuard can={isEdit ? ApiPermissions.bodyCriticals.update : ApiPermissions.bodyCriticals.create} fallback={<IkcoTypography color="error">شما به این عملیات دسترسی ندارید.</IkcoTypography>}>
+          <IkcoButton variant="contained" startIcon={<Save />} loading={saving} disabled={stage !== "part"} onClick={handleSubmit(onSubmit)}>
+            ذخیره
+          </IkcoButton>
+        </PermissionGuard>
+        {!editIdProp && (
+          <IkcoButton startIcon={<Search />} disabled={stage !== "normal"} onClick={() => setDialog("search")}>
+            جستجوی اقلام بحرانی
+          </IkcoButton>
+        )}
+        <IkcoButton startIcon={<History />} disabled={!isEdit} onClick={() => setDialog("log")}>
+          لاگ
+        </IkcoButton>
+        <IkcoButton startIcon={<Tag />} onClick={() => setDialog("count")}>
+          تعداد بدنه‌های پیش تخصیص شده
+        </IkcoButton>
+        <IkcoButton startIcon={<Cancel />} disabled={stage === "normal"} onClick={() => (editIdProp ? onDone?.() : clearForm())}>
+          انصراف
+        </IkcoButton>
+      </ActionBar>
+
+      <BodyExcelImportDialog open={dialog === "excel"} close={() => setDialog(null)} defaultBiwSiteId={body?.b_VIN_BIWSiteID} />
+      <BodyCriticalSearchDialog
+        open={dialog === "search"}
+        close={() => setDialog(null)}
+        onPick={(id) => {
+          setPickedId(id);
+          setDialog(null);
+        }}
+      />
+      <BodyPreAssignCountDialog open={dialog === "count"} close={() => setDialog(null)} initialBodyNumber={getValues("bodyNumber")} />
+      <TabularDialog open={dialog === "log"} close={() => setDialog(null)} title="گزارش رویدادها" load={() => getBodyCriticalsEventLog({ eventTypeId: 0, changedRecordId: editId })} />
     </IkcoStack>
   );
 }

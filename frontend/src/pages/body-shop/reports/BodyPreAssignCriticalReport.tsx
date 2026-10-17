@@ -1,27 +1,11 @@
-import ReportPage, { type IReportFilter } from "../../../components/ReportPage";
+import DateOrPartReport from "../../../components/DateOrPartReport";
 import { getBodyReportsPreAssignCriticalBodies } from "../../../server/services/bodyReportsService";
 import { ApiPermissions } from "../../../types/permissions";
-import { bodyReportsGetPreAssignCriticalBodiesInputRules, type IBodyReportsGetPreAssignCriticalBodiesInput } from "../../../types/BodyShop";
-
-const filters: IReportFilter[] = [
-  { name: "fromDate", label: "از تاریخ", type: "date" },
-  { name: "toDate", label: "تا تاریخ", type: "date" },
-  { name: "partNo", label: "شماره فنی", type: "text" },
-];
 
 /**
- * بدنه‌های پیش‌تخصیص بحرانی.
- * Backend: GET /api/production-feasibility/body-shop/reports/pre-assign-critical-bodies (PF.S_PreAssignCriticalBody_SelectAll)، دسترسی bodyshop.reports.preassigncritical.
- * فرم سامانه ویندوزی: frmRPTPreAssignCriticalBody.
+ * گزارش پیش تخصیص بدنه‌های بحرانی (frmRPTPreAssignCriticalBody).
+ * Backend: POST /api/production-feasibility/body-shop/reports/pre-assign-critical-bodies، دسترسی bodyshop.reports.preassigncritical.
  */
 export default function BodyPreAssignCriticalReport() {
-  return (
-    <ReportPage<IBodyReportsGetPreAssignCriticalBodiesInput>
-      title="بدنه‌های پیش‌تخصیص بحرانی"
-      permission={ApiPermissions.bodyReports.preassigncritical}
-      filters={filters}
-      run={getBodyReportsPreAssignCriticalBodies}
-      rules={bodyReportsGetPreAssignCriticalBodiesInputRules}
-    />
-  );
+  return <DateOrPartReport title="گزارش پیش تخصیص بدنه‌های بحرانی" listTitle="لیست بدنه ها" permission={ApiPermissions.bodyReports.preassigncritical} run={getBodyReportsPreAssignCriticalBodies} />;
 }

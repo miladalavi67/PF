@@ -27,6 +27,7 @@ import type { ITabularResult } from "../../types/Common";
 import { ApiPermissions } from "../../types/permissions";
 import { columnHeaders } from "../../utils/columnHeaders";
 import { resultColumns, tabularRows } from "../../utils/tabularUtility";
+import ActionBar from "../../components/ActionBar";
 
 interface Option {
   id: number;
@@ -73,6 +74,8 @@ export default function UserAccessManagement() {
   const [loading, setLoading] = useState(false);
   const [busy, setBusy] = useState(false);
   const [confirm, setConfirm] = useState(false);
+  // grpDataEntry.Visible فرم ویندوزی: پنل ثبت فقط پس از «افزودن» نمایان است
+  const [adding, setAdding] = useState(false);
 
   const rows = useMemo(() => tabularRows(access), [access]);
   const columns = useMemo(() => resultColumns(access, columnHeaders), [access]);
@@ -120,6 +123,7 @@ export default function UserAccessManagement() {
       await insertUserAccess({ items });
       toast.success(`${items.length} دسترسی ثبت شد`);
       setUserIds([]);
+      setAdding(false);
       await loadAccess();
     } finally {
       setBusy(false);
@@ -143,6 +147,7 @@ export default function UserAccessManagement() {
   return (
     <IkcoStack spacing={2}>
       <IkcoTypography variant="h6">دسترسی کاربران به خطوط بدنه‌سازی</IkcoTypography>
+      {adding && (
       <PermissionGuard can={ApiPermissions.userAccess.create}>
         <IkcoCard>
           <IkcoCardContent>
@@ -185,21 +190,24 @@ export default function UserAccessManagement() {
           </IkcoCardContent>
           <IkcoCardActions>
             <IkcoButton variant="contained" loading={busy} onClick={() => void save()}>ثبت دسترسی</IkcoButton>
+            <IkcoButton disabled={busy} onClick={() => setAdding(false)}>انصراف</IkcoButton>
           </IkcoCardActions>
         </IkcoCard>
       </PermissionGuard>
+      )}
 
-      <IkcoCard>
-        <IkcoCardActions>
-          <IkcoButton onClick={() => void loadAccess()}>بازخوانی</IkcoButton>
+      <ActionBar>
+          <PermissionGuard can={ApiPermissions.userAccess.create}>
+            <IkcoButton variant="contained" disabled={adding} onClick={() => setAdding(true)}>افزودن</IkcoButton>
+          </PermissionGuard>
+          <IkcoButton disabled={adding} onClick={() => void loadAccess()}>بازخوانی</IkcoButton>
           {canDelete && (
-            <IkcoButton color="error" disabled={selection.length === 0} onClick={() => setConfirm(true)}>
+            <IkcoButton color="error" disabled={adding || selection.length === 0} onClick={() => setConfirm(true)}>
               {`حذف انتخاب‌شده‌ها (${selection.length})`}
             </IkcoButton>
           )}
           <ExcelExportButton fileName="دسترسی کاربران به خطوط" columns={columns} rows={rows as unknown as Record<string, unknown>[]} />
-        </IkcoCardActions>
-      </IkcoCard>
+        </ActionBar>
 
       <IkcoDataGrid
         columns={columns}

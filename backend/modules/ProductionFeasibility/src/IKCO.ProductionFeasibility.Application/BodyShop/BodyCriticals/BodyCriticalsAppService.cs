@@ -1,4 +1,4 @@
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using IKCO.ProductionFeasibility.Common;
 using IKCO.ProductionFeasibility.Common.ValueObjects;
 using IKCO.ProductionFeasibility.Exceptions;
@@ -59,6 +59,14 @@ public partial class BodyCriticalsAppService : PfAppService, IBodyCriticalsAppSe
     public async Task<GlobalResultDto> DisableCriticalPartsAsync(BodyCriticalsDisableCriticalPartsInput input)
     {
         var userId = await _currentUser.GetIdAsync();
+        if (!string.IsNullOrWhiteSpace(input.Reason))
+        {
+            foreach (var id in input.Ids)
+            {
+                await _repository.InsertDisableReasonAsync(input.EventTypeId, id, input.Reason.Trim() + " (حذف بحران)", userId);
+            }
+        }
+
         var result = await _repository.DisableCriticalPartsAsync(new IdList(input.Ids).ToCommaSeparated(), userId);
         return EnsureSuccess(result, "غیرفعال‌سازی بحران‌های بدنه‌سازی", r => r > 0);
     }

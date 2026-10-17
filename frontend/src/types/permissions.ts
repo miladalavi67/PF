@@ -97,45 +97,18 @@ export const ApiPermissions = {
 
 /** کلیدهای UI منو (PfPermissionTree.Ui) — مقادیر مجاز permissionKey در mfe-manifest.ts */
 export const uiPermissionKeys = [
-  "bodyshop.menu.register", // ثبت بحران بدنه‌سازی
+  "bodyshop.menu.register", // ثبت بحران
   "bodyshop.menu.search", // جستجوی اقلام بحرانی
   "bodyshop.menu.tracking", // گزارش ردیابی تغییرات اقلام بحرانی
   "bodyshop.menu.criticalreport", // گزارش اقلام بحرانی
-  "bodyshop.menu.licensetracking", // ردیابی پارامترهای بحرانی
-  "bodyshop.menu.productsofsites", // محصولات به تفکیک خطوط بدنه‌سازی
-  "bodyshop.menu.preassigncount", // تعداد بدنه‌های پیش‌تخصیص‌شده
-  "bodyshop.menu.preassigncritical", // بدنه‌های پیش‌تخصیص بحرانی
-  "bodyshop.menu.conflicts", // مغایرت پیش‌تخصیص بدنه‌های بحرانی
-  "bodyshop.menu.eventlog", // گزارش رویدادها
-  "bodyshop.menu.sap", // قطعات ناموفق در انتقال از SAP
-  "mechanical.menu.register", // ثبت بحران مکانیکی
-  "mechanical.menu.search", // جستجوی اقلام بحرانی (مکانیکی و سنکرون)
-  "mechanical.menu.exceptions", // استثناهای محصولات بحران
-  "mechanical.menu.reasons", // دلایل عدم امکان تولید
-  "mechanical.menu.contrast", // مغایرت زیرکلاس‌ها با SAP
-  "mechanical.menu.arrived", // اقلام بحرانی وارد شده به شرکت
-  "mechanical.menu.productionpossibility", // گزارش امکان تولید
-  "mechanical.menu.productionpossibilitylicense", // گزارش امکان تولید با مجوز مصرف‌شده و باقی‌مانده
-  "mechanical.menu.productionpossibilitytrimshop", // امکان تولید به تفکیک سالن مونتاژ
+  "bodyshop.menu.preassigncritical", // گزارش پیش تخصیص بدنه‌های بحرانی
+  "bodyshop.menu.conflicts", // گزارش مغایرت پیش تخصیص بدنه‌های بحرانی
+  "bodyshop.menu.productsofsites", // گزارش محصولات به تفکیک خطوط بدنه‌سازی
+  "mechanical.menu.register", // تعریف اقلام بحرانی قطعات مکانیکی
+  "mechanical.menu.search", // جستجوی اقلام بحرانی
+  "mechanical.menu.productionpossibility", // گزارش ردیابی اقلام بحرانی
   "mechanical.menu.general", // گزارش جامع اقلام بحرانی
-  "mechanical.menu.incoming", // بدنه‌های وارد شده به خط به تفکیک بحران
-  "mechanical.menu.incomingsummary", // خلاصه بدنه‌های وارد شده به خط
-  "mechanical.menu.licensetracking", // ردیابی مجوزهای تولید با کسری
-  "mechanical.menu.licensecriticals", // بحران‌های دارای مجوز تولید با کسری
-  "mechanical.menu.usedlicensebodies", // بدنه‌های مرتبط با مجوز مصرف‌شده
-  "mechanical.menu.licenselog", // تاریخچه مجوزهای یک بحران
-  "mechanical.menu.exceptionparts", // شماره فنی‌های دارای استثنا
-  "mechanical.menu.exceptionlog", // تاریخچه مجوزهای استثنا
-  "mechanical.menu.stocklog", // تاریخچه موجودی اقلام بحرانی
-  "mechanical.menu.sapcritical", // لاگ انتقال اقلام بحرانی از SAP
-  "mechanical.menu.sapfailed", // قطعات ناموفق در انتقال از SAP
-  "mechanical.menu.asn", // گزارش ASN
-  "mechanical.menu.trimconflicts", // دلایل عدم امکان ورود خودرو به مونتاژ
-  "mechanical.menu.trimbodycount", // تعداد بدنه‌های ورودی به مونتاژ
-  "mechanical.menu.trimcriticalbodies", // بدنه‌های بحرانی ورودی به مونتاژ
-  "synchron.menu.basis", // تعریف مبنای ست‌ها
-  "synchron.menu.sets", // ثبت و ویرایش بحران سنکرون
-  "synchron.menu.indicatorcars", // تعیین خودروی شاخص سالن‌ها
-  "synchron.menu.productionpossibility", // گزارش امکان تولید سنکرون
+  "mechanical.menu.asn", // گزارش ASN های در راه
+  "synchron.menu.sets", // تعریف اقلام بحرانی سنکرون
   "usermanagement.menu.access", // مدیریت کاربران
 ] as const;

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using IKCO.ProductionFeasibility.Common;
@@ -28,6 +28,9 @@ public partial interface IBodyCriticalsRepository
 
     /// <summary>غیرفعال‌سازی بحران‌های بدنه‌سازی (frmBodyCriticalSearch (غیرفعال‌سازی)) — <c>PF.S_DisableCriticalParts</c></summary>
     Task<GlobalResultDto?> DisableCriticalPartsAsync(string idString, int userId);
+
+    /// <summary>ثبت دلیل حذف بحران در لاگ رویدادها — <c>PF.InsertEventLog</c> (AttributeId = 4)</summary>
+    Task InsertDisableReasonAsync(int eventTypeId, int criticalPartId, string note, int userId);
 
     /// <summary>اطلاعات یک بحران بدنه‌سازی برای ویرایش (BL_BodyCritical.CriticalPartsInfo (frmBodyCriticalParts در حالت ویرایش)) — <c>PF.S_CriticalPartsInfo</c></summary>
     Task<TabularResult> GetCriticalPartInfoAsync(int criticalPartsId);

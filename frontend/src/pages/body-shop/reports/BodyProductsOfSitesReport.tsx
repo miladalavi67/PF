@@ -14,7 +14,7 @@ const filters: IReportFilter[] = [
 export default function BodyProductsOfSitesReport() {
   return (
     <ReportPage<Record<string, never>>
-      title="محصولات به تفکیک خطوط بدنه‌سازی"
+      title="گزارش محصولات به تفکیک خطوط بدنه‌سازی"
       permission={ApiPermissions.bodyReports.productsofsites}
       filters={filters}
       run={() => getBodyReportsProductsOfSites()}

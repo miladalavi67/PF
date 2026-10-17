@@ -14,8 +14,8 @@ import {
   IkcoTypography,
   type IkcoGridColDef,
 } from "@ikco/frontend-kit";
-import { PermissionGuard, useCan, useMFENavigate } from "@ikco/mfe-core";
-import { Add, Delete } from "@mui/icons-material";
+import { PermissionGuard, useCan } from "@ikco/mfe-core";
+import { Add, AddCircle, Cancel, Check, DirectionsCar, Delete, History, PlaylistAddCheck, Search } from "@mui/icons-material";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import ConfirmDialog from "../../components/ConfirmDialog";
@@ -23,6 +23,7 @@ import LookupAutocomplete from "../../components/LookupAutocomplete";
 import LookupMultiSelect from "../../components/LookupMultiSelect";
 import TabularDialog from "../../components/TabularDialog";
 import { useQuery } from "../../hooks/useQueryString";
+import { getMechLicensesTrackingList } from "../../server/services/mechLicensesService";
 import { getMechPartsPartDescription } from "../../server/services/mechPartsService";
 import { getSyncBasisByStatus } from "../../server/services/syncBasisService";
 import {
@@ -43,6 +44,10 @@ import { syncSetsCreateHeaderInputRules } from "../../types/Synchron";
 import { ApiPermissions } from "../../types/permissions";
 import { columnHeaders } from "../../utils/columnHeaders";
 import { resultColumns, tabularRows } from "../../utils/tabularUtility";
+import MechCriticalSearchDialog from "../mechanical/dialogs/MechCriticalSearchDialog";
+import MechLicenseChangeDialog from "../mechanical/dialogs/MechLicenseChangeDialog";
+import SyncIndicatorCarsDialog from "./dialogs/SyncIndicatorCarsDialog";
+import ActionBar from "../../components/ActionBar";
 
 const size = { xl: 3, lg: 3, md: 4, sm: 6, xs: 12 };
 const ALL = -1;
@@ -81,11 +86,19 @@ const Grid = ({ result, title }: { result: ITabularResult | null; title: string 
  * (قطعات، رنگ‌ها، سالن‌ها و محصولات) در یک تراکنش سمت سرور. اگر ثبت ترکیب شکست بخورد، سرآیند تازه‌ساخته حذف منطقی می‌شود.
  * ویرایش (?id=): تغییر واحد/موجودی/توضیحات/وضعیت، افزودن محصول و مشاهده ترکیب ثبت‌شده.
  */
-export default function SyncSetManagement() {
+interface Props {
+  /** شناسه بحران سنکرون برای ویرایش؛ در غیر این صورت از پارامتر ?id= آدرس خوانده می‌شود */
+  editId?: number;
+  /** پس از ذخیره/حذف (هنگامی که فرم داخل modal باز شده است) */
+  onDone?: () => void;
+}
+
+export default function SyncSetManagement({ editId: editIdProp, onDone }: Props = {}) {
   const query = useQuery();
-  const editId = Number(query.get("id") ?? 0);
+  const [pickedId, setPickedId] = useState<number | null>(null);
+  const editId = pickedId ?? editIdProp ?? Number(query.get("id") ?? 0);
   const isEdit = editId > 0;
-  const navigate = useMFENavigate();
+  const [dialog, setDialog] = useState<"search" | "indicator" | "license" | "log" | null>(null);
   const canDelete = useCan(ApiPermissions.syncSets.delete);
   const canIndicator = useCan(ApiPermissions.syncSets.update);
 
@@ -234,6 +247,31 @@ export default function SyncSetManagement() {
     },
   ];
 
+  const clearForm = () => {
+    setPickedId(editIdProp ? null : 0);
+    setBasisId(null);
+    setDeptId(null);
+    setColorCode("");
+    setColorId(null);
+    setTrimId(null);
+    setToodooziId(null);
+    setOptionId(null);
+    setStock("0");
+    setNote("");
+    setStatus(1);
+    setParts([]);
+    setPartNo("");
+    setPartDesc({});
+    setColorIds([]);
+    setSaloonIds([]);
+    setDraft(emptyDraft);
+    setProducts([]);
+    setSavedParts(null);
+    setSavedColors(null);
+    setSavedSaloons(null);
+    setSavedProducts(null);
+  };
+
   const create = async () => {
     if (!basisId || !deptId) {
       toast.error("مبنای ست و واحد مسئول را انتخاب کنید");
@@ -268,7 +306,8 @@ export default function SyncSetManagement() {
       });
       await saveSyncSetsComposition(id, { parts, colorIds, saloonIds, products });
       toast.success("بحران سنکرون ثبت شد");
-      navigate(`synchron/sets?id=${id}`);
+      setPickedId(id);
+      onDone?.();
     } catch (e) {
       if (id > 0) {
         try {
@@ -299,7 +338,9 @@ export default function SyncSetManagement() {
     try {
       await deleteSyncSets(editId);
       toast.success("بحران حذف شد");
-      navigate("mechanical/search");
+      setConfirmDelete(false);
+      clearForm();
+      onDone?.();
     } finally {
       setBusy(false);
     }
@@ -348,8 +389,6 @@ export default function SyncSetManagement() {
             <PermissionGuard can={ApiPermissions.syncSets.update}>
               <IkcoButton variant="contained" loading={busy} onClick={() => void update()}>ذخیره سرآیند</IkcoButton>
             </PermissionGuard>
-            {canIndicator && <IkcoButton onClick={() => navigate(`synchron/indicator-cars?id=${editId}`)}>تعیین خودروی شاخص سالن‌ها</IkcoButton>}
-            {canIndicator && <IkcoButton onClick={() => navigate(`mechanical/license-change?type=1&id=${editId}`)}>تغییر شرایط تولید</IkcoButton>}
             {canDelete && <IkcoButton color="error" onClick={() => setConfirmDelete(true)}>حذف بحران</IkcoButton>}
           </IkcoCardActions>
         )}
@@ -360,10 +399,14 @@ export default function SyncSetManagement() {
           <IkcoCardContent>
             <IkcoStack spacing={2}>
               <IkcoTypography variant="subtitle1">قطعات ست</IkcoTypography>
-              <IkcoStack direction="row" spacing={1} alignItems="center">
-                <IkcoTextField label="شماره فنی" value={partNo} onChange={(e) => setPartNo(e.target.value)} slotProps={{ htmlInput: { maxLength: 20 } }} />
-                <IkcoButton startIcon={<Add />} loading={busy} onClick={() => void addPart()}>افزودن قطعه</IkcoButton>
-              </IkcoStack>
+              <IkcoGrid container spacing={1} alignItems="center">
+                <IkcoGrid size={{ xs: 12, sm: 6, md: 4 }}>
+                  <IkcoTextField label="شماره فنی" value={partNo} onChange={(e) => setPartNo(e.target.value)} slotProps={{ htmlInput: { maxLength: 20 } }} />
+                </IkcoGrid>
+                <IkcoGrid size="auto">
+                  <IkcoButton variant="outlined" startIcon={<Add />} loading={busy} onClick={() => void addPart()}>افزودن قطعه</IkcoButton>
+                </IkcoGrid>
+              </IkcoGrid>
               {parts.map((p) => (
                 <IkcoStack key={p.partNo} direction="row" spacing={1} alignItems="center">
                   <IkcoTypography variant="body2">{`${p.partNo} — ${partDesc[p.partNo] ?? ""}`}</IkcoTypography>
@@ -414,7 +457,6 @@ export default function SyncSetManagement() {
           {!isEdit && (
             <IkcoCardActions>
               <IkcoButton variant="contained" loading={busy} onClick={() => void create()}>ثبت بحران سنکرون</IkcoButton>
-              <IkcoButton onClick={() => navigate("mechanical/search")}>انصراف</IkcoButton>
             </IkcoCardActions>
           )}
         </IkcoCard>
@@ -431,6 +473,30 @@ export default function SyncSetManagement() {
         </IkcoStack>
       )}
 
+      <ActionBar>
+          <IkcoButton startIcon={<AddCircle />} onClick={clearForm}>جدید</IkcoButton>
+          <PermissionGuard can={isEdit ? ApiPermissions.syncSets.update : ApiPermissions.syncSets.create}>
+            <IkcoButton variant="contained" startIcon={<Check />} loading={busy} onClick={() => void (isEdit ? update() : create())}>ثبت</IkcoButton>
+          </PermissionGuard>
+          <IkcoButton startIcon={<Cancel />} onClick={clearForm}>انصراف</IkcoButton>
+          {!editIdProp && <IkcoButton startIcon={<Search />} onClick={() => setDialog("search")}>جستجو</IkcoButton>}
+          {canIndicator && <IkcoButton startIcon={<PlaylistAddCheck />} disabled={!isEdit} onClick={() => setDialog("license")}>تغییر در شرایط تولید</IkcoButton>}
+          <IkcoButton startIcon={<History />} disabled={!isEdit} onClick={() => setDialog("log")}>Log</IkcoButton>
+          {canIndicator && <IkcoButton startIcon={<DirectionsCar />} disabled={!isEdit} onClick={() => setDialog("indicator")}>بدنه (های) شاخص</IkcoButton>}
+        </ActionBar>
+
+      <MechCriticalSearchDialog
+        open={dialog === "search"}
+        close={() => setDialog(null)}
+        kind={1}
+        onPick={(id) => {
+          setPickedId(id);
+          setDialog(null);
+        }}
+      />
+      <SyncIndicatorCarsDialog open={dialog === "indicator"} close={() => setDialog(null)} setId={editId} />
+      <MechLicenseChangeDialog open={dialog === "license"} close={() => setDialog(null)} criticalPartTypeId={1} criticalPartId={editId} />
+      <TabularDialog open={dialog === "log"} close={() => setDialog(null)} title="Log" load={() => getMechLicensesTrackingList({ criticalPartTypeId: 1, criticalPartId: editId })} />
       <TabularDialog open={showProducts} close={() => setShowProducts(false)} title="محصولات بحران سنکرون" load={() => getSyncSetsProductDetails(editId)} />
       <ConfirmDialog open={confirmDelete} close={() => setConfirmDelete(false)} title="حذف بحران" message="این بحران سنکرون حذف منطقی شود؟" confirmText="حذف" loading={busy} onConfirm={remove} />
     </IkcoStack>

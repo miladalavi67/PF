@@ -14,43 +14,15 @@ import BodyCriticalRegister from "./pages/body-shop/BodyCriticalRegister";
 import BodyCriticalSearch from "./pages/body-shop/BodyCriticalSearch";
 import BodyTrackingReport from "./pages/body-shop/reports/BodyTrackingReport";
 import BodyCriticalPartsReport from "./pages/body-shop/reports/BodyCriticalPartsReport";
-import BodyLicenseTrackingReport from "./pages/body-shop/reports/BodyLicenseTrackingReport";
-import BodyProductsOfSitesReport from "./pages/body-shop/reports/BodyProductsOfSitesReport";
-import BodyPreAssignCountReport from "./pages/body-shop/reports/BodyPreAssignCountReport";
 import BodyPreAssignCriticalReport from "./pages/body-shop/reports/BodyPreAssignCriticalReport";
 import BodyConflictsReport from "./pages/body-shop/reports/BodyConflictsReport";
-import BodyEventLogReport from "./pages/body-shop/reports/BodyEventLogReport";
-import BodySapFailedTransfersReport from "./pages/body-shop/reports/BodySapFailedTransfersReport";
+import BodyProductsOfSitesReport from "./pages/body-shop/reports/BodyProductsOfSitesReport";
 import MechCriticalRegister from "./pages/mechanical/MechCriticalRegister";
 import MechCriticalSearch from "./pages/mechanical/MechCriticalSearch";
-import MechExceptions from "./pages/mechanical/MechExceptions";
-import MechNotPossibleReasons from "./pages/mechanical/MechNotPossibleReasons";
-import MechContrastOfSubClasses from "./pages/mechanical/MechContrastOfSubClasses";
-import MechReceivedPartsReport from "./pages/mechanical/reports/MechReceivedPartsReport";
-import MechLicenseChange from "./pages/mechanical/MechLicenseChange";
 import MechProductionPossibilityReport from "./pages/mechanical/reports/MechProductionPossibilityReport";
-import MechProductionPossibilityWithLicenseReport from "./pages/mechanical/reports/MechProductionPossibilityWithLicenseReport";
-import MechProductionPossibilityByTrimShopReport from "./pages/mechanical/reports/MechProductionPossibilityByTrimShopReport";
 import MechGeneralReport from "./pages/mechanical/reports/MechGeneralReport";
-import MechIncomingBodiesReport from "./pages/mechanical/reports/MechIncomingBodiesReport";
-import MechIncomingBodiesSummaryReport from "./pages/mechanical/reports/MechIncomingBodiesSummaryReport";
-import MechLicenseTrackingReport from "./pages/mechanical/reports/MechLicenseTrackingReport";
-import MechLicenseTrackingCriticalsReport from "./pages/mechanical/reports/MechLicenseTrackingCriticalsReport";
-import MechUsedLicenseBodiesReport from "./pages/mechanical/reports/MechUsedLicenseBodiesReport";
-import MechLicenseLogReport from "./pages/mechanical/reports/MechLicenseLogReport";
-import MechExceptionPartNumbersReport from "./pages/mechanical/reports/MechExceptionPartNumbersReport";
-import MechExceptionLicenseLogReport from "./pages/mechanical/reports/MechExceptionLicenseLogReport";
-import MechStockLogReport from "./pages/mechanical/reports/MechStockLogReport";
-import MechSapCriticalLogReport from "./pages/mechanical/reports/MechSapCriticalLogReport";
-import MechSapFailedTransfersReport from "./pages/mechanical/reports/MechSapFailedTransfersReport";
 import MechAsnReport from "./pages/mechanical/reports/MechAsnReport";
-import MechTrimInConflictsReport from "./pages/mechanical/reports/MechTrimInConflictsReport";
-import MechTrimShopBodyCountReport from "./pages/mechanical/reports/MechTrimShopBodyCountReport";
-import MechTrimShopCriticalBodiesReport from "./pages/mechanical/reports/MechTrimShopCriticalBodiesReport";
-import SyncBasisManagement from "./pages/synchron/SyncBasisManagement";
 import SyncSetManagement from "./pages/synchron/SyncSetManagement";
-import SyncIndicatorCars from "./pages/synchron/SyncIndicatorCars";
-import SyncProductionPossibilityReport from "./pages/synchron/reports/SyncProductionPossibilityReport";
 import UserAccessManagement from "./pages/admin/UserAccessManagement";
 
 /**
@@ -63,43 +35,15 @@ const routeObject: RouteObject[] = [
   { path: "/body-shop/search", element: <BodyCriticalSearch /> },
   { path: "/body-shop/reports/tracking", element: <BodyTrackingReport /> },
   { path: "/body-shop/reports/critical-parts", element: <BodyCriticalPartsReport /> },
-  { path: "/body-shop/reports/license-tracking", element: <BodyLicenseTrackingReport /> },
-  { path: "/body-shop/reports/products-of-sites", element: <BodyProductsOfSitesReport /> },
-  { path: "/body-shop/reports/pre-assign-count", element: <BodyPreAssignCountReport /> },
   { path: "/body-shop/reports/pre-assign-critical", element: <BodyPreAssignCriticalReport /> },
   { path: "/body-shop/reports/conflicts", element: <BodyConflictsReport /> },
-  { path: "/body-shop/reports/event-log", element: <BodyEventLogReport /> },
-  { path: "/body-shop/reports/sap-failed-transfers", element: <BodySapFailedTransfersReport /> },
+  { path: "/body-shop/reports/products-of-sites", element: <BodyProductsOfSitesReport /> },
   { path: "/mechanical/register", element: <MechCriticalRegister /> },
   { path: "/mechanical/search", element: <MechCriticalSearch /> },
-  { path: "/mechanical/exceptions", element: <MechExceptions /> },
-  { path: "/mechanical/not-possible-reasons", element: <MechNotPossibleReasons /> },
-  { path: "/mechanical/contrast-of-subclasses", element: <MechContrastOfSubClasses /> },
-  { path: "/mechanical/received-parts", element: <MechReceivedPartsReport /> },
-  { path: "/mechanical/license-change", element: <MechLicenseChange /> },
   { path: "/mechanical/reports/production-possibility", element: <MechProductionPossibilityReport /> },
-  { path: "/mechanical/reports/production-possibility-with-license", element: <MechProductionPossibilityWithLicenseReport /> },
-  { path: "/mechanical/reports/production-possibility-by-trim-shop", element: <MechProductionPossibilityByTrimShopReport /> },
   { path: "/mechanical/reports/general", element: <MechGeneralReport /> },
-  { path: "/mechanical/reports/incoming-bodies", element: <MechIncomingBodiesReport /> },
-  { path: "/mechanical/reports/incoming-bodies-summary", element: <MechIncomingBodiesSummaryReport /> },
-  { path: "/mechanical/reports/license-tracking", element: <MechLicenseTrackingReport /> },
-  { path: "/mechanical/reports/license-tracking-criticals", element: <MechLicenseTrackingCriticalsReport /> },
-  { path: "/mechanical/reports/used-license-bodies", element: <MechUsedLicenseBodiesReport /> },
-  { path: "/mechanical/reports/license-log", element: <MechLicenseLogReport /> },
-  { path: "/mechanical/reports/exception-part-numbers", element: <MechExceptionPartNumbersReport /> },
-  { path: "/mechanical/reports/exception-license-log", element: <MechExceptionLicenseLogReport /> },
-  { path: "/mechanical/reports/stock-log", element: <MechStockLogReport /> },
-  { path: "/mechanical/reports/sap-critical-log", element: <MechSapCriticalLogReport /> },
-  { path: "/mechanical/reports/sap-failed-transfers", element: <MechSapFailedTransfersReport /> },
   { path: "/mechanical/reports/asn", element: <MechAsnReport /> },
-  { path: "/mechanical/reports/trim-in-conflicts", element: <MechTrimInConflictsReport /> },
-  { path: "/mechanical/reports/trim-shop-body-count", element: <MechTrimShopBodyCountReport /> },
-  { path: "/mechanical/reports/trim-shop-critical-bodies", element: <MechTrimShopCriticalBodiesReport /> },
-  { path: "/synchron/basis", element: <SyncBasisManagement /> },
   { path: "/synchron/sets", element: <SyncSetManagement /> },
-  { path: "/synchron/indicator-cars", element: <SyncIndicatorCars /> },
-  { path: "/synchron/reports/production-possibility", element: <SyncProductionPossibilityReport /> },
   { path: "/user-management", element: <UserAccessManagement /> },
 ];
 
