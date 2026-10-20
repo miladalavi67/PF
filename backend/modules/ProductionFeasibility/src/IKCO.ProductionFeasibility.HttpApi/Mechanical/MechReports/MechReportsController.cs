@@ -2,6 +2,8 @@ using System.Threading.Tasks;
 using IKCO.ProductionFeasibility.Common;
 using IKCO.ProductionFeasibility.Controllers;
 using IKCO.ProductionFeasibility.Permissions;
+using IKCO.ProductionFeasibility.BodyShop.Results;
+using IKCO.ProductionFeasibility.Mechanical.Results;
 using IKCO.ProductionFeasibility.Mechanical.MechReports.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -33,8 +35,8 @@ public partial class MechReportsController : PfController
     /// </remarks>
     [HttpPost("production-possibility")]
     [Authorize(PfPermissions.MechReports.Productionpossibility)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetProductionPossibilityAsync([FromBody] MechReportsGetProductionPossibilityInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<ProductionPossibilityRow>))]
+    public Task<ListResultDto<ProductionPossibilityRow>> GetProductionPossibilityAsync([FromBody] MechReportsGetProductionPossibilityInput input)
         => _service.GetProductionPossibilityAsync(input);
 
     /// <summary>گزارش امکان تولید با مجوز مصرف‌شده و باقی‌مانده</summary>
@@ -47,8 +49,8 @@ public partial class MechReportsController : PfController
     /// </remarks>
     [HttpPost("production-possibility-with-license")]
     [Authorize(PfPermissions.MechReports.Productionpossibility)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetProductionPossibilityWithLicenseAsync([FromBody] MechReportsGetProductionPossibilityWithLicenseInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<ProductionPossibilityRow>))]
+    public Task<ListResultDto<ProductionPossibilityRow>> GetProductionPossibilityWithLicenseAsync([FromBody] MechReportsGetProductionPossibilityWithLicenseInput input)
         => _service.GetProductionPossibilityWithLicenseAsync(input);
 
     /// <summary>امکان تولید به تفکیک سالن مونتاژ</summary>
@@ -60,21 +62,21 @@ public partial class MechReportsController : PfController
     /// </remarks>
     [HttpGet("production-possibility-by-trim-shop")]
     [Authorize(PfPermissions.MechReports.Productionpossibility)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetProductionPossibilityByTrimShopAsync([FromQuery] MechReportsGetProductionPossibilityByTrimShopInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<ProdPossibilityByTrimShopRow>))]
+    public Task<ListResultDto<ProdPossibilityByTrimShopRow>> GetProductionPossibilityByTrimShopAsync([FromQuery] MechReportsGetProductionPossibilityByTrimShopInput input)
         => _service.GetProductionPossibilityByTrimShopAsync(input);
 
     /// <summary>گزارش جامع اقلام بحرانی (مکانیکی و سنکرون)</summary>
     /// <remarks>
     /// معادل فرم/متد سامانه ویندوزی: <c>frmRPTProdpossibility (جامع)</c>.
-    /// رویه ذخیره‌شده: <c>dbo.S_CriticalPartsGeneralReport</c>.
+    /// رویه ذخیره‌شده: <c>dbo.S_CriticalPartsGeneralReport_Web</c>.
     ///
     ///     GET /api/production-feasibility/mechanical/reports/general
     /// </remarks>
     [HttpGet("general")]
     [Authorize(PfPermissions.MechReports.General)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetGeneralReportAsync([FromQuery] MechReportsGetGeneralReportInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<GeneralReportRow>))]
+    public Task<ListResultDto<GeneralReportRow>> GetGeneralReportAsync([FromQuery] MechReportsGetGeneralReportInput input)
         => _service.GetGeneralReportAsync(input);
 
     /// <summary>بدنه‌های در راه / وارد شده به خط برای یک بحران</summary>
@@ -86,8 +88,8 @@ public partial class MechReportsController : PfController
     /// </remarks>
     [HttpGet("incoming-bodies")]
     [Authorize(PfPermissions.MechReports.Incoming)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetIncomingBodiesByCriticalPartAsync([FromQuery] MechReportsGetIncomingBodiesByCriticalPartInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<IncomingBodiesCountRow>))]
+    public Task<ListResultDto<IncomingBodiesCountRow>> GetIncomingBodiesByCriticalPartAsync([FromQuery] MechReportsGetIncomingBodiesByCriticalPartInput input)
         => _service.GetIncomingBodiesByCriticalPartAsync(input);
 
     /// <summary>فهرست بدنه‌های وارد شده برای یک بحران</summary>
@@ -99,8 +101,8 @@ public partial class MechReportsController : PfController
     /// </remarks>
     [HttpGet("incoming-body-list")]
     [Authorize(PfPermissions.MechReports.Incoming)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetIncomingBodyListAsync([FromQuery] MechReportsGetIncomingBodyListInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<IncomingBodyRow>))]
+    public Task<ListResultDto<IncomingBodyRow>> GetIncomingBodyListAsync([FromQuery] MechReportsGetIncomingBodyListInput input)
         => _service.GetIncomingBodyListAsync(input);
 
     /// <summary>خلاصه بدنه‌های وارد شده به خط</summary>
@@ -112,8 +114,8 @@ public partial class MechReportsController : PfController
     /// </remarks>
     [HttpGet("incoming-bodies-summary")]
     [Authorize(PfPermissions.MechReports.Incoming)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetIncomingBodiesSummaryAsync([FromQuery] MechReportsGetIncomingBodiesSummaryInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<IncomingBodiesSummaryRow>))]
+    public Task<ListResultDto<IncomingBodiesSummaryRow>> GetIncomingBodiesSummaryAsync([FromQuery] MechReportsGetIncomingBodiesSummaryInput input)
         => _service.GetIncomingBodiesSummaryAsync(input);
 
     /// <summary>تاریخچه موجودی شماره فنی</summary>
@@ -125,8 +127,8 @@ public partial class MechReportsController : PfController
     /// </remarks>
     [HttpGet("stock-log")]
     [Authorize(PfPermissions.MechReports.Stocklog)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetStockLogAsync([FromQuery] MechReportsGetStockLogInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<StockLogRow>))]
+    public Task<ListResultDto<StockLogRow>> GetStockLogAsync([FromQuery] MechReportsGetStockLogInput input)
         => _service.GetStockLogAsync(input);
 
     /// <summary>لاگ انتقال اقلام بحرانی از SAP</summary>
@@ -138,8 +140,8 @@ public partial class MechReportsController : PfController
     /// </remarks>
     [HttpGet("sap-critical-log")]
     [Authorize(PfPermissions.MechReports.Sap)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetSapCriticalLogAsync([FromQuery] MechReportsGetSapCriticalLogInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<SapCriticalLogRow>))]
+    public Task<ListResultDto<SapCriticalLogRow>> GetSapCriticalLogAsync([FromQuery] MechReportsGetSapCriticalLogInput input)
         => _service.GetSapCriticalLogAsync(input);
 
     /// <summary>قطعات ناموفق در انتقال از SAP</summary>
@@ -151,8 +153,8 @@ public partial class MechReportsController : PfController
     /// </remarks>
     [HttpGet("failed-sap-transfers")]
     [Authorize(PfPermissions.MechReports.Sap)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetFailedSapTransfersAsync([FromQuery] MechReportsGetFailedSapTransfersInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<FailedSapTransferRow>))]
+    public Task<ListResultDto<FailedSapTransferRow>> GetFailedSapTransfersAsync([FromQuery] MechReportsGetFailedSapTransfersInput input)
         => _service.GetFailedSapTransfersAsync(input);
 
     /// <summary>گزارش ASN (اعلان ورود محموله)</summary>
@@ -164,8 +166,8 @@ public partial class MechReportsController : PfController
     /// </remarks>
     [HttpGet("asn")]
     [Authorize(PfPermissions.MechReports.Sap)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetAsnReportAsync([FromQuery] MechReportsGetAsnReportInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<AsnRow>))]
+    public Task<ListResultDto<AsnRow>> GetAsnReportAsync([FromQuery] MechReportsGetAsnReportInput input)
         => _service.GetAsnReportAsync(input);
 
     /// <summary>دلایل عدم امکان ورود خودرو به مونتاژ</summary>
@@ -177,8 +179,8 @@ public partial class MechReportsController : PfController
     /// </remarks>
     [HttpGet("not-possible-to-trim-in")]
     [Authorize(PfPermissions.MechReports.Conflicts)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetNotPossibleProductsToTrimStepAsync([FromQuery] MechReportsGetNotPossibleProductsToTrimStepInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<TrimInNotPossibleRow>))]
+    public Task<ListResultDto<TrimInNotPossibleRow>> GetNotPossibleProductsToTrimStepAsync([FromQuery] MechReportsGetNotPossibleProductsToTrimStepInput input)
         => _service.GetNotPossibleProductsToTrimStepAsync(input);
 
     /// <summary>تعداد بدنه‌های ورودی به مونتاژ پس از ثبت</summary>
@@ -190,8 +192,8 @@ public partial class MechReportsController : PfController
     /// </remarks>
     [HttpGet("trim-shop-body-count")]
     [Authorize(PfPermissions.MechReports.Conflicts)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetTrimShopBodyCountAsync([FromQuery] MechReportsGetTrimShopBodyCountInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<TrimShopBodyCountRow>))]
+    public Task<ListResultDto<TrimShopBodyCountRow>> GetTrimShopBodyCountAsync([FromQuery] MechReportsGetTrimShopBodyCountInput input)
         => _service.GetTrimShopBodyCountAsync(input);
 
     /// <summary>بدنه‌های بحرانی ورودی به مونتاژ</summary>
@@ -203,8 +205,8 @@ public partial class MechReportsController : PfController
     /// </remarks>
     [HttpGet("trim-shop-critical-bodies")]
     [Authorize(PfPermissions.MechReports.Conflicts)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetTrimShopCriticalBodiesAsync([FromQuery] MechReportsGetTrimShopCriticalBodiesInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<TrimShopCriticalBodyRow>))]
+    public Task<ListResultDto<TrimShopCriticalBodyRow>> GetTrimShopCriticalBodiesAsync([FromQuery] MechReportsGetTrimShopCriticalBodiesInput input)
         => _service.GetTrimShopCriticalBodiesAsync(input);
 
 }

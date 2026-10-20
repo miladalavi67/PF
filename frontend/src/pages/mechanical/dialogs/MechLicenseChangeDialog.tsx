@@ -18,7 +18,7 @@ import FormDialog from "../../../components/FormDialog";
 import LookupAutocomplete from "../../../components/LookupAutocomplete";
 import TabularDialog from "../../../components/TabularDialog";
 import { changeMechLicenses, getMechLicensesSummary, getMechLicensesTrackingInfo, getMechLicensesTrackingList } from "../../../server/services/mechLicensesService";
-import type { ITabularResult } from "../../../types/Common";
+import type { ITabularResult } from "../../../types/tabular";
 import type { ILicenseSummaryDto } from "../../../types/Mechanical";
 import { mechLicensesChangeInputRules } from "../../../types/Mechanical";
 import { ApiPermissions } from "../../../types/permissions";

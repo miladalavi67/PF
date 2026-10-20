@@ -149,8 +149,20 @@ foreach (var (type, file) in typeArea.OrderBy(k => k.Value).ThenBy(k => tsName[k
             sb.AppendLine($"  /** {doc} */");
         sb.AppendLine($"  {JsonName(p)}{(optional ? "?" : string.Empty)}: {ts}{(nullable ? " | null" : string.Empty)};");
     }
+    if (IsResultRow(type))
+    {
+        sb.AppendLine("  /** ستون‌های دیگر خروجی رویه که در مدل تعریف نشده‌اند (ExtraColumns) */");
+        sb.AppendLine("  [column: string]: unknown;");
+    }
     sb.AppendLine("}");
     sb.AppendLine();
+
+    if (IsResultRow(type))
+    {
+        sb.AppendLine($"/** ترتیب ستون‌های خروجی رویه برای {tsName[type]} (نمایش در جدول) */");
+        sb.AppendLine($"export const {ColumnsConst(type)} = [{string.Join(", ", Props(type).Select(p => "\"" + JsonName(p) + "\""))}] as const;");
+        sb.AppendLine();
+    }
 
     // قواعد اعتبارسنجی react-hook-form از Data Annotation های DTO ورودی (قاعده جدیدی تعریف نمی‌شود)
     if (isInput && !type.IsGenericTypeDefinition)
@@ -215,6 +227,7 @@ foreach (var group in endpoints.GroupBy(e => e.Controller))
     var entity = group.Key.Name.Replace("Controller", string.Empty);
     var serviceFile = LowerFirst(entity) + "Service";
     var imports = new SortedDictionary<string, SortedSet<string>>();
+    var valueImports = new SortedDictionary<string, SortedSet<string>>();
     var used = new HashSet<string>();
     var fns = new List<string>();
     var sb = new StringBuilder();
@@ -256,7 +269,16 @@ foreach (var group in endpoints.GroupBy(e => e.Controller))
         sb.AppendLine($"/** {summary} — <c>{ep.Verb} {ep.Route}</c>، دسترسی: {ep.Permission} */");
         sb.AppendLine($"const {fn} = async ({string.Join(", ", sig)}) => {{");
         sb.AppendLine($"  const {{ data }} = await {call};");
-        sb.AppendLine("  return data;");
+        var row = ep.Method.ReturnType.IsGenericType ? ResultRowOfList(ep.Method.ReturnType.GetGenericArguments()[0]) : null;
+        if (row != null)
+        {
+            // ردیف‌های نوع‌دار رویه برای جدول‌ها (ReportView/TabularDialog) به قالب ستون/ردیف تبدیل می‌شوند
+            AddImport(valueImports, "../../utils/tabularUtility", "toTabular");
+            AddImport(valueImports, "../../types/" + typeArea[row], ColumnsConst(row));
+            sb.AppendLine($"  return toTabular(data.items, {ColumnsConst(row)});");
+        }
+        else
+            sb.AppendLine("  return data;");
         sb.AppendLine("};");
         sb.AppendLine();
         catalog.AppendLine($"| {serviceFile} | {fn} | {ep.Verb} | `{ep.Route}` | `{ep.Permission}` | {summary.Replace("|", "/")} |");
@@ -265,6 +287,8 @@ foreach (var group in endpoints.GroupBy(e => e.Controller))
     var head = new StringBuilder(Header).AppendLine();
     foreach (var (file, names) in imports)
         head.AppendLine($"import type {{ {string.Join(", ", names)} }} from \"../../types/{file}\";");
+    foreach (var (module, names) in valueImports)
+        head.AppendLine($"import {{ {string.Join(", ", names)} }} from \"{module}\";");
     head.AppendLine("import http from \"../https\";").AppendLine();
     sb.AppendLine("export {");
     foreach (var fn in fns)
@@ -454,8 +478,17 @@ string JsonName(PropertyInfo p) =>
 
 static IEnumerable<PropertyInfo> Props(Type t) =>
     t.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-        .Where(p => p.GetIndexParameters().Length == 0 && p.GetCustomAttribute<System.Text.Json.Serialization.JsonIgnoreAttribute>() == null)
+        .Where(p => p.GetIndexParameters().Length == 0 && p.GetCustomAttribute<System.Text.Json.Serialization.JsonIgnoreAttribute>() == null
+                    && p.GetCustomAttribute<System.Text.Json.Serialization.JsonExtensionDataAttribute>() == null)
         .GroupBy(p => p.Name).Select(g => g.First());
+
+// ردیف خروجی رویه (PfResultRow): نام ستون‌ها همان خروجی رویه است و ستون‌های تعریف‌نشده هم در JSON می‌آیند
+static bool IsResultRow(Type t) => typeof(IKCO.ProductionFeasibility.Common.PfResultRow).IsAssignableFrom(t);
+
+static Type? ResultRowOfList(Type? t) =>
+    t is { IsGenericType: true } && t.GetGenericTypeDefinition().Name.StartsWith("ListResultDto") && IsResultRow(t.GetGenericArguments()[0])
+        ? t.GetGenericArguments()[0]
+        : null;
 
 static bool IsModel(Type t) =>
     t.IsClass && t != typeof(string) && t != typeof(object)
@@ -479,6 +512,15 @@ static string AreaOfNamespace(string ns)
 }
 
 static string LowerFirst(string s) => s.Length == 0 ? s : char.ToLowerInvariant(s[0]) + s[1..];
+
+string ColumnsConst(Type row) => LowerFirst(tsName[row].Substring(1)) + "Columns";
+
+static void AddImport(SortedDictionary<string, SortedSet<string>> imports, string module, string name)
+{
+    if (!imports.TryGetValue(module, out var set))
+        imports[module] = set = new SortedSet<string>();
+    set.Add(name);
+}
 
 static string Combine(string a, string? b) =>
     string.IsNullOrEmpty(b) ? a.TrimEnd('/') : b.StartsWith('/') || b.StartsWith("~/") ? b.TrimStart('~', '/') : a.TrimEnd('/') + "/" + b;

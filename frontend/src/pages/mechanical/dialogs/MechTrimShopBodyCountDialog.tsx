@@ -6,7 +6,7 @@ import ExcelExportButton from "../../../components/ExcelExportButton";
 import FormDialog from "../../../components/FormDialog";
 import { getMechPartsBodyProperties } from "../../../server/services/mechPartsService";
 import { getMechReportsTrimShopBodyCount } from "../../../server/services/mechReportsService";
-import type { ITabularResult } from "../../../types/Common";
+import type { ITabularResult } from "../../../types/tabular";
 import { columnHeaders } from "../../../utils/columnHeaders";
 import { resultColumns, tabularRows } from "../../../utils/tabularUtility";
 

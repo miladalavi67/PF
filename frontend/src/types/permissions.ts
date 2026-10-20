@@ -7,8 +7,8 @@ export const ApiPermissions = {
     view: "bodyshop.criticalparts.view",
     create: "bodyshop.criticalparts.create",
     update: "bodyshop.criticalparts.update",
-    disable: "bodyshop.criticalparts.disable",
     license: "bodyshop.criticalparts.license",
+    disable: "bodyshop.criticalparts.disable",
   },
   bodyReports: {
     group: "bodyshop.reports",
@@ -78,6 +78,7 @@ export const ApiPermissions = {
   syncReports: {
     group: "synchron.reports",
     productionpossibility: "synchron.reports.productionpossibility",
+    sap: "synchron.reports.sap",
   },
   userAccess: {
     group: "usermanagement.useraccess",

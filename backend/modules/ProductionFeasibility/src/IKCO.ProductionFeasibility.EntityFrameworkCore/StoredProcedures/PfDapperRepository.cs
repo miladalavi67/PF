@@ -61,6 +61,15 @@ public abstract class PfDapperRepository<TDbContext> : DapperRepository<TDbConte
         => RunAsync(procedure, style, async (connection, transaction) =>
             (await connection.QueryAsync<T>(procedure, parameters.Dapper, transaction, commandTimeout, CommandType.StoredProcedure)).ToList());
 
+    /// <summary>
+    /// ردیف‌های اولین result set به صورت مدل نوع‌دار <typeparamref name="T"/> (Dapper + <see cref="PfResultRowReader"/>)؛
+    /// ستون‌های خارج از مدل در <see cref="PfResultRow.ExtraColumns"/> حفظ می‌شوند.
+    /// </summary>
+    protected Task<List<T>> QueryRowsAsync<T>(string procedure, SpParameters parameters, LegacyCallStyle style, int commandTimeout)
+        where T : PfResultRow, new()
+        => RunAsync(procedure, style, async (connection, transaction) =>
+            PfResultRowReader.Map<T>(await connection.QueryAsync(procedure, parameters.Dapper, transaction, commandTimeout, CommandType.StoredProcedure)));
+
     /// <summary>اولین ردیف (معادل <c>.FirstOrDefault()</c> روی نتیجه FunctionImport)</summary>
     protected async Task<T?> QueryFirstOrDefaultAsync<T>(string procedure, SpParameters parameters, LegacyCallStyle style, int commandTimeout)
         where T : class

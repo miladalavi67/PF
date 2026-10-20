@@ -1,6 +1,8 @@
 using System.Threading.Tasks;
 using IKCO.ProductionFeasibility.Common;
 using IKCO.ProductionFeasibility.Mechanical.MechParts.Dtos;
+using IKCO.ProductionFeasibility.Mechanical.Results;
+using Volo.Abp.Application.Dtos;
 
 namespace IKCO.ProductionFeasibility.Mechanical.MechParts;
 
@@ -10,5 +12,5 @@ public partial interface IMechPartsAppService
     Task<GlobalResultDto> SaveProductsAsync(int criticalPartsId, MechPartsSaveProductsInput input);
 
     /// <summary>مقایسه زیرکلاس‌های SAP با زیرکلاس‌های ثبت‌شده در SFC</summary>
-    Task<TabularResult> CompareSubClassesAsync(MechPartsCompareSubClassesInput input);
+    Task<ListResultDto<SubClassContrastRow>> CompareSubClassesAsync(MechPartsCompareSubClassesInput input);
 }

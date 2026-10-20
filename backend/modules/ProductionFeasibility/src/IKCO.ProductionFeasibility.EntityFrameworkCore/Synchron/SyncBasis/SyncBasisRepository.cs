@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using IKCO.ProductionFeasibility.Common;
 using IKCO.ProductionFeasibility.EntityFrameworkCore;
 using IKCO.ProductionFeasibility.StoredProcedures;
+using IKCO.ProductionFeasibility.Synchron.Results;
 using IKCO.ProductionFeasibility.Synchron.SyncBasis.Repositories;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.EntityFrameworkCore;
@@ -17,39 +18,48 @@ public partial class SyncBasisRepository : PfDapperRepository<PfDbContext>, ISyn
     {
     }
 
-    public async Task<TabularResult> GetListAsync()
+    public async Task<List<SetBasisReportRow>> GetListAsync()
     {
         var parameters = new SpParameters();
-        return await QueryTableAsync("dbo.S_RptGetCriticalPartsSet", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+        return await QueryRowsAsync<SetBasisReportRow>("dbo.S_RptGetCriticalPartsSet", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
     }
 
-    public async Task<TabularResult> GetByCodeAsync(string code)
+    public async Task<List<SetBasisRow>> GetByCodeAsync(string code)
     {
         var parameters = new SpParameters()
             .VarChar("@Code", code, 50);
-        return await QueryTableAsync("dbo.S_CriticalPartsSetBasisSelectByCode", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+        return await QueryRowsAsync<SetBasisRow>("dbo.S_CriticalPartsSetBasisSelectByCode", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
     }
 
-    public async Task<TabularResult> GetByIdAsync(string id)
+    public async Task<List<SetBasisRow>> GetByIdAsync(string id)
     {
         var parameters = new SpParameters()
             .VarChar("@Id", id, 50);
-        return await QueryTableAsync("dbo.S_CriticalPartsSetBasisSelectById", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+        return await QueryRowsAsync<SetBasisRow>("dbo.S_CriticalPartsSetBasisSelectById", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
     }
 
-    public async Task<TabularResult> GetByStatusAsync(byte? status)
+    public async Task<List<SetBasisRow>> GetByStatusAsync(byte? status)
     {
         var parameters = new SpParameters();
         if (status != null)
             parameters.TinyInt("@Status", status);
-        return await QueryTableAsync("dbo.S_CriticalPartsSetBasisSelectByStatus", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+        return await QueryRowsAsync<SetBasisRow>("dbo.S_CriticalPartsSetBasisSelectByStatus", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
     }
 
-    public async Task<TabularResult> CountBySetCodeAsync(string setCode)
+    public async Task<int?> CountBySetCodeAsync(string setCode)
     {
         var parameters = new SpParameters()
             .VarChar("@SetCode", setCode, 50);
-        return await QueryTableAsync("dbo.S_CriticalPartsSetCountSetCode", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+        var scalar = await ExecuteScalarAsync("dbo.S_CriticalPartsSetCountSetCode", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+        return scalar is null or DBNull ? null : Convert.ToInt32(scalar);
+    }
+
+    public async Task AddPartTypePropertyAsync(int partTypeCode, int propertyId)
+    {
+        var parameters = new SpParameters()
+            .Int("@PartTypeCode", partTypeCode)
+            .Int("@PropertyId", propertyId);
+        await ExecuteAsync("dbo.S_InsertCriticalPartTypeProperty", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Command);
     }
 
     public async Task CreateAsync(string code, string descF, int carClass, int partTypeId, int levelType, int userId, bool isTrim, bool isOption, bool isToodoozi, bool isColor)

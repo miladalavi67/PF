@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using IKCO.ProductionFeasibility.Common;
+using IKCO.ProductionFeasibility.BodyShop.Results;
 using IKCO.ProductionFeasibility.BodyShop.BodyCriticals.Dtos;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
@@ -19,7 +20,7 @@ public partial interface IBodyCriticalsAppService : IApplicationService
     Task<ListResultDto<PartProductRow>> GetPartProductsAsync(BodyCriticalsGetPartProductsInput input);
 
     /// <summary>کدهای کلاس مصرف‌کننده شماره فنی</summary>
-    Task<TabularResult> GetCodeClassByPartNoAsync(BodyCriticalsGetCodeClassByPartNoInput input);
+    Task<ListResultDto<CodeClassRow>> GetCodeClassByPartNoAsync(BodyCriticalsGetCodeClassByPartNoInput input);
 
     /// <summary>ثبت بحران بدنه‌سازی</summary>
     Task<GlobalResultDto> CreateCriticalPartAsync(BodyCriticalsCreateCriticalPartInput input);
@@ -27,13 +28,10 @@ public partial interface IBodyCriticalsAppService : IApplicationService
     /// <summary>ویرایش بحران بدنه‌سازی</summary>
     Task<GlobalResultDto> UpdateCriticalPartAsync(int criticalPartsId, BodyCriticalsUpdateCriticalPartInput input);
 
-    /// <summary>غیرفعال‌سازی بحران‌های بدنه‌سازی</summary>
-    Task<GlobalResultDto> DisableCriticalPartsAsync(BodyCriticalsDisableCriticalPartsInput input);
-
     /// <summary>اطلاعات یک بحران بدنه‌سازی برای ویرایش</summary>
-    Task<TabularResult> GetCriticalPartInfoAsync(int criticalPartsId);
+    Task<ListResultDto<BodyCriticalPartInfoRow>> GetCriticalPartInfoAsync(int criticalPartsId);
 
     /// <summary>گزارش رویدادهای یک بحران</summary>
-    Task<TabularResult> GetEventLogAsync(BodyCriticalsGetEventLogInput input);
+    Task<ListResultDto<EventLogRow>> GetEventLogAsync(BodyCriticalsGetEventLogInput input);
 
 }

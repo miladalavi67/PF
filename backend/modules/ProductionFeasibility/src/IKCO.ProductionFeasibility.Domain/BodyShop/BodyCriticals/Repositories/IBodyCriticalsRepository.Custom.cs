@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using IKCO.ProductionFeasibility.BodyShop.Results;
 using IKCO.ProductionFeasibility.Common;
 
 namespace IKCO.ProductionFeasibility.BodyShop.BodyCriticals.Repositories;
@@ -17,5 +18,11 @@ public partial interface IBodyCriticalsRepository
         string? toDate, string? toTime, string? note, int userId);
 
     /// <summary><c>PF.S_CreateBatchCriticalPartProduct</c> با پارامتر جدولی</summary>
-    Task<TabularResult> BatchCreateAsync(int biwSiteId, IReadOnlyList<IReadOnlyDictionary<string, object?>> rows, int userId);
+    Task<List<BodyBatchCreateResultRow>> BatchCreateAsync(int biwSiteId, IReadOnlyList<IReadOnlyDictionary<string, object?>> rows, int userId);
+
+    /// <summary>غیرفعال‌سازی بحران‌های بدنه‌سازی — <c>PF.S_DisableCriticalParts</c> (شناسه‌ها جداشده با ویرگول)</summary>
+    Task<GlobalResultDto?> DisableCriticalPartsAsync(string idString, int userId);
+
+    /// <summary>ثبت دلیل حذف بحران در لاگ رویدادها — <c>PF.InsertEventLog</c> (AttributeId = 4)</summary>
+    Task InsertDisableReasonAsync(int eventTypeId, int criticalPartId, string note, int userId);
 }

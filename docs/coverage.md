@@ -6,47 +6,19 @@
 
 | بخش | صفحه | مسیر | نوع | کامپوننت |
 |---|---|---|---|---|
-| bodyshop.operations | ثبت بحران بدنه‌سازی | `/body-shop/register` | custom | `BodyCriticalRegister` |
+| bodyshop.operations | ثبت بحران | `/body-shop/register` | custom | `BodyCriticalRegister` |
 | bodyshop.operations | جستجوی اقلام بحرانی | `/body-shop/search` | custom | `BodyCriticalSearch` |
-| bodyshop.reports | گزارش ردیابی تغییرات اقلام بحرانی | `/body-shop/reports/tracking` | report | `BodyTrackingReport` |
-| bodyshop.reports | گزارش اقلام بحرانی | `/body-shop/reports/critical-parts` | report | `BodyCriticalPartsReport` |
-| bodyshop.reports | ردیابی پارامترهای بحرانی | `/body-shop/reports/license-tracking` | report | `BodyLicenseTrackingReport` |
-| bodyshop.reports | محصولات به تفکیک خطوط بدنه‌سازی | `/body-shop/reports/products-of-sites` | report | `BodyProductsOfSitesReport` |
-| bodyshop.reports | تعداد بدنه‌های پیش‌تخصیص‌شده | `/body-shop/reports/pre-assign-count` | report | `BodyPreAssignCountReport` |
-| bodyshop.reports | بدنه‌های پیش‌تخصیص بحرانی | `/body-shop/reports/pre-assign-critical` | report | `BodyPreAssignCriticalReport` |
-| bodyshop.reports | مغایرت پیش‌تخصیص بدنه‌های بحرانی | `/body-shop/reports/conflicts` | report | `BodyConflictsReport` |
-| bodyshop.reports | گزارش رویدادها | `/body-shop/reports/event-log` | report | `BodyEventLogReport` |
-| bodyshop.reports | قطعات ناموفق در انتقال از SAP | `/body-shop/reports/sap-failed-transfers` | report | `BodySapFailedTransfersReport` |
-| mechanical.operations | ثبت بحران مکانیکی | `/mechanical/register` | custom | `MechCriticalRegister` |
-| mechanical.operations | جستجوی اقلام بحرانی (مکانیکی و سنکرون) | `/mechanical/search` | custom | `MechCriticalSearch` |
-| mechanical.operations | استثناهای محصولات بحران | `/mechanical/exceptions` | custom | `MechExceptions` |
-| mechanical.operations | دلایل عدم امکان تولید | `/mechanical/not-possible-reasons` | custom | `MechNotPossibleReasons` |
-| mechanical.operations | مغایرت زیرکلاس‌ها با SAP | `/mechanical/contrast-of-subclasses` | custom | `MechContrastOfSubClasses` |
-| mechanical.operations | اقلام بحرانی وارد شده به شرکت | `/mechanical/received-parts` | report | `MechReceivedPartsReport` |
-| mechanical.operations | تغییر شرایط تولید / اصلاح مجوز | `/mechanical/license-change` | internal | `MechLicenseChange` |
-| mechanical.reports | گزارش امکان تولید | `/mechanical/reports/production-possibility` | report | `MechProductionPossibilityReport` |
-| mechanical.reports | گزارش امکان تولید با مجوز مصرف‌شده و باقی‌مانده | `/mechanical/reports/production-possibility-with-license` | report | `MechProductionPossibilityWithLicenseReport` |
-| mechanical.reports | امکان تولید به تفکیک سالن مونتاژ | `/mechanical/reports/production-possibility-by-trim-shop` | report | `MechProductionPossibilityByTrimShopReport` |
-| mechanical.reports | گزارش جامع اقلام بحرانی | `/mechanical/reports/general` | report | `MechGeneralReport` |
-| mechanical.reports | بدنه‌های وارد شده به خط به تفکیک بحران | `/mechanical/reports/incoming-bodies` | report | `MechIncomingBodiesReport` |
-| mechanical.reports | خلاصه بدنه‌های وارد شده به خط | `/mechanical/reports/incoming-bodies-summary` | report | `MechIncomingBodiesSummaryReport` |
-| mechanical.reports | ردیابی مجوزهای تولید با کسری | `/mechanical/reports/license-tracking` | report | `MechLicenseTrackingReport` |
-| mechanical.reports | بحران‌های دارای مجوز تولید با کسری | `/mechanical/reports/license-tracking-criticals` | report | `MechLicenseTrackingCriticalsReport` |
-| mechanical.reports | بدنه‌های مرتبط با مجوز مصرف‌شده | `/mechanical/reports/used-license-bodies` | report | `MechUsedLicenseBodiesReport` |
-| mechanical.reports | تاریخچه مجوزهای یک بحران | `/mechanical/reports/license-log` | report | `MechLicenseLogReport` |
-| mechanical.reports | شماره فنی‌های دارای استثنا | `/mechanical/reports/exception-part-numbers` | report | `MechExceptionPartNumbersReport` |
-| mechanical.reports | تاریخچه مجوزهای استثنا | `/mechanical/reports/exception-license-log` | report | `MechExceptionLicenseLogReport` |
-| mechanical.reports | تاریخچه موجودی اقلام بحرانی | `/mechanical/reports/stock-log` | report | `MechStockLogReport` |
-| mechanical.reports | لاگ انتقال اقلام بحرانی از SAP | `/mechanical/reports/sap-critical-log` | report | `MechSapCriticalLogReport` |
-| mechanical.reports | قطعات ناموفق در انتقال از SAP | `/mechanical/reports/sap-failed-transfers` | report | `MechSapFailedTransfersReport` |
-| mechanical.reports | گزارش ASN | `/mechanical/reports/asn` | report | `MechAsnReport` |
-| mechanical.reports | دلایل عدم امکان ورود خودرو به مونتاژ | `/mechanical/reports/trim-in-conflicts` | report | `MechTrimInConflictsReport` |
-| mechanical.reports | تعداد بدنه‌های ورودی به مونتاژ | `/mechanical/reports/trim-shop-body-count` | report | `MechTrimShopBodyCountReport` |
-| mechanical.reports | بدنه‌های بحرانی ورودی به مونتاژ | `/mechanical/reports/trim-shop-critical-bodies` | report | `MechTrimShopCriticalBodiesReport` |
-| synchron.operations | تعریف مبنای ست‌ها | `/synchron/basis` | custom | `SyncBasisManagement` |
-| synchron.operations | ثبت و ویرایش بحران سنکرون | `/synchron/sets` | custom | `SyncSetManagement` |
-| synchron.operations | تعیین خودروی شاخص سالن‌ها | `/synchron/indicator-cars` | custom | `SyncIndicatorCars` |
-| synchron.reports | گزارش امکان تولید سنکرون | `/synchron/reports/production-possibility` | report | `SyncProductionPossibilityReport` |
+| bodyshop.reports | گزارش ردیابی تغییرات اقلام بحرانی | `/body-shop/reports/tracking` | custom | `BodyTrackingReport` |
+| bodyshop.reports | گزارش اقلام بحرانی | `/body-shop/reports/critical-parts` | custom | `BodyCriticalPartsReport` |
+| bodyshop.reports | گزارش پیش تخصیص بدنه‌های بحرانی | `/body-shop/reports/pre-assign-critical` | custom | `BodyPreAssignCriticalReport` |
+| bodyshop.reports | گزارش مغایرت پیش تخصیص بدنه‌های بحرانی | `/body-shop/reports/conflicts` | custom | `BodyConflictsReport` |
+| bodyshop.reports | گزارش محصولات به تفکیک خطوط بدنه‌سازی | `/body-shop/reports/products-of-sites` | custom | `BodyProductsOfSitesReport` |
+| mechanical.operations | تعریف اقلام بحرانی قطعات مکانیکی | `/mechanical/register` | custom | `MechCriticalRegister` |
+| mechanical.operations | جستجوی اقلام بحرانی | `/mechanical/search` | custom | `MechCriticalSearch` |
+| mechanical.reports | گزارش ردیابی اقلام بحرانی | `/mechanical/reports/production-possibility` | custom | `MechProductionPossibilityReport` |
+| mechanical.reports | گزارش جامع اقلام بحرانی | `/mechanical/reports/general` | custom | `MechGeneralReport` |
+| mechanical.reports | گزارش ASN های در راه | `/mechanical/reports/asn` | custom | `MechAsnReport` |
+| synchron.operations | تعریف اقلام بحرانی سنکرون | `/synchron/sets` | custom | `SyncSetManagement` |
 | system.admin | مدیریت کاربران | `/user-management` | custom | `UserAccessManagement` |
 
 ## Endpointهای تولیدشده
@@ -59,7 +31,6 @@
 | BodyCriticals | GetCodeClassByPartNo — کدهای کلاس مصرف‌کننده شماره فنی | GET | `/api/production-feasibility/body-shop/critical-parts/code-class-by-part-no` | `PF.S_GetCodeClassByPartNo` | `bodyshop.criticalparts.view` | frmUploadParts (ثبت گروهی) |
 | BodyCriticals | CreateCriticalPart — ثبت بحران بدنه‌سازی | POST | `/api/production-feasibility/body-shop/critical-parts/` | `PF.S_CreateCriticalParts_V3` | `bodyshop.criticalparts.create` | frmBodyCriticalParts.btnSave |
 | BodyCriticals | UpdateCriticalPart — ویرایش بحران بدنه‌سازی | PUT | `/api/production-feasibility/body-shop/critical-parts/{criticalPartsId:int}` | `PF.S_Web_UpdateCriticalParts` | `bodyshop.criticalparts.update` | frmBodyCriticalParts (حالت ویرایش) |
-| BodyCriticals | DisableCriticalParts — غیرفعال‌سازی بحران‌های بدنه‌سازی | POST | `/api/production-feasibility/body-shop/critical-parts/disable` | `PF.S_DisableCriticalParts` | `bodyshop.criticalparts.disable` | frmBodyCriticalSearch (غیرفعال‌سازی) |
 | BodyCriticals | GetCriticalPartInfo — اطلاعات یک بحران بدنه‌سازی برای ویرایش | GET | `/api/production-feasibility/body-shop/critical-parts/{criticalPartsId:int}/info` | `PF.S_CriticalPartsInfo` | `bodyshop.criticalparts.view` | BL_BodyCritical.CriticalPartsInfo (frmBodyCriticalParts در حالت ویرایش) |
 | BodyCriticals | GetEventLog — گزارش رویدادهای یک بحران | GET | `/api/production-feasibility/body-shop/critical-parts/event-log` | `PF.S_EventLogList` | `bodyshop.criticalparts.view` | frmEventLog |
 | BodyReports | SearchCriticalParts — جستجوی اقلام بحرانی بدنه‌سازی | POST | `/api/production-feasibility/body-shop/reports/critical-parts/search` | `PF.S_BodyCriticalSearch_Web` | `bodyshop.reports.search` | frmBodyCriticalSearch / frmRPTBodyCriticalSearch |
@@ -89,9 +60,9 @@
 | MechParts | GetProducts — محصولات ثبت‌شده یک بحران | GET | `/api/production-feasibility/mechanical/critical-parts/{criticalPartId:int}/products` | `dbo.S_CriticalPartProductsSelectByCriticalPartId_V2` | `mechanical.criticalparts.view` | frmCriticalPartSearch (جزئیات) |
 | MechParts | Create — ثبت بحران مکانیکی | POST | `/api/production-feasibility/mechanical/critical-parts/` | `dbo.S_CriticalPartsINSERT` | `mechanical.criticalparts.create` | frmCriticalPart.btnOk |
 | MechParts | Update — ویرایش بحران مکانیکی | PUT | `/api/production-feasibility/mechanical/critical-parts/{id:int}` | `dbo.S_CriticalPartsUpdate` | `mechanical.criticalparts.update` | frmCriticalPart (ویرایش) |
-| MechParts | SaveProduct — ثبت/به‌روزرسانی یک محصول بحران | POST | `/api/production-feasibility/mechanical/critical-parts/{criticalPartsId:int}/products` | `dbo.S_CriticalPartsPruductUpdate_H_V1` | `mechanical.criticalparts.update` | frmCriticalPart (محصولات) |
+| MechParts | SaveProduct — ثبت/به‌روزرسانی یک محصول بحران | POST | `/api/production-feasibility/mechanical/critical-parts/{criticalPartsId:int}/products` | `dbo.S_CriticalPartsPruductUpdate_Web` | `mechanical.criticalparts.update` | MechanicalParts/MechanicalCriticalPartsProductUpdate (بک‌اند قبلی) / frmCriticalPart (محصولات) |
 | MechParts | AddSubClass — افزودن زیرکلاس مغایر به بحران | POST | `/api/production-feasibility/mechanical/critical-parts/add-subclass` | `dbo.S_AddContrastOfSubClasses` | `mechanical.criticalparts.compare` | frmRPTContrastOfSubClasses (افزودن) |
-| MechParts | Delete — حذف محصولات بحران مکانیکی | DELETE | `/api/production-feasibility/mechanical/critical-parts/{id:int}` | `dbo.S_CriticalPartDelete` | `mechanical.criticalparts.delete` | frmCriticalPartSearch (حذف) |
+| MechParts | Delete — حذف بحران مکانیکی (به همراه استثناها و مجوزهای آن) | DELETE | `/api/production-feasibility/mechanical/critical-parts/{id:int}` | `dbo.S_CriticalPartDelete_Web` | `mechanical.criticalparts.delete` | MechanicalParts/MechanicalCriticalPartDelete (بک‌اند قبلی) / frmCriticalPartSearch (حذف) |
 | MechSearch | SearchCriticalParts — جستجوی اقلام بحرانی (مکانیکی و سنکرون) | POST | `/api/production-feasibility/mechanical/search/critical-parts` | `dbo.S_CriticalPartsSearchByConditions` | `mechanical.search.search` | frmCriticalPartSearch |
 | MechSearch | SearchByTrimShop — جستجوی بحران‌ها بر اساس سالن و بازه تاریخ | GET | `/api/production-feasibility/mechanical/search/critical-parts-by-trim-shop` | `dbo.S_CriticalPartSearch` | `mechanical.search.search` | frmCriticalPartSearch (نسخه قدیم) |
 | MechSearch | GetReceivedParts — اقلام بحرانی فعال وارد شده به شرکت | GET | `/api/production-feasibility/mechanical/search/received-parts` | `dbo.S_CriticalPart_RecievedParts` | `mechanical.search.arrived` | frmCriticalPartsArrived |
@@ -115,7 +86,7 @@
 | MechReports | GetProductionPossibility — گزارش امکان تولید مکانیکی | POST | `/api/production-feasibility/mechanical/reports/production-possibility` | `dbo.S_RptCriticalPartsProduction_Mechanical` | `mechanical.reports.productionpossibility` | frmRPTProductionPossibility / frmRPTProdpossibility |
 | MechReports | GetProductionPossibilityWithLicense — گزارش امکان تولید با مجوز مصرف‌شده و باقی‌مانده | POST | `/api/production-feasibility/mechanical/reports/production-possibility-with-license` | `dbo.S_CriticalPartsProductionPossibilityAllWithUsedLicenseAndRemainingBySubClassId_V5` | `mechanical.reports.productionpossibility` | frmRPTProductionPossibility (با مجوز) |
 | MechReports | GetProductionPossibilityByTrimShop — امکان تولید به تفکیک سالن مونتاژ | GET | `/api/production-feasibility/mechanical/reports/production-possibility-by-trim-shop` | `dbo.S_RPT_DESC_ProdPossibilityByTrimShop` | `mechanical.reports.productionpossibility` | frmRPTProdpossibility |
-| MechReports | GetGeneralReport — گزارش جامع اقلام بحرانی (مکانیکی و سنکرون) | GET | `/api/production-feasibility/mechanical/reports/general` | `dbo.S_CriticalPartsGeneralReport` | `mechanical.reports.general` | frmRPTProdpossibility (جامع) |
+| MechReports | GetGeneralReport — گزارش جامع اقلام بحرانی (مکانیکی و سنکرون) | GET | `/api/production-feasibility/mechanical/reports/general` | `dbo.S_CriticalPartsGeneralReport_Web` | `mechanical.reports.general` | frmRPTProdpossibility (جامع) |
 | MechReports | GetIncomingBodiesByCriticalPart — بدنه‌های در راه / وارد شده به خط برای یک بحران | GET | `/api/production-feasibility/mechanical/reports/incoming-bodies` | `dbo.S_RPT_IncommingBodiesByCriticalPartId` | `mechanical.reports.incoming` | frm_RPT_Des_IncommingBodiesByCPId |
 | MechReports | GetIncomingBodyList — فهرست بدنه‌های وارد شده برای یک بحران | GET | `/api/production-feasibility/mechanical/reports/incoming-body-list` | `dbo.S_RPT_IncommingBodiesListByCriticalPartId` | `mechanical.reports.incoming` | frm_RPT_ST_IncommingBodiesByCP |
 | MechReports | GetIncomingBodiesSummary — خلاصه بدنه‌های وارد شده به خط | GET | `/api/production-feasibility/mechanical/reports/incoming-bodies-summary` | `dbo.S_RPT_IncommingBodiesByCriticalParts` | `mechanical.reports.incoming` | frm_RPT_ST_IncommingBodiesByCP |
@@ -131,6 +102,7 @@
 | SyncBasis | GetById — مبنای ست بر اساس شناسه | GET | `/api/production-feasibility/synchron/basis/{id}` | `dbo.S_CriticalPartsSetBasisSelectById` | `synchron.basis.view` | frmCriticalPartSetBasis |
 | SyncBasis | GetByStatus — مبناهای ست بر اساس وضعیت | GET | `/api/production-feasibility/synchron/basis/by-status` | `dbo.S_CriticalPartsSetBasisSelectByStatus` | `synchron.basis.view` | frmCriticalPartSetBasis |
 | SyncBasis | CountBySetCode — تعداد ست‌های ثبت‌شده با کد ست | GET | `/api/production-feasibility/synchron/basis/count-by-code` | `dbo.S_CriticalPartsSetCountSetCode` | `synchron.basis.view` | frmCriticalPartSet |
+| SyncBasis | AddPartTypeProperty — ثبت ویژگی نوع قطعه سنکرون | POST | `/api/production-feasibility/synchron/basis/part-type-properties` | `dbo.S_InsertCriticalPartTypeProperty` | `synchron.basis.create` | SyncParts/SyncPartsInsertCriticalPartTypeProperty (بک‌اند قبلی) |
 | SyncBasis | Create — ثبت مبنای ست سنکرون | POST | `/api/production-feasibility/synchron/basis/` | `dbo.S_InsertCriticalPartSet` | `synchron.basis.create` | frmCriticalPartSetBasis.btnSave |
 | SyncBasis | Update — ویرایش مبنای ست سنکرون | PUT | `/api/production-feasibility/synchron/basis/{id:int}` | `dbo.S_UpdateCriticalPartsSet` | `synchron.basis.update` | frmCriticalPartSetBasis.btnSave (ویرایش) |
 | SyncSets | GetById — اطلاعات بحران سنکرون | GET | `/api/production-feasibility/synchron/sets/{id:int}` | `dbo.S_CriticalPartSetSelectById` | `synchron.sets.view` | frmCriticalPartSet |
@@ -140,13 +112,20 @@
 | SyncSets | GetSaloons — سالن‌های بحران سنکرون | GET | `/api/production-feasibility/synchron/sets/{criticalPartSetId:int}/saloons` | `dbo.S_CriticalPartSetSaloonSelectByCriticalPartSetId` | `synchron.sets.view` | frmCriticalPartSetIndicatorCars |
 | SyncSets | GetProducts — محصولات بحران سنکرون | GET | `/api/production-feasibility/synchron/sets/{criticalPartsSetId:int}/products` | `dbo.S_CriticalPartSetProductSelectByCriticalPartsSetId` | `synchron.sets.view` | frmCriticalPartSet |
 | SyncSets | GetProductDetails — جزئیات محصولات بحران سنکرون | GET | `/api/production-feasibility/synchron/sets/{criticalPartsSetId:int}/product-details` | `dbo.S_CriticalPartSetProductSelectDetailsByCriticalPartsSetId` | `synchron.sets.view` | frmCriticalPartSet |
-| SyncSets | GetNotEnteredIndicatorCarsCount — تعداد سالن‌های بدون خودروی شاخص | GET | `/api/production-feasibility/synchron/sets/{criticalPartsSetId:int}/not-entered-indicator-cars-count` | `dbo.S_CriticalPartsSetSaloonNotEnteredIndicatorCarsCount` | `synchron.sets.view` | frmCriticalPartSetIndicatorCars |
-| SyncSets | CreateHeader — ثبت سرآیند بحران سنکرون | POST | `/api/production-feasibility/synchron/sets/` | `dbo.S_CriticalPartsSetInsert` | `synchron.sets.create` | frmCriticalPartSet.btnSave |
-| SyncSets | UpdateHeader — ویرایش بحران سنکرون | PUT | `/api/production-feasibility/synchron/sets/{id:int}` | `dbo.S_CriticalPartsSetUpdate` | `synchron.sets.update` | frmCriticalPartSet (ویرایش) |
-| SyncSets | AddProduct — ثبت یک محصول بحران سنکرون | POST | `/api/production-feasibility/synchron/sets/{criticalPartsSetId:int}/products` | `dbo.S_CriticalPartsSetProductInsert` | `synchron.sets.update` | frmCriticalPartSet (محصولات) |
-| SyncSets | UpdateSaloonIndicatorCar — تعیین خودروی شاخص سالن بحران سنکرون | PUT | `/api/production-feasibility/synchron/sets/{criticalPartsSetId:int}/saloons/{id:int}` | `dbo.S_CriticalPartsSetSaloonUpdate` | `synchron.sets.update` | frmCriticalPartSetIndicatorCars |
+| SyncSets | GetNotEnteredIndicatorCarsCount — تعداد سالن‌های بدون خودروی شاخص | GET | `/api/production-feasibility/synchron/sets/{criticalPartsSetId:int}/not-entered-indicator-cars-count` | `dbo.S_CriticalPartsSetSaloonNotEnteredIndicatorCarsCount_Web` | `synchron.sets.view` | SyncParts/GetSyncPartsCriticalPartsSetSaloonNotEnteredIndicatorCarsCount (بک‌اند قبلی) |
+| SyncSets | GetSetSaloons — سالن‌های ثبت‌شده بحران سنکرون | GET | `/api/production-feasibility/synchron/sets/{criticalPartsSetId:int}/set-saloons` | `dbo.S_GetCriticalPartsSet_Saloons` | `synchron.sets.view` | SyncParts/SyncPartsGetCriticalPartsSet_Saloons (بک‌اند قبلی) |
+| SyncSets | GetPartInfo — اطلاعات شماره فنی از BOM (کلاس، زیرکلاس و نوع قطعه) | GET | `/api/production-feasibility/synchron/sets/part-info` | `dbo.SIMP_PartGetInfoByPartNo_Web` | `synchron.sets.view` | SyncParts/GetSyncPartsInfo (بک‌اند قبلی) |
+| SyncSets | GetSimilarColors — رنگ‌های هم‌کد با کد ۵ رقمی | GET | `/api/production-feasibility/synchron/sets/similar-colors` | `dbo.S_SelectColorsSimilarTo5DigitCode` | `synchron.sets.view` | SyncParts/GetSyncPartsColorsSimilarTo5DigitCode (بک‌اند قبلی) |
+| SyncSets | GetSaloonsByCarModels — سالن‌های مونتاژ مدل‌های انتخاب‌شده | GET | `/api/production-feasibility/synchron/sets/saloons-by-car-models` | `dbo.S_SelectSaloonsByCarModels` | `synchron.sets.view` | SyncParts/GetSyncPartsSaloonsByCarModels (بک‌اند قبلی) |
+| SyncSets | CreateHeader — ثبت سرآیند بحران سنکرون | POST | `/api/production-feasibility/synchron/sets/` | `dbo.S_CriticalPartsSetInsert_Web` | `synchron.sets.create` | SyncParts/SyncPartsCriticalPartsSetInsert (بک‌اند قبلی) / frmCriticalPartSet.btnSave |
+| SyncSets | UpdateHeader — ویرایش بحران سنکرون | PUT | `/api/production-feasibility/synchron/sets/{id:int}` | `dbo.S_CriticalPartsSetUpdate_Web` | `synchron.sets.update` | SyncParts/SyncPartsCriticalPartsSetUpdate (بک‌اند قبلی) / frmCriticalPartSet (ویرایش) |
+| SyncSets | AddProduct — ثبت یک محصول بحران سنکرون | POST | `/api/production-feasibility/synchron/sets/{criticalPartsSetId:int}/products` | `dbo.S_CriticalPartsSetProductInsert_Web` | `synchron.sets.update` | SyncParts/SyncPartsCriticalPartsSetProductInsert (بک‌اند قبلی) / frmCriticalPartSet (محصولات) |
+| SyncSets | UpdateSaloonIndicatorCar — تعیین خودروی شاخص سالن بحران سنکرون | PUT | `/api/production-feasibility/synchron/sets/{criticalPartsSetId:int}/saloons/{id:int}` | `dbo.S_CriticalPartsSetSaloonUpdate_Web` | `synchron.sets.update` | SyncParts/SyncPartsCriticalPartsSetSaloonUpdate (بک‌اند قبلی) / frmCriticalPartSetIndicatorCars |
 | SyncSets | Delete — حذف منطقی بحران سنکرون | DELETE | `/api/production-feasibility/synchron/sets/{id:int}` | `dbo.S_CriticalPartsSetDeleteLogically` | `synchron.sets.delete` | frmCriticalPartSet (حذف) |
 | SyncReports | GetProductionPossibility — گزارش امکان تولید سنکرون | POST | `/api/production-feasibility/synchron/reports/production-possibility` | `dbo.S_RptCriticalPartsProduction_Synchron` | `synchron.reports.productionpossibility` | frmRPTProductionPossibility (سنکرون) |
+| SyncReports | GetSapCriticalPartsMaster — اقلام بحرانی دریافتی از SAP | GET | `/api/production-feasibility/synchron/reports/sap-critical-parts-master` | `dbo.S_Web_SAP_CriticalPartsMaster_SelectAll` | `synchron.reports.sap` | SyncPartsReports/Rpt_SyncCriticalPartsSetBasis (بک‌اند قبلی) |
+| SyncReports | GetSapReserveMaster — رزروهای دریافتی از SAP | GET | `/api/production-feasibility/synchron/reports/sap-reserve-master` | `dbo.S_Web_SAP_ReserveMaster_SelectAll` | `synchron.reports.sap` | SyncPartsReports/RptSyncParts_SAP_ReserveMaster (بک‌اند قبلی) |
+| SyncReports | GetAsnReport — گزارش ASN (اعلان ورود محموله) | GET | `/api/production-feasibility/synchron/reports/asn` | `dbo.S_ASNReport` | `synchron.reports.sap` | SyncPartsReports/Rpt_SyncPartsASN (بک‌اند قبلی) |
 | UserAccess | GetAllUsers — فهرست کاربران امکان تولید | GET | `/api/production-feasibility/user-management/user-access/users` | `PF.GetAllUsers` | `usermanagement.useraccess.view` | frmUserManagement |
 | UserAccess | GetUsersAccessList — فهرست دسترسی کاربران به خطوط | GET | `/api/production-feasibility/user-management/user-access/` | `PF.GetUsersAccessList` | `usermanagement.useraccess.view` | frmUserManagement |
 | UserAccess | GetSites — سایت‌های مجازی | GET | `/api/production-feasibility/user-management/user-access/sites` | `PF.GetSiteByDomainId` | `usermanagement.useraccess.view` | frmUserManagement |

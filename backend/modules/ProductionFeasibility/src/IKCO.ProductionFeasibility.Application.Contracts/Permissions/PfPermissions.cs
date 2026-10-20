@@ -13,8 +13,8 @@ public static class PfPermissions
         public const string View = "bodyshop.criticalparts.view";
         public const string Create = "bodyshop.criticalparts.create";
         public const string Update = "bodyshop.criticalparts.update";
-        public const string Disable = "bodyshop.criticalparts.disable";
         public const string License = "bodyshop.criticalparts.license";
+        public const string Disable = "bodyshop.criticalparts.disable";
     }
 
     public static class BodyReports
@@ -104,6 +104,7 @@ public static class PfPermissions
     {
         public const string Group = "synchron.reports";
         public const string Productionpossibility = "synchron.reports.productionpossibility";
+        public const string Sap = "synchron.reports.sap";
     }
 
     public static class UserAccess

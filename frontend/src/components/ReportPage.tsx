@@ -1,7 +1,8 @@
 import { IkcoCheckbox, IkcoDatePicker, IkcoGrid, IkcoTextField, type IkcoGridColDef } from "@ikco/frontend-kit";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import type { IFieldRules, ITabularResult } from "../types/Common";
+import type { IFieldRules } from "../types/Common";
+import type { ITabularResult } from "../types/tabular";
 import { columnHeaders } from "../utils/columnHeaders";
 import { firstOfMonthJalali, todayJalali } from "../utils/dateUtility";
 import { resultColumns, tabularRows, type IGridRow } from "../utils/tabularUtility";

@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using IKCO.ProductionFeasibility.Common;
+using IKCO.ProductionFeasibility.BodyShop.Results;
 using IKCO.ProductionFeasibility.BodyShop.BodyReports.Dtos;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
@@ -10,40 +11,40 @@ namespace IKCO.ProductionFeasibility.BodyShop.BodyReports;
 public partial interface IBodyReportsAppService : IApplicationService
 {
     /// <summary>جستجوی اقلام بحرانی بدنه‌سازی</summary>
-    Task<TabularResult> SearchCriticalPartsAsync(BodyReportsSearchCriticalPartsInput input);
+    Task<ListResultDto<BodyCriticalSearchRow>> SearchCriticalPartsAsync(BodyReportsSearchCriticalPartsInput input);
 
     /// <summary>محصولات یک بحران</summary>
-    Task<TabularResult> GetCriticalPartProductsAsync(int criticalPartsId);
+    Task<ListResultDto<BodyCriticalProductRow>> GetCriticalPartProductsAsync(int criticalPartsId);
 
     /// <summary>ردیابی تغییرات اقلام بحرانی</summary>
-    Task<TabularResult> GetTrackingCriticalPartsAsync(BodyReportsGetTrackingCriticalPartsInput input);
+    Task<ListResultDto<BodyTrackingCriticalPartRow>> GetTrackingCriticalPartsAsync(BodyReportsGetTrackingCriticalPartsInput input);
 
     /// <summary>محصولات بحران در ردیابی</summary>
-    Task<TabularResult> GetTrackingCriticalPartProductsAsync(int criticalPartsId);
+    Task<ListResultDto<BodyTrackingProductRow>> GetTrackingCriticalPartProductsAsync(int criticalPartsId);
 
     /// <summary>محصولات به تفکیک خطوط بدنه‌سازی</summary>
-    Task<TabularResult> GetProductsOfSitesAsync();
+    Task<ListResultDto<BodyProductsOfSiteRow>> GetProductsOfSitesAsync();
 
     /// <summary>تعداد بدنه‌های پیش‌تخصیص‌شده</summary>
-    Task<TabularResult> GetPreAssignBodyCountsAsync(BodyReportsGetPreAssignBodyCountsInput input);
+    Task<ListResultDto<BodyPreAssignCountRow>> GetPreAssignBodyCountsAsync(BodyReportsGetPreAssignBodyCountsInput input);
 
     /// <summary>بدنه‌های پیش‌تخصیص بحرانی</summary>
-    Task<TabularResult> GetPreAssignCriticalBodiesAsync(BodyReportsGetPreAssignCriticalBodiesInput input);
+    Task<ListResultDto<BodyPreAssignCriticalRow>> GetPreAssignCriticalBodiesAsync(BodyReportsGetPreAssignCriticalBodiesInput input);
 
     /// <summary>مغایرت پیش‌تخصیص بدنه‌های بحرانی</summary>
-    Task<TabularResult> GetNotPossibleProductsToStepAssignAsync(BodyReportsGetNotPossibleProductsToStepAssignInput input);
+    Task<ListResultDto<BodyNotPossibleToAssignRow>> GetNotPossibleProductsToStepAssignAsync(BodyReportsGetNotPossibleProductsToStepAssignInput input);
 
     /// <summary>ردیابی پارامترهای بحرانی (مجوز تولید با کسری)</summary>
-    Task<TabularResult> GetShortageLicenseTrackingAsync(BodyReportsGetShortageLicenseTrackingInput input);
+    Task<ListResultDto<BodyLicenseTrackingRow>> GetShortageLicenseTrackingAsync(BodyReportsGetShortageLicenseTrackingInput input);
 
     /// <summary>وضعیت مجوز تولید یک بحران</summary>
-    Task<TabularResult> GetProductionPossibilityStatusAsync(int id);
+    Task<ListResultDto<BodyProductionPossibilityStatusRow>> GetProductionPossibilityStatusAsync(int id);
 
     /// <summary>قطعات ناموفق در انتقال از SAP</summary>
-    Task<TabularResult> GetFailedSapTransfersAsync(BodyReportsGetFailedSapTransfersInput input);
+    Task<ListResultDto<FailedSapTransferRow>> GetFailedSapTransfersAsync(BodyReportsGetFailedSapTransfersInput input);
 
     /// <summary>زمان آخرین به‌روزرسانی داده‌های SAP</summary>
-    Task<TabularResult> GetSapDataUpdateTimesAsync();
+    Task<ListResultDto<SapDataUpdateTimesRow>> GetSapDataUpdateTimesAsync();
 
     /// <summary>شناسه آخرین تغییر مجوزها (برای به‌روزرسانی خودکار گزارش)</summary>
     Task<string?> GetLastChangeOnLicenseAsync();

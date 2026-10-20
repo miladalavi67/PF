@@ -35,7 +35,7 @@ import {
   getMechExceptionsLicenseLog,
   getMechExceptionsLicenses,
 } from "../../server/services/mechExceptionsService";
-import type { ITabularResult } from "../../types/Common";
+import type { ITabularResult } from "../../types/tabular";
 import { mechExceptionsCreateLicenseInputRules, mechExceptionsGetExceptionListInputRules } from "../../types/Mechanical";
 import { ApiPermissions } from "../../types/permissions";
 import { columnHeaders } from "../../utils/columnHeaders";

@@ -7,7 +7,7 @@ import ExcelExportButton from "../../../components/ExcelExportButton";
 import LookupAutocomplete from "../../../components/LookupAutocomplete";
 import TabularDialog from "../../../components/TabularDialog";
 import { getMechReportsGeneralReport, getMechReportsIncomingBodiesByCriticalPart, getMechReportsStockLog } from "../../../server/services/mechReportsService";
-import type { ITabularResult } from "../../../types/Common";
+import type { ITabularResult } from "../../../types/tabular";
 import { ApiPermissions } from "../../../types/permissions";
 import { columnHeaders } from "../../../utils/columnHeaders";
 import { resultColumns, tabularRows, type IGridRow } from "../../../utils/tabularUtility";

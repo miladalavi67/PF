@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using IKCO.ProductionFeasibility.Common;
+using IKCO.ProductionFeasibility.BodyShop.Results;
 
 namespace IKCO.ProductionFeasibility.BodyShop.BodyCriticals.Repositories;
 
@@ -18,7 +19,7 @@ public partial interface IBodyCriticalsRepository
     Task<List<PartProductRow>> GetPartProductsAsync(string partNo, int biwSiteId);
 
     /// <summary>کدهای کلاس مصرف‌کننده شماره فنی (frmUploadParts (ثبت گروهی)) — <c>PF.S_GetCodeClassByPartNo</c></summary>
-    Task<TabularResult> GetCodeClassByPartNoAsync(string partNo, int biwSiteId);
+    Task<List<CodeClassRow>> GetCodeClassByPartNoAsync(string partNo, int biwSiteId);
 
     /// <summary>ثبت بحران بدنه‌سازی (frmBodyCriticalParts.btnSave) — <c>PF.S_CreateCriticalParts_V3</c></summary>
     Task<GlobalResultDto?> CreateCriticalPartAsync(int carId, string partNo, string partDesc, string partGroup, string? alterNativePartNo, string? criticalPartNote, int biwSiteId, int totalStock, int rawStock, int userId, string? productionStateNote, string? letterNo, bool isOutOfSAP);
@@ -26,16 +27,10 @@ public partial interface IBodyCriticalsRepository
     /// <summary>ویرایش بحران بدنه‌سازی (frmBodyCriticalParts (حالت ویرایش)) — <c>PF.S_Web_UpdateCriticalParts</c></summary>
     Task<GlobalResultDto?> UpdateCriticalPartAsync(int criticalPartsId, string partGroup, string? alterNativePartNo, string? criticalPartNote, int rawStock, int userId, string? productionStateNote, string? letterNo);
 
-    /// <summary>غیرفعال‌سازی بحران‌های بدنه‌سازی (frmBodyCriticalSearch (غیرفعال‌سازی)) — <c>PF.S_DisableCriticalParts</c></summary>
-    Task<GlobalResultDto?> DisableCriticalPartsAsync(string idString, int userId);
-
-    /// <summary>ثبت دلیل حذف بحران در لاگ رویدادها — <c>PF.InsertEventLog</c> (AttributeId = 4)</summary>
-    Task InsertDisableReasonAsync(int eventTypeId, int criticalPartId, string note, int userId);
-
     /// <summary>اطلاعات یک بحران بدنه‌سازی برای ویرایش (BL_BodyCritical.CriticalPartsInfo (frmBodyCriticalParts در حالت ویرایش)) — <c>PF.S_CriticalPartsInfo</c></summary>
-    Task<TabularResult> GetCriticalPartInfoAsync(int criticalPartsId);
+    Task<List<BodyCriticalPartInfoRow>> GetCriticalPartInfoAsync(int criticalPartsId);
 
     /// <summary>گزارش رویدادهای یک بحران (frmEventLog) — <c>PF.S_EventLogList</c></summary>
-    Task<TabularResult> GetEventLogAsync(int eventTypeId, int changedRecordId);
+    Task<List<EventLogRow>> GetEventLogAsync(int eventTypeId, int changedRecordId);
 
 }

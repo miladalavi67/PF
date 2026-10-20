@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using IKCO.ProductionFeasibility.BodyShop.BodyCriticals.Dtos;
+using IKCO.ProductionFeasibility.BodyShop.Results;
 using IKCO.ProductionFeasibility.Common;
 using Volo.Abp.Application.Dtos;
 
@@ -14,8 +15,11 @@ public partial interface IBodyCriticalsAppService
     Task<GlobalResultDto> RegisterLicenseAsync(BodyCriticalsRegisterLicenseInput input);
 
     /// <summary>ثبت گروهی بحران‌ها از اکسل</summary>
-    Task<TabularResult> BatchCreateAsync(BodyCriticalsBatchCreateInput input);
+    Task<ListResultDto<BodyBatchCreateResultRow>> BatchCreateAsync(BodyCriticalsBatchCreateInput input);
 
     /// <summary>زیرکلاس‌های مصرف‌کننده شماره فنی از SAP</summary>
     Task<ListResultDto<SapWhereUsedItemDto>> GetSapWhereUsedAsync(BodyCriticalsGetSapWhereUsedInput input);
+
+    /// <summary>غیرفعال‌سازی (حذف) بحران‌های بدنه‌سازی با ثبت دلیل در لاگ رویدادها</summary>
+    Task<GlobalResultDto> DisableCriticalPartsAsync(BodyCriticalsDisableCriticalPartsInput input);
 }

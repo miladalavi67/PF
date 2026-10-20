@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using IKCO.ProductionFeasibility.Common;
+using IKCO.ProductionFeasibility.Mechanical.Results;
 using IKCO.ProductionFeasibility.Mechanical.MechExceptions.Dtos;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
@@ -10,16 +11,16 @@ namespace IKCO.ProductionFeasibility.Mechanical.MechExceptions;
 public partial interface IMechExceptionsAppService : IApplicationService
 {
     /// <summary>فهرست بدنه‌های استثنا</summary>
-    Task<TabularResult> GetExceptionListAsync(MechExceptionsGetExceptionListInput input);
+    Task<ListResultDto<ProductExceptionRow>> GetExceptionListAsync(MechExceptionsGetExceptionListInput input);
 
     /// <summary>مجوزهای استثنا</summary>
-    Task<TabularResult> GetLicensesAsync(int id);
+    Task<ListResultDto<ExceptionLicenseRow>> GetLicensesAsync(int id);
 
     /// <summary>بدنه‌های مصرف‌کننده مجوز استثنا</summary>
-    Task<TabularResult> GetLicenseBodiesAsync(int id);
+    Task<ListResultDto<ExceptionLicenseBodyRow>> GetLicenseBodiesAsync(int id);
 
     /// <summary>تاریخچه مجوزهای استثنا برای شماره فنی</summary>
-    Task<TabularResult> GetLicenseLogAsync(MechExceptionsGetLicenseLogInput input);
+    Task<ListResultDto<ExceptionLicenseRow>> GetLicenseLogAsync(MechExceptionsGetLicenseLogInput input);
 
     /// <summary>ثبت مجوز برای استثنا</summary>
     Task CreateLicenseAsync(MechExceptionsCreateLicenseInput input);
@@ -31,6 +32,6 @@ public partial interface IMechExceptionsAppService : IApplicationService
     Task DisableExceptionsAsync(MechExceptionsDisableExceptionsInput input);
 
     /// <summary>گزارش شماره فنی‌های دارای استثنا</summary>
-    Task<TabularResult> GetPartNumbersInExceptionsAsync(MechExceptionsGetPartNumbersInExceptionsInput input);
+    Task<ListResultDto<ExceptionPartNumberRow>> GetPartNumbersInExceptionsAsync(MechExceptionsGetPartNumbersInExceptionsInput input);
 
 }

@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using IKCO.ProductionFeasibility.Common;
 using IKCO.ProductionFeasibility.Common.ValueObjects;
 using IKCO.ProductionFeasibility.Exceptions;
+using IKCO.ProductionFeasibility.Synchron.Results;
 using IKCO.ProductionFeasibility.Synchron.SyncBasis.Dtos;
 using IKCO.ProductionFeasibility.Synchron.SyncBasis.Repositories;
 using IKCO.ProductionFeasibility.Users;
@@ -21,29 +22,34 @@ public partial class SyncBasisAppService : PfAppService, ISyncBasisAppService
         _currentUser = currentUser;
     }
 
-    public async Task<TabularResult> GetListAsync()
+    public async Task<ListResultDto<SetBasisReportRow>> GetListAsync()
     {
-        return await _repository.GetListAsync();
+        return new ListResultDto<SetBasisReportRow>(await _repository.GetListAsync());
     }
 
-    public async Task<TabularResult> GetByCodeAsync(SyncBasisGetByCodeInput input)
+    public async Task<ListResultDto<SetBasisRow>> GetByCodeAsync(SyncBasisGetByCodeInput input)
     {
-        return await _repository.GetByCodeAsync(input.Code);
+        return new ListResultDto<SetBasisRow>(await _repository.GetByCodeAsync(input.Code));
     }
 
-    public async Task<TabularResult> GetByIdAsync(string id)
+    public async Task<ListResultDto<SetBasisRow>> GetByIdAsync(string id)
     {
-        return await _repository.GetByIdAsync(id);
+        return new ListResultDto<SetBasisRow>(await _repository.GetByIdAsync(id));
     }
 
-    public async Task<TabularResult> GetByStatusAsync(SyncBasisGetByStatusInput input)
+    public async Task<ListResultDto<SetBasisRow>> GetByStatusAsync(SyncBasisGetByStatusInput input)
     {
-        return await _repository.GetByStatusAsync(input.Status);
+        return new ListResultDto<SetBasisRow>(await _repository.GetByStatusAsync(input.Status));
     }
 
-    public async Task<TabularResult> CountBySetCodeAsync(SyncBasisCountBySetCodeInput input)
+    public async Task<int> CountBySetCodeAsync(SyncBasisCountBySetCodeInput input)
     {
-        return await _repository.CountBySetCodeAsync(input.SetCode);
+        return await _repository.CountBySetCodeAsync(input.SetCode) ?? default;
+    }
+
+    public async Task AddPartTypePropertyAsync(SyncBasisAddPartTypePropertyInput input)
+    {
+        await _repository.AddPartTypePropertyAsync(input.PartTypeCode, input.PropertyId);
     }
 
     public async Task CreateAsync(SyncBasisCreateInput input)

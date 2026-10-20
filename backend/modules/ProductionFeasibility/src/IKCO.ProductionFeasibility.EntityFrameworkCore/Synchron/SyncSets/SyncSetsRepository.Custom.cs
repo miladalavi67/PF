@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Dapper;
+using IKCO.ProductionFeasibility.Common;
+using IKCO.ProductionFeasibility.Mechanical.Results;
 using IKCO.ProductionFeasibility.StoredProcedures;
 using IKCO.ProductionFeasibility.Synchron.SyncSets.Repositories;
 
@@ -9,88 +10,45 @@ namespace IKCO.ProductionFeasibility.Synchron.SyncSets;
 
 public partial class SyncSetsRepository
 {
-    private async Task<bool> ProcedureExistsAsync(string name)
-    {
-        var ids = await QuerySqlAsync<int?>("SELECT OBJECT_ID(@Name, N'P')", new { Name = name }, PfCommandTimeouts.Lookup);
-        return ids.FirstOrDefault().HasValue;
-    }
-
     public async Task<int?> FindShortagePartListIdAsync(string partNo)
     {
-        var ids = await QuerySqlAsync<int?>(
-            "SELECT TOP 1 CAST(Id AS int) FROM dbo.T_ShortagePartList WITH (NOLOCK) WHERE PartNo = @PartNo AND [Status] = 1 ORDER BY Id",
-            new { PartNo = partNo }, PfCommandTimeouts.Lookup);
-        return ids.FirstOrDefault();
+        var parameters = new SpParameters().VarChar("@PartNo", partNo, 20);
+        var rows = await QueryRowsAsync<PartInShortageListRow>("dbo.SIMP_SelectParInShortagePartList", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+        return rows.FirstOrDefault(r => r.ShortagePartListId > 0)?.ShortagePartListId;
     }
 
-    public async Task InsertPartsAsync(int criticalPartsSetId, IReadOnlyList<SyncSetPart> parts)
-    {
-        const string procedure = "dbo.S_InsertCriticalPartsSet_Parts_Web";
-        if (await ProcedureExistsAsync(procedure))
+    public Task<GlobalResultDto?> InsertPartsAsync(int criticalPartsSetId, IReadOnlyList<SyncSetPart> parts)
+        => ExecuteTableAsync("dbo.S_InsertCriticalPartsSet_Parts_Web", parts.Select(p => new Dictionary<string, object?>
         {
-            var rows = parts.Select(p => (IReadOnlyDictionary<string, object?>)new Dictionary<string, object?>
-            {
-                ["CriticalPartsSetId"] = criticalPartsSetId, ["ShortagePartListId"] = p.ShortagePartListId, ["PartNo"] = p.PartNo,
-            }).ToList();
-            var table = await CreateTableParameterAsync(procedure, "@Table", rows);
-            await ExecuteAsync(procedure, new SpParameters().Table("@Table", table), LegacyCallStyle.AdoNet, PfCommandTimeouts.Command);
-            return;
-        }
+            ["CriticalPartsSetId"] = criticalPartsSetId, ["ShortagePartListId"] = p.ShortagePartListId, ["PartNo"] = p.PartNo,
+        }));
 
-        foreach (var p in parts)
-            await ExecuteSqlAsync(
-                "INSERT INTO dbo.T_CriticalPartsSet_Parts (CriticalPartsSetId, ShortagePartListId, PartNo) VALUES (@SetId, @ShortagePartListId, @PartNo)",
-                new { SetId = criticalPartsSetId, p.ShortagePartListId, p.PartNo });
+    public Task<GlobalResultDto?> InsertColorsAsync(int criticalPartsSetId, IReadOnlyList<int> colorIds)
+        => ExecuteTableAsync("dbo.S_InsertCriticalPartsSet_Colors_Web", colorIds.Select(c => new Dictionary<string, object?>
+        {
+            ["CriticalPartsSetId"] = criticalPartsSetId, ["CarColorId"] = c,
+        }));
+
+    public Task<GlobalResultDto?> InsertSaloonsAsync(int criticalPartsSetId, IReadOnlyList<int> saloonIds)
+        => ExecuteTableAsync("dbo.S_InsertCriticalPartsSet_Saloons_Web", saloonIds.Select(s => new Dictionary<string, object?>
+        {
+            ["CriticalPartsSetId"] = criticalPartsSetId, ["SaloonId"] = s,
+        }));
+
+    public async Task<List<GlobalResultDto?>> InsertProductsAsync(int criticalPartsSetId, IReadOnlyList<SyncSetProduct> products)
+    {
+        var results = new List<GlobalResultDto?>(products.Count);
+        foreach (var p in products)
+            results.Add(await AddProductAsync(criticalPartsSetId, p.CarGroupId, p.CarModelId, p.CarClassId, p.CarSubClassId, p.CarTrimId,
+                p.CarToodooziId, p.CarOptionId, p.CarColorId, p.SaloonId));
+        return results;
     }
 
-    public async Task InsertColorsAsync(int criticalPartsSetId, IReadOnlyList<int> colorIds)
+    /// <summary>رویه‌های <c>S_InsertCriticalPartsSet_*_Web</c> (پارامتر جدولی <c>@Table</c>، خروجی Result/Message)</summary>
+    private async Task<GlobalResultDto?> ExecuteTableAsync(string procedure, IEnumerable<Dictionary<string, object?>> rows)
     {
-        const string procedure = "dbo.S_InsertCriticalPartsSet_Colors_Web";
-        if (await ProcedureExistsAsync(procedure))
-        {
-            var rows = colorIds.Select(c => (IReadOnlyDictionary<string, object?>)new Dictionary<string, object?>
-            {
-                ["CriticalPartsSetId"] = criticalPartsSetId, ["CarColorId"] = c,
-            }).ToList();
-            var table = await CreateTableParameterAsync(procedure, "@Table", rows);
-            await ExecuteAsync(procedure, new SpParameters().Table("@Table", table), LegacyCallStyle.AdoNet, PfCommandTimeouts.Command);
-            return;
-        }
-
-        foreach (var c in colorIds)
-            await ExecuteSqlAsync("INSERT INTO dbo.T_CriticalPartsSet_Colors (CriticalPartsSetId, CarColorId) VALUES (@SetId, @ColorId)",
-                new { SetId = criticalPartsSetId, ColorId = c });
-    }
-
-    public async Task InsertSaloonsAsync(int criticalPartsSetId, IReadOnlyList<int> saloonIds)
-    {
-        const string procedure = "dbo.S_InsertCriticalPartsSet_Saloons_Web";
-        if (await ProcedureExistsAsync(procedure))
-        {
-            var rows = saloonIds.Select(s => (IReadOnlyDictionary<string, object?>)new Dictionary<string, object?>
-            {
-                ["CriticalPartsSetId"] = criticalPartsSetId, ["SaloonId"] = s,
-            }).ToList();
-            var table = await CreateTableParameterAsync(procedure, "@Table", rows);
-            await ExecuteAsync(procedure, new SpParameters().Table("@Table", table), LegacyCallStyle.AdoNet, PfCommandTimeouts.Command);
-            return;
-        }
-
-        foreach (var s in saloonIds)
-            await ExecuteSqlAsync("INSERT INTO dbo.T_CriticalPartsSet_Saloons (CriticalPartsSetId, SaloonId) VALUES (@SetId, @SaloonId)",
-                new { SetId = criticalPartsSetId, SaloonId = s });
-    }
-
-    public async Task InsertProductsAsync(int criticalPartsSetId, IReadOnlyList<SyncSetProduct> products)
-    {
-        const string procedure = "dbo.S_InsertCriticalPartsSet_Products";
-        var rows = products.Select(p => (IReadOnlyDictionary<string, object?>)new Dictionary<string, object?>
-        {
-            ["CriticalPartsSetId"] = criticalPartsSetId, ["CarGroupId"] = p.CarGroupId, ["CarModelId"] = p.CarModelId, ["CarClassId"] = p.CarClassId,
-            ["CarSubClassId"] = p.CarSubClassId, ["CarTrimId"] = p.CarTrimId, ["CarToodooziId"] = p.CarToodooziId, ["CarOptionId"] = p.CarOptionId,
-            ["CarColorId"] = p.CarColorId, ["SaloonId"] = p.SaloonId,
-        }).ToList();
-        var table = await CreateTableParameterAsync(procedure, "@dt", rows);
-        await ExecuteAsync(procedure, new SpParameters().Table("@dt", table), LegacyCallStyle.AdoNet, PfCommandTimeouts.Command);
+        var table = await CreateTableParameterAsync(procedure, "@Table", rows.Cast<IReadOnlyDictionary<string, object?>>().ToList());
+        return await QueryFirstOrDefaultAsync<GlobalResultDto>(procedure, new SpParameters().Table("@Table", table), LegacyCallStyle.AdoNet,
+            PfCommandTimeouts.Command);
     }
 }

@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using IKCO.ProductionFeasibility.Common;
 using IKCO.ProductionFeasibility.Common.ValueObjects;
 using IKCO.ProductionFeasibility.Exceptions;
+using IKCO.ProductionFeasibility.BodyShop.Results;
 using IKCO.ProductionFeasibility.BodyShop.BodyReports.Dtos;
 using IKCO.ProductionFeasibility.BodyShop.BodyReports.Repositories;
 using IKCO.ProductionFeasibility.Users;
@@ -21,64 +22,64 @@ public partial class BodyReportsAppService : PfAppService, IBodyReportsAppServic
         _currentUser = currentUser;
     }
 
-    public async Task<TabularResult> SearchCriticalPartsAsync(BodyReportsSearchCriticalPartsInput input)
+    public async Task<ListResultDto<BodyCriticalSearchRow>> SearchCriticalPartsAsync(BodyReportsSearchCriticalPartsInput input)
     {
-        return await _repository.SearchCriticalPartsAsync(input.PlantId, input.VINBiwSite, PartNumber.OptionalValue(input.PartNumber), input.Status, ShamsiDate.OptionalValue(input.FromDate), ShamsiDate.OptionalValue(input.ToDate), input.CarGroupId, input.CarModelId, input.CarClassId, input.TypeOfSearch, input.ProductionPossibilityId);
+        return new ListResultDto<BodyCriticalSearchRow>(await _repository.SearchCriticalPartsAsync(input.PlantId, input.VINBiwSite, PartNumber.OptionalValue(input.PartNumber), input.Status, ShamsiDate.OptionalValue(input.FromDate), ShamsiDate.OptionalValue(input.ToDate), input.CarGroupId, input.CarModelId, input.CarClassId, input.TypeOfSearch, input.ProductionPossibilityId));
     }
 
-    public async Task<TabularResult> GetCriticalPartProductsAsync(int criticalPartsId)
+    public async Task<ListResultDto<BodyCriticalProductRow>> GetCriticalPartProductsAsync(int criticalPartsId)
     {
-        return await _repository.GetCriticalPartProductsAsync(criticalPartsId);
+        return new ListResultDto<BodyCriticalProductRow>(await _repository.GetCriticalPartProductsAsync(criticalPartsId));
     }
 
-    public async Task<TabularResult> GetTrackingCriticalPartsAsync(BodyReportsGetTrackingCriticalPartsInput input)
+    public async Task<ListResultDto<BodyTrackingCriticalPartRow>> GetTrackingCriticalPartsAsync(BodyReportsGetTrackingCriticalPartsInput input)
     {
-        return await _repository.GetTrackingCriticalPartsAsync(input.PlantId, input.VINBiwSite, input.CarGroupId, input.CarModelId, input.CarClassId, input.SubClassId, input.ProductionPossibilityId);
+        return new ListResultDto<BodyTrackingCriticalPartRow>(await _repository.GetTrackingCriticalPartsAsync(input.PlantId, input.VINBiwSite, input.CarGroupId, input.CarModelId, input.CarClassId, input.SubClassId, input.ProductionPossibilityId));
     }
 
-    public async Task<TabularResult> GetTrackingCriticalPartProductsAsync(int criticalPartsId)
+    public async Task<ListResultDto<BodyTrackingProductRow>> GetTrackingCriticalPartProductsAsync(int criticalPartsId)
     {
-        return await _repository.GetTrackingCriticalPartProductsAsync(criticalPartsId);
+        return new ListResultDto<BodyTrackingProductRow>(await _repository.GetTrackingCriticalPartProductsAsync(criticalPartsId));
     }
 
-    public async Task<TabularResult> GetProductsOfSitesAsync()
+    public async Task<ListResultDto<BodyProductsOfSiteRow>> GetProductsOfSitesAsync()
     {
-        return await _repository.GetProductsOfSitesAsync();
+        return new ListResultDto<BodyProductsOfSiteRow>(await _repository.GetProductsOfSitesAsync());
     }
 
-    public async Task<TabularResult> GetPreAssignBodyCountsAsync(BodyReportsGetPreAssignBodyCountsInput input)
+    public async Task<ListResultDto<BodyPreAssignCountRow>> GetPreAssignBodyCountsAsync(BodyReportsGetPreAssignBodyCountsInput input)
     {
-        return await _repository.GetPreAssignBodyCountsAsync(input.CarId);
+        return new ListResultDto<BodyPreAssignCountRow>(await _repository.GetPreAssignBodyCountsAsync(input.CarId));
     }
 
-    public async Task<TabularResult> GetPreAssignCriticalBodiesAsync(BodyReportsGetPreAssignCriticalBodiesInput input)
+    public async Task<ListResultDto<BodyPreAssignCriticalRow>> GetPreAssignCriticalBodiesAsync(BodyReportsGetPreAssignCriticalBodiesInput input)
     {
-        return await _repository.GetPreAssignCriticalBodiesAsync(ShamsiDate.OptionalValue(input.FromDate), ShamsiDate.OptionalValue(input.ToDate), PartNumber.OptionalValue(input.PartNo));
+        return new ListResultDto<BodyPreAssignCriticalRow>(await _repository.GetPreAssignCriticalBodiesAsync(ShamsiDate.OptionalValue(input.FromDate), ShamsiDate.OptionalValue(input.ToDate), PartNumber.OptionalValue(input.PartNo)));
     }
 
-    public async Task<TabularResult> GetNotPossibleProductsToStepAssignAsync(BodyReportsGetNotPossibleProductsToStepAssignInput input)
+    public async Task<ListResultDto<BodyNotPossibleToAssignRow>> GetNotPossibleProductsToStepAssignAsync(BodyReportsGetNotPossibleProductsToStepAssignInput input)
     {
-        return await _repository.GetNotPossibleProductsToStepAssignAsync(ShamsiDate.OptionalValue(input.FromDate), ShamsiDate.OptionalValue(input.ToDate), PartNumber.OptionalValue(input.PartNo));
+        return new ListResultDto<BodyNotPossibleToAssignRow>(await _repository.GetNotPossibleProductsToStepAssignAsync(ShamsiDate.OptionalValue(input.FromDate), ShamsiDate.OptionalValue(input.ToDate), PartNumber.OptionalValue(input.PartNo)));
     }
 
-    public async Task<TabularResult> GetShortageLicenseTrackingAsync(BodyReportsGetShortageLicenseTrackingInput input)
+    public async Task<ListResultDto<BodyLicenseTrackingRow>> GetShortageLicenseTrackingAsync(BodyReportsGetShortageLicenseTrackingInput input)
     {
-        return await _repository.GetShortageLicenseTrackingAsync(input.CriticalPartTypeId, input.CriticalPartId);
+        return new ListResultDto<BodyLicenseTrackingRow>(await _repository.GetShortageLicenseTrackingAsync(input.CriticalPartTypeId, input.CriticalPartId));
     }
 
-    public async Task<TabularResult> GetProductionPossibilityStatusAsync(int id)
+    public async Task<ListResultDto<BodyProductionPossibilityStatusRow>> GetProductionPossibilityStatusAsync(int id)
     {
-        return await _repository.GetProductionPossibilityStatusAsync(id);
+        return new ListResultDto<BodyProductionPossibilityStatusRow>(await _repository.GetProductionPossibilityStatusAsync(id));
     }
 
-    public async Task<TabularResult> GetFailedSapTransfersAsync(BodyReportsGetFailedSapTransfersInput input)
+    public async Task<ListResultDto<FailedSapTransferRow>> GetFailedSapTransfersAsync(BodyReportsGetFailedSapTransfersInput input)
     {
-        return await _repository.GetFailedSapTransfersAsync(new ShamsiDate(input.FromDate).Value, new ShamsiDate(input.ToDate).Value);
+        return new ListResultDto<FailedSapTransferRow>(await _repository.GetFailedSapTransfersAsync(new ShamsiDate(input.FromDate).Value, new ShamsiDate(input.ToDate).Value));
     }
 
-    public async Task<TabularResult> GetSapDataUpdateTimesAsync()
+    public async Task<ListResultDto<SapDataUpdateTimesRow>> GetSapDataUpdateTimesAsync()
     {
-        return await _repository.GetSapDataUpdateTimesAsync();
+        return new ListResultDto<SapDataUpdateTimesRow>(await _repository.GetSapDataUpdateTimesAsync());
     }
 
     public async Task<string?> GetLastChangeOnLicenseAsync()

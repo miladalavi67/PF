@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using IKCO.ProductionFeasibility.Common;
 using IKCO.ProductionFeasibility.EntityFrameworkCore;
 using IKCO.ProductionFeasibility.StoredProcedures;
+using IKCO.ProductionFeasibility.Synchron.Results;
 using IKCO.ProductionFeasibility.Synchron.SyncSets.Repositories;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.EntityFrameworkCore;
@@ -17,63 +18,93 @@ public partial class SyncSetsRepository : PfDapperRepository<PfDbContext>, ISync
     {
     }
 
-    public async Task<TabularResult> GetByIdAsync(int id)
+    public async Task<List<CriticalPartSetRow>> GetByIdAsync(int id)
     {
         var parameters = new SpParameters()
             .Int("@Id", id);
-        return await QueryTableAsync("dbo.S_CriticalPartSetSelectById", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+        return await QueryRowsAsync<CriticalPartSetRow>("dbo.S_CriticalPartSetSelectById", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
     }
 
-    public async Task<TabularResult> GetPartsAsync(int criticalPartsSetId)
+    public async Task<List<SetPartRow>> GetPartsAsync(int criticalPartsSetId)
     {
         var parameters = new SpParameters()
             .Int("@CriticalPartsSetId", criticalPartsSetId);
-        return await QueryTableAsync("dbo.S_CriticalPartSetPartSelectByCriticalPartsSetId", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+        return await QueryRowsAsync<SetPartRow>("dbo.S_CriticalPartSetPartSelectByCriticalPartsSetId", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
     }
 
-    public async Task<TabularResult> GetPartsWithShortageListAsync(int criticalPartsSetId)
+    public async Task<List<SetPartWithShortageRow>> GetPartsWithShortageListAsync(int criticalPartsSetId)
     {
         var parameters = new SpParameters()
             .Int("@CriticalPartsSetId", criticalPartsSetId);
-        return await QueryTableAsync("dbo.S_CriticalPartSetPartWithShortagePartListSelectByCriticalPartsSetId", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+        return await QueryRowsAsync<SetPartWithShortageRow>("dbo.S_CriticalPartSetPartWithShortagePartListSelectByCriticalPartsSetId", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
     }
 
-    public async Task<TabularResult> GetColorsAsync(int criticalPartsSetId)
+    public async Task<List<SetColorRow>> GetColorsAsync(int criticalPartsSetId)
     {
         var parameters = new SpParameters()
             .Int("@CriticalPartsSetId", criticalPartsSetId);
-        return await QueryTableAsync("dbo.S_CriticalPartSetColorSelectByCriticalPartSetId", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+        return await QueryRowsAsync<SetColorRow>("dbo.S_CriticalPartSetColorSelectByCriticalPartSetId", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
     }
 
-    public async Task<TabularResult> GetSaloonsAsync(int criticalPartSetId)
+    public async Task<List<SetSaloonRow>> GetSaloonsAsync(int criticalPartSetId)
     {
         var parameters = new SpParameters()
             .Int("@CriticalPartSetId", criticalPartSetId);
-        return await QueryTableAsync("dbo.S_CriticalPartSetSaloonSelectByCriticalPartSetId", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+        return await QueryRowsAsync<SetSaloonRow>("dbo.S_CriticalPartSetSaloonSelectByCriticalPartSetId", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
     }
 
-    public async Task<TabularResult> GetProductsAsync(int criticalPartsSetId)
+    public async Task<List<SetProductRow>> GetProductsAsync(int criticalPartsSetId)
     {
         var parameters = new SpParameters()
             .Int("@CriticalPartsSetId", criticalPartsSetId);
-        return await QueryTableAsync("dbo.S_CriticalPartSetProductSelectByCriticalPartsSetId", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+        return await QueryRowsAsync<SetProductRow>("dbo.S_CriticalPartSetProductSelectByCriticalPartsSetId", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
     }
 
-    public async Task<TabularResult> GetProductDetailsAsync(int criticalPartsSetId)
+    public async Task<List<SetProductDetailRow>> GetProductDetailsAsync(int criticalPartsSetId)
     {
         var parameters = new SpParameters()
             .Int("@CriticalPartsSetId", criticalPartsSetId);
-        return await QueryTableAsync("dbo.S_CriticalPartSetProductSelectDetailsByCriticalPartsSetId", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+        return await QueryRowsAsync<SetProductDetailRow>("dbo.S_CriticalPartSetProductSelectDetailsByCriticalPartsSetId", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
     }
 
-    public async Task<TabularResult> GetNotEnteredIndicatorCarsCountAsync(int criticalPartsSetId)
+    public async Task<int?> GetNotEnteredIndicatorCarsCountAsync(int criticalPartsSetId)
     {
         var parameters = new SpParameters()
             .Int("@CriticalPartsSetId", criticalPartsSetId);
-        return await QueryTableAsync("dbo.S_CriticalPartsSetSaloonNotEnteredIndicatorCarsCount", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+        var scalar = await ExecuteScalarAsync("dbo.S_CriticalPartsSetSaloonNotEnteredIndicatorCarsCount_Web", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+        return scalar is null or DBNull ? null : Convert.ToInt32(scalar);
     }
 
-    public async Task<int> CreateHeaderAsync(int setId, int deptId, string productsColorCode, int productsColorId, int productsTrimId, int productsToodooziId, int productsOptionId, short stock, string? note, int userId)
+    public async Task<List<SetSaloonItemRow>> GetSetSaloonsAsync(int criticalPartsSetId)
+    {
+        var parameters = new SpParameters()
+            .Int("@CriticalPartsSetId", criticalPartsSetId);
+        return await QueryRowsAsync<SetSaloonItemRow>("dbo.S_GetCriticalPartsSet_Saloons", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+    }
+
+    public async Task<List<BomPartInfoRow>> GetPartInfoAsync(string partNo)
+    {
+        var parameters = new SpParameters()
+            .VarChar("@PartNo", partNo, 50);
+        return await QueryRowsAsync<BomPartInfoRow>("dbo.SIMP_PartGetInfoByPartNo_Web", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+    }
+
+    public async Task<List<SimilarColorRow>> GetSimilarColorsAsync(string code)
+    {
+        var parameters = new SpParameters()
+            .Char("@Code", code, 5);
+        return await QueryRowsAsync<SimilarColorRow>("dbo.S_SelectColorsSimilarTo5DigitCode", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+    }
+
+    public async Task<List<SaloonByCarModelRow>> GetSaloonsByCarModelsAsync(string carModelIdSTR, byte plantId)
+    {
+        var parameters = new SpParameters()
+            .VarChar("@CarModelIdSTR", carModelIdSTR, 2000)
+            .TinyInt("@PlantId", plantId);
+        return await QueryRowsAsync<SaloonByCarModelRow>("dbo.S_SelectSaloonsByCarModels", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+    }
+
+    public async Task<GlobalResultDto?> CreateHeaderAsync(int setId, int deptId, string productsColorCode, int productsColorId, int productsTrimId, int productsToodooziId, int productsOptionId, short stock, string? note, int userId)
     {
         var parameters = new SpParameters()
             .Int("@SetId", setId)
@@ -86,12 +117,10 @@ public partial class SyncSetsRepository : PfDapperRepository<PfDbContext>, ISync
             .SmallInt("@Stock", stock)
             .VarChar("@Note", note, 100)
             .Int("@UserId", userId);
-        parameters.Output("@Id", System.Data.DbType.Int32);
-        await ExecuteAsync("dbo.S_CriticalPartsSetInsert", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Command);
-        return parameters.Get<int>("@Id");
+        return await QueryFirstOrDefaultAsync<GlobalResultDto>("dbo.S_CriticalPartsSetInsert_Web", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Command);
     }
 
-    public async Task UpdateHeaderAsync(int id, int deptId, short stock, string? note, byte status, int userId)
+    public async Task<GlobalResultDto?> UpdateHeaderAsync(int id, int deptId, short stock, string? note, byte status, int userId)
     {
         var parameters = new SpParameters()
             .Int("@Id", id)
@@ -100,10 +129,10 @@ public partial class SyncSetsRepository : PfDapperRepository<PfDbContext>, ISync
             .NVarChar("@Note", note, 100)
             .TinyInt("@Status", status)
             .Int("@UserId", userId);
-        await ExecuteAsync("dbo.S_CriticalPartsSetUpdate", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Command);
+        return await QueryFirstOrDefaultAsync<GlobalResultDto>("dbo.S_CriticalPartsSetUpdate_Web", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Command);
     }
 
-    public async Task AddProductAsync(int criticalPartsSetId, int carGroupId, int carModelId, int carClassId, int carSubClassId, int carTrimId, int carToodooziId, int carOptionId, int carColorId, int saloonId)
+    public async Task<GlobalResultDto?> AddProductAsync(int criticalPartsSetId, int carGroupId, int carModelId, int carClassId, int carSubClassId, int carTrimId, int carToodooziId, int carOptionId, int carColorId, int saloonId)
     {
         var parameters = new SpParameters()
             .Int("@CriticalPartsSetId", criticalPartsSetId)
@@ -116,17 +145,17 @@ public partial class SyncSetsRepository : PfDapperRepository<PfDbContext>, ISync
             .Int("@CarOptionId", carOptionId)
             .Int("@CarColorId", carColorId)
             .Int("@SaloonId", saloonId);
-        await ExecuteAsync("dbo.S_CriticalPartsSetProductInsert", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Command);
+        return await QueryFirstOrDefaultAsync<GlobalResultDto>("dbo.S_CriticalPartsSetProductInsert_Web", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Command);
     }
 
-    public async Task UpdateSaloonIndicatorCarAsync(int id, int criticalPartsSetId, short saloonId, int indicatorCarId)
+    public async Task<GlobalResultDto?> UpdateSaloonIndicatorCarAsync(int id, int criticalPartsSetId, short saloonId, int indicatorCarId)
     {
         var parameters = new SpParameters()
             .Int("@Id", id)
             .Int("@CriticalPartsSetId", criticalPartsSetId)
             .SmallInt("@SaloonId", saloonId)
             .Int("@IndicatorCarId", indicatorCarId);
-        await ExecuteAsync("dbo.S_CriticalPartsSetSaloonUpdate", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Command);
+        return await QueryFirstOrDefaultAsync<GlobalResultDto>("dbo.S_CriticalPartsSetSaloonUpdate_Web", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Command);
     }
 
     public async Task DeleteAsync(int id)

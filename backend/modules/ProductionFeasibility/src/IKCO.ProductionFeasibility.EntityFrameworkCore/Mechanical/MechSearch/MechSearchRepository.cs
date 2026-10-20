@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using IKCO.ProductionFeasibility.Common;
 using IKCO.ProductionFeasibility.EntityFrameworkCore;
 using IKCO.ProductionFeasibility.StoredProcedures;
+using IKCO.ProductionFeasibility.Mechanical.Results;
 using IKCO.ProductionFeasibility.Mechanical.MechSearch.Repositories;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.EntityFrameworkCore;
@@ -17,7 +18,7 @@ public partial class MechSearchRepository : PfDapperRepository<PfDbContext>, IMe
     {
     }
 
-    public async Task<TabularResult> SearchCriticalPartsAsync(string? partNo, string? setCode, string? fromDate, string? toDate, string? trimShopIds, int? status, int? criticalPartTypeId)
+    public async Task<List<CriticalPartSearchRow>> SearchCriticalPartsAsync(string? partNo, string? setCode, string? fromDate, string? toDate, string? trimShopIds, int? status, int? criticalPartTypeId)
     {
         var parameters = new SpParameters();
         if (partNo != null)
@@ -34,10 +35,10 @@ public partial class MechSearchRepository : PfDapperRepository<PfDbContext>, IMe
             parameters.Int("@Status", status);
         if (criticalPartTypeId != null)
             parameters.Int("@CriticalPartTypeId", criticalPartTypeId);
-        return await QueryTableAsync("dbo.S_CriticalPartsSearchByConditions", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Report);
+        return await QueryRowsAsync<CriticalPartSearchRow>("dbo.S_CriticalPartsSearchByConditions", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Report);
     }
 
-    public async Task<TabularResult> SearchByTrimShopAsync(string? partNo, string? fromDate, string? toDate, int trimShopId, int type)
+    public async Task<List<TrimShopCriticalPartRow>> SearchByTrimShopAsync(string? partNo, string? fromDate, string? toDate, int trimShopId, int type)
     {
         var parameters = new SpParameters()
             .Int("@TrimShopId", trimShopId)
@@ -48,15 +49,15 @@ public partial class MechSearchRepository : PfDapperRepository<PfDbContext>, IMe
             parameters.VarChar("@FromDate", fromDate, 10);
         if (toDate != null)
             parameters.VarChar("@ToDate", toDate, 10);
-        return await QueryTableAsync("dbo.S_CriticalPartSearch", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Report);
+        return await QueryRowsAsync<TrimShopCriticalPartRow>("dbo.S_CriticalPartSearch", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Report);
     }
 
-    public async Task<TabularResult> GetReceivedPartsAsync(string fromDate, string toDate)
+    public async Task<List<ReceivedPartRow>> GetReceivedPartsAsync(string fromDate, string toDate)
     {
         var parameters = new SpParameters()
             .NVarChar("@FromDate", fromDate, 10)
             .NVarChar("@ToDate", toDate, 10);
-        return await QueryTableAsync("dbo.S_CriticalPart_RecievedParts", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Report);
+        return await QueryRowsAsync<ReceivedPartRow>("dbo.S_CriticalPart_RecievedParts", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Report);
     }
 
 }

@@ -17,15 +17,16 @@ import LookupMultiSelect from "../../components/LookupMultiSelect";
 import SectionPanel from "../../components/SectionPanel";
 import TabularDialog from "../../components/TabularDialog";
 import { getMechLicensesTrackingList } from "../../server/services/mechLicensesService";
-import { deleteMechParts, getMechPartsPartDescription, getMechPartsProducts } from "../../server/services/mechPartsService";
+import { deleteMechParts, getMechPartsProducts } from "../../server/services/mechPartsService";
 import { searchMechSearchCriticalParts } from "../../server/services/mechSearchService";
 import { deleteSyncSets, getSyncSetsProductDetails } from "../../server/services/syncSetsService";
-import type { ITabularResult } from "../../types/Common";
+import type { ITabularResult } from "../../types/tabular";
 import { mechSearchSearchCriticalPartsInputRules } from "../../types/Mechanical";
 import { ApiPermissions } from "../../types/permissions";
 import { columnHeaders } from "../../utils/columnHeaders";
 import { resultColumns, tabularRows, type IGridRow } from "../../utils/tabularUtility";
 import MechLicenseChangeDialog from "./dialogs/MechLicenseChangeDialog";
+import PartNumberField from "../../components/PartNumberField";
 import ActionBar from "../../components/ActionBar";
 
 interface Props {
@@ -56,7 +57,6 @@ export default function MechCriticalSearchPanel({ initialKind = -1, onEdit, onPi
   const canChange = useCan(ApiPermissions.mechLicenses.change);
 
   const [partNo, setPartNo] = useState("");
-  const [partDesc, setPartDesc] = useState("");
   const [setCode, setSetCode] = useState("");
   const [allSaloons, setAllSaloons] = useState(true);
   const [trimShopIds, setTrimShopIds] = useState<number[]>([]);
@@ -77,16 +77,6 @@ export default function MechCriticalSearchPanel({ initialKind = -1, onEdit, onPi
 
   // GrvParts_RowsChanged: دکمه‌های تغییر/حذف/ردیابی فقط وقتی جدول ردیف دارد فعالند
   const hasRows = rows.length > 0;
-
-  const loadPartDesc = async () => {
-    const value = partNo.trim();
-    if (!value) {
-      setPartDesc("");
-      return;
-    }
-    const desc = await getMechPartsPartDescription({ partNo: value });
-    setPartDesc(typeof desc === "string" ? desc.trim() : "");
-  };
 
   const run = async () => {
     if (partNo.length > 30 || setCode.length > 30) {
@@ -145,12 +135,7 @@ export default function MechCriticalSearchPanel({ initialKind = -1, onEdit, onPi
     <IkcoStack spacing={2}>
       <SectionPanel title="شرایط جستجو">
           <IkcoGrid container spacing={2} alignItems="center">
-            <IkcoGrid size={{ xs: 12, md: 3 }}>
-              <IkcoTextField label="شماره فنی" value={partNo} onChange={(e) => setPartNo(e.target.value)} onBlur={() => void loadPartDesc()} slotProps={{ htmlInput: { maxLength: 30 } }} />
-            </IkcoGrid>
-            <IkcoGrid size={{ xs: 12, md: 3 }}>
-              <IkcoTextField label="شرح" value={partDesc} disabled />
-            </IkcoGrid>
+            <PartNumberField value={partNo} onChange={setPartNo} descLabel="شرح" maxLength={30} size={{ xs: 12, md: 3 }} descSize={{ xs: 12, md: 3 }} />
             <IkcoGrid size={{ xs: 12, md: 3 }}>
               <IkcoTextField label="کد ست" value={setCode} onChange={(e) => setSetCode(e.target.value)} slotProps={{ htmlInput: { maxLength: 30 } }} placeholder="فقط سنکرون" />
             </IkcoGrid>

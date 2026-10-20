@@ -4,6 +4,8 @@ using System.Linq;
 using System.Net;
 using IKCO.Infrastructure;
 using IKCO.ProductionFeasibility.Host.Identity;
+using IKCO.ProductionFeasibility.Host.LiveUpdates;
+using IKCO.ProductionFeasibility.LiveUpdates;
 using IKCO.ProductionFeasibility.Sap;
 using IKCO.ProductionFeasibility.Users;
 using Microsoft.AspNetCore.Builder;
@@ -63,6 +65,11 @@ public class HostModule : AbpModule
         context.Services.AddHttpContextAccessor();
         context.Services.AddTransient<IPfIdentityProvider, HttpPfIdentityProvider>();
         context.Services.Configure<SapOptions>(configuration.GetSection(SapOptions.SectionName));
+
+        // به‌روزرسانی زنده گزارش‌های ردیابی (جایگزین Service Broker فرم‌های ویندوزی)
+        context.Services.AddSignalR();
+        context.Services.Configure<LiveUpdateOptions>(configuration.GetSection(LiveUpdateOptions.SectionName));
+        context.Services.AddHostedService<TableChangeNotifier>();
     }
 
     private void ConfigureExceptionStatusCodes()
@@ -127,6 +134,15 @@ public class HostModule : AbpModule
         app.UseRouting();
         app.UseAbpRequestLocalization();
         app.UseCors(CorsPolicyName);
+        // WebSocket مرورگر هدر Authorization نمی‌فرستد؛ کلاینت SignalR توکن را در access_token می‌گذارد (فقط برای مسیر هاب)
+        app.Use(async (http, next) =>
+        {
+            if (http.Request.Path.StartsWithSegments(PfLiveHub.Route)
+                && string.IsNullOrEmpty(http.Request.Headers.Authorization)
+                && http.Request.Query.TryGetValue("access_token", out var token) && !string.IsNullOrEmpty(token))
+                http.Request.Headers.Authorization = "Bearer " + token;
+            await next();
+        });
         app.UseCorrelationId();
         // مدیریت خطا، لاگ درخواست/پاسخ سازمانی و احراز هویت/مجوز IKCO.Auth
         app.UseIKCOInfrastructure();
@@ -141,6 +157,6 @@ public class HostModule : AbpModule
         });
         app.UseAuditing();
         app.UseAbpSerilogEnrichers();
-        app.UseConfiguredEndpoints();
+        app.UseConfiguredEndpoints(endpoints => endpoints.MapHub<PfLiveHub>(PfLiveHub.Route));
     }
 }

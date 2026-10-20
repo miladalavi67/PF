@@ -38,7 +38,7 @@ import {
   saveSyncSetsComposition,
   updateSyncSetsHeader,
 } from "../../server/services/syncSetsService";
-import type { ITabularResult } from "../../types/Common";
+import type { ITabularResult } from "../../types/tabular";
 import type { ISyncSetPartItem, ISyncSetProductItem } from "../../types/Synchron";
 import { syncSetsCreateHeaderInputRules } from "../../types/Synchron";
 import { ApiPermissions } from "../../types/permissions";
@@ -293,7 +293,8 @@ export default function SyncSetManagement({ editId: editIdProp, onDone }: Props 
     setBusy(true);
     let id = 0;
     try {
-      id = await createSyncSetsHeader({
+      // S_CriticalPartsSetInsert_Web: شناسه بحران سنکرون جدید در Result برمی‌گردد
+      const header = await createSyncSetsHeader({
         setId: basisId,
         deptId,
         productsColorCode: colorCode.trim(),
@@ -304,6 +305,7 @@ export default function SyncSetManagement({ editId: editIdProp, onDone }: Props 
         stock: Number(stock) || 0,
         note: note.trim() || null,
       });
+      id = header.result;
       await saveSyncSetsComposition(id, { parts, colorIds, saloonIds, products });
       toast.success("بحران سنکرون ثبت شد");
       setPickedId(id);

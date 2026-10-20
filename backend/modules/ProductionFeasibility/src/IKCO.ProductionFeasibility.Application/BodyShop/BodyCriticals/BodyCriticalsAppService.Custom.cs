@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using IKCO.ProductionFeasibility.BodyShop.BodyCriticals.Dtos;
+using IKCO.ProductionFeasibility.BodyShop.Results;
 using IKCO.ProductionFeasibility.Common;
 using IKCO.ProductionFeasibility.Common.ValueObjects;
 using IKCO.ProductionFeasibility.Sap;
@@ -36,7 +37,7 @@ public partial class BodyCriticalsAppService
     }
 
     [UnitOfWork(isTransactional: true)]
-    public async Task<TabularResult> BatchCreateAsync(BodyCriticalsBatchCreateInput input)
+    public async Task<ListResultDto<BodyBatchCreateResultRow>> BatchCreateAsync(BodyCriticalsBatchCreateInput input)
     {
         var userId = await _currentUser.GetIdAsync();
         var rows = input.Rows.Select(r => (IReadOnlyDictionary<string, object?>)new Dictionary<string, object?>
@@ -54,7 +55,7 @@ public partial class BodyCriticalsAppService
             ["CarClassCode"] = r.CarClassCode,
             ["Quantity"] = r.Quantity,
         }).ToList();
-        return await _repository.BatchCreateAsync(input.BIWSiteId, rows, userId);
+        return new ListResultDto<BodyBatchCreateResultRow>(await _repository.BatchCreateAsync(input.BIWSiteId, rows, userId));
     }
 
     public async Task<ListResultDto<SapWhereUsedItemDto>> GetSapWhereUsedAsync(BodyCriticalsGetSapWhereUsedInput input)
@@ -63,5 +64,23 @@ public partial class BodyCriticalsAppService
         var items = await client.GetWhereUsedAsync(new PartNumber(input.PartNo).Value, input.SaloonCode.Trim());
         return new ListResultDto<SapWhereUsedItemDto>(items
             .Select(i => new SapWhereUsedItemDto { SubClassCode = i.SubClassCode, Quantity = i.Quantity }).ToList());
+    }
+
+    /// <summary>
+    /// معادل حذف بحران در frmBodyCriticalSearch: دلیل حذف برای هر بحران با پسوند «(حذف بحران)» در لاگ رویدادها ثبت و سپس بحران‌ها
+    /// غیرفعال می‌شوند؛ همه در یک تراکنش.
+    /// </summary>
+    [UnitOfWork(isTransactional: true)]
+    public async Task<GlobalResultDto> DisableCriticalPartsAsync(BodyCriticalsDisableCriticalPartsInput input)
+    {
+        var userId = await _currentUser.GetIdAsync();
+        if (!string.IsNullOrWhiteSpace(input.Reason))
+        {
+            foreach (var id in input.Ids)
+                await _repository.InsertDisableReasonAsync(input.EventTypeId, id, input.Reason.Trim() + " (حذف بحران)", userId);
+        }
+
+        var result = await _repository.DisableCriticalPartsAsync(new IdList(input.Ids).ToCommaSeparated(), userId);
+        return EnsureSuccess(result, "غیرفعال‌سازی بحران‌های بدنه‌سازی", r => r > 0);
     }
 }

@@ -33,7 +33,7 @@ import {
 import { getBodyReportsCriticalPartProducts } from "../../server/services/bodyReportsService";
 import type { IBodyInfoRow, IPartProductRow } from "../../types/BodyShop";
 import { bodyCriticalsCreateCriticalPartInputRules, bodyCriticalsUpdateCriticalPartInputRules } from "../../types/BodyShop";
-import type { ITabularResult } from "../../types/Common";
+import type { ITabularResult } from "../../types/tabular";
 import { ApiPermissions } from "../../types/permissions";
 import { columnHeaders } from "../../utils/columnHeaders";
 import { resultColumns, tabularRows, type IGridRow } from "../../utils/tabularUtility";

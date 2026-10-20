@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using IKCO.ProductionFeasibility.Common;
+using IKCO.ProductionFeasibility.Synchron.Results;
 using IKCO.ProductionFeasibility.Synchron.SyncBasis.Dtos;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
@@ -10,19 +11,22 @@ namespace IKCO.ProductionFeasibility.Synchron.SyncBasis;
 public partial interface ISyncBasisAppService : IApplicationService
 {
     /// <summary>فهرست مبناهای ست سنکرون</summary>
-    Task<TabularResult> GetListAsync();
+    Task<ListResultDto<SetBasisReportRow>> GetListAsync();
 
     /// <summary>مبنای ست بر اساس کد</summary>
-    Task<TabularResult> GetByCodeAsync(SyncBasisGetByCodeInput input);
+    Task<ListResultDto<SetBasisRow>> GetByCodeAsync(SyncBasisGetByCodeInput input);
 
     /// <summary>مبنای ست بر اساس شناسه</summary>
-    Task<TabularResult> GetByIdAsync(string id);
+    Task<ListResultDto<SetBasisRow>> GetByIdAsync(string id);
 
     /// <summary>مبناهای ست بر اساس وضعیت</summary>
-    Task<TabularResult> GetByStatusAsync(SyncBasisGetByStatusInput input);
+    Task<ListResultDto<SetBasisRow>> GetByStatusAsync(SyncBasisGetByStatusInput input);
 
     /// <summary>تعداد ست‌های ثبت‌شده با کد ست</summary>
-    Task<TabularResult> CountBySetCodeAsync(SyncBasisCountBySetCodeInput input);
+    Task<int> CountBySetCodeAsync(SyncBasisCountBySetCodeInput input);
+
+    /// <summary>ثبت ویژگی نوع قطعه سنکرون</summary>
+    Task AddPartTypePropertyAsync(SyncBasisAddPartTypePropertyInput input);
 
     /// <summary>ثبت مبنای ست سنکرون</summary>
     Task CreateAsync(SyncBasisCreateInput input);

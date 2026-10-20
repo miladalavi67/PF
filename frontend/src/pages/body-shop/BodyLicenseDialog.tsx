@@ -9,7 +9,7 @@ import TabularDialog from "../../components/TabularDialog";
 import { getBodyCriticalsEventLog, registerBodyCriticalsLicense } from "../../server/services/bodyCriticalsService";
 import { getBodyReportsProductionPossibilityStatus, getBodyReportsShortageLicenseTracking } from "../../server/services/bodyReportsService";
 import { bodyCriticalsRegisterLicenseInputRules } from "../../types/BodyShop";
-import type { ITabularResult } from "../../types/Common";
+import type { ITabularResult } from "../../types/tabular";
 import { columnHeaders } from "../../utils/columnHeaders";
 import { resultColumns, tabularRows } from "../../utils/tabularUtility";
 

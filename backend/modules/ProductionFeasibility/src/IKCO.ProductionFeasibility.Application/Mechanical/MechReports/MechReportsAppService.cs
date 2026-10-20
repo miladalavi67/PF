@@ -2,6 +2,8 @@ using System.Threading.Tasks;
 using IKCO.ProductionFeasibility.Common;
 using IKCO.ProductionFeasibility.Common.ValueObjects;
 using IKCO.ProductionFeasibility.Exceptions;
+using IKCO.ProductionFeasibility.BodyShop.Results;
+using IKCO.ProductionFeasibility.Mechanical.Results;
 using IKCO.ProductionFeasibility.Mechanical.MechReports.Dtos;
 using IKCO.ProductionFeasibility.Mechanical.MechReports.Repositories;
 using IKCO.ProductionFeasibility.Users;
@@ -21,74 +23,74 @@ public partial class MechReportsAppService : PfAppService, IMechReportsAppServic
         _currentUser = currentUser;
     }
 
-    public async Task<TabularResult> GetProductionPossibilityAsync(MechReportsGetProductionPossibilityInput input)
+    public async Task<ListResultDto<ProductionPossibilityRow>> GetProductionPossibilityAsync(MechReportsGetProductionPossibilityInput input)
     {
-        return await _repository.GetProductionPossibilityAsync(input.SaloonId, input.CrisisTypeId, input.CriticalPartTypeId, input.SubClassId, PartNumber.OptionalValue(input.PartNo), input.CarModelId, input.CarClassId);
+        return new ListResultDto<ProductionPossibilityRow>(await _repository.GetProductionPossibilityAsync(input.SaloonId, input.CrisisTypeId, input.CriticalPartTypeId, input.SubClassId, PartNumber.OptionalValue(input.PartNo), input.CarModelId, input.CarClassId));
     }
 
-    public async Task<TabularResult> GetProductionPossibilityWithLicenseAsync(MechReportsGetProductionPossibilityWithLicenseInput input)
+    public async Task<ListResultDto<ProductionPossibilityRow>> GetProductionPossibilityWithLicenseAsync(MechReportsGetProductionPossibilityWithLicenseInput input)
     {
-        return await _repository.GetProductionPossibilityWithLicenseAsync(input.SaloonId, input.CrisisTypeId, input.CriticalPartTypeId, input.SubClassId, input.CarModelId, input.CarClassId);
+        return new ListResultDto<ProductionPossibilityRow>(await _repository.GetProductionPossibilityWithLicenseAsync(input.SaloonId, input.CrisisTypeId, input.CriticalPartTypeId, input.SubClassId, input.CarModelId, input.CarClassId));
     }
 
-    public async Task<TabularResult> GetProductionPossibilityByTrimShopAsync(MechReportsGetProductionPossibilityByTrimShopInput input)
+    public async Task<ListResultDto<ProdPossibilityByTrimShopRow>> GetProductionPossibilityByTrimShopAsync(MechReportsGetProductionPossibilityByTrimShopInput input)
     {
-        return await _repository.GetProductionPossibilityByTrimShopAsync(input.TrimShopId, input.ProdState);
+        return new ListResultDto<ProdPossibilityByTrimShopRow>(await _repository.GetProductionPossibilityByTrimShopAsync(input.TrimShopId, input.ProdState));
     }
 
-    public async Task<TabularResult> GetGeneralReportAsync(MechReportsGetGeneralReportInput input)
+    public async Task<ListResultDto<GeneralReportRow>> GetGeneralReportAsync(MechReportsGetGeneralReportInput input)
     {
-        return await _repository.GetGeneralReportAsync(input.CriticalPartTypeId, input.SaloonId, input.CrisisTypeId, input.PlantId);
+        return new ListResultDto<GeneralReportRow>(await _repository.GetGeneralReportAsync(input.CriticalPartTypeId, input.SaloonId, input.CrisisTypeId, input.PlantId));
     }
 
-    public async Task<TabularResult> GetIncomingBodiesByCriticalPartAsync(MechReportsGetIncomingBodiesByCriticalPartInput input)
+    public async Task<ListResultDto<IncomingBodiesCountRow>> GetIncomingBodiesByCriticalPartAsync(MechReportsGetIncomingBodiesByCriticalPartInput input)
     {
-        return await _repository.GetIncomingBodiesByCriticalPartAsync(input.Id, input.CriticalPartTypeId, input.SaloonId, input.PlantId);
+        return new ListResultDto<IncomingBodiesCountRow>(await _repository.GetIncomingBodiesByCriticalPartAsync(input.Id, input.CriticalPartTypeId, input.SaloonId, input.PlantId));
     }
 
-    public async Task<TabularResult> GetIncomingBodyListAsync(MechReportsGetIncomingBodyListInput input)
+    public async Task<ListResultDto<IncomingBodyRow>> GetIncomingBodyListAsync(MechReportsGetIncomingBodyListInput input)
     {
-        return await _repository.GetIncomingBodyListAsync(input.Id, input.CriticalPartTypeId, input.SaloonId, input.ProductionStepGroupId, input.PlantId);
+        return new ListResultDto<IncomingBodyRow>(await _repository.GetIncomingBodyListAsync(input.Id, input.CriticalPartTypeId, input.SaloonId, input.ProductionStepGroupId, input.PlantId));
     }
 
-    public async Task<TabularResult> GetIncomingBodiesSummaryAsync(MechReportsGetIncomingBodiesSummaryInput input)
+    public async Task<ListResultDto<IncomingBodiesSummaryRow>> GetIncomingBodiesSummaryAsync(MechReportsGetIncomingBodiesSummaryInput input)
     {
-        return await _repository.GetIncomingBodiesSummaryAsync(input.SaloonId, input.CrisisTypeId, input.ProductionStepGroupId, input.PlantId);
+        return new ListResultDto<IncomingBodiesSummaryRow>(await _repository.GetIncomingBodiesSummaryAsync(input.SaloonId, input.CrisisTypeId, input.ProductionStepGroupId, input.PlantId));
     }
 
-    public async Task<TabularResult> GetStockLogAsync(MechReportsGetStockLogInput input)
+    public async Task<ListResultDto<StockLogRow>> GetStockLogAsync(MechReportsGetStockLogInput input)
     {
-        return await _repository.GetStockLogAsync(new PartNumber(input.PartNo).Value);
+        return new ListResultDto<StockLogRow>(await _repository.GetStockLogAsync(new PartNumber(input.PartNo).Value));
     }
 
-    public async Task<TabularResult> GetSapCriticalLogAsync(MechReportsGetSapCriticalLogInput input)
+    public async Task<ListResultDto<SapCriticalLogRow>> GetSapCriticalLogAsync(MechReportsGetSapCriticalLogInput input)
     {
-        return await _repository.GetSapCriticalLogAsync(new PartNumber(input.PartNo).Value);
+        return new ListResultDto<SapCriticalLogRow>(await _repository.GetSapCriticalLogAsync(new PartNumber(input.PartNo).Value));
     }
 
-    public async Task<TabularResult> GetFailedSapTransfersAsync(MechReportsGetFailedSapTransfersInput input)
+    public async Task<ListResultDto<FailedSapTransferRow>> GetFailedSapTransfersAsync(MechReportsGetFailedSapTransfersInput input)
     {
-        return await _repository.GetFailedSapTransfersAsync(new ShamsiDate(input.FromDate).Value, new ShamsiDate(input.ToDate).Value);
+        return new ListResultDto<FailedSapTransferRow>(await _repository.GetFailedSapTransfersAsync(new ShamsiDate(input.FromDate).Value, new ShamsiDate(input.ToDate).Value));
     }
 
-    public async Task<TabularResult> GetAsnReportAsync(MechReportsGetAsnReportInput input)
+    public async Task<ListResultDto<AsnRow>> GetAsnReportAsync(MechReportsGetAsnReportInput input)
     {
-        return await _repository.GetAsnReportAsync(PartNumber.OptionalValue(input.PartNumber), ShamsiDate.OptionalValue(input.FromDate), ShamsiDate.OptionalValue(input.ToDate), input.Type);
+        return new ListResultDto<AsnRow>(await _repository.GetAsnReportAsync(PartNumber.OptionalValue(input.PartNumber), ShamsiDate.OptionalValue(input.FromDate), ShamsiDate.OptionalValue(input.ToDate), input.Type));
     }
 
-    public async Task<TabularResult> GetNotPossibleProductsToTrimStepAsync(MechReportsGetNotPossibleProductsToTrimStepInput input)
+    public async Task<ListResultDto<TrimInNotPossibleRow>> GetNotPossibleProductsToTrimStepAsync(MechReportsGetNotPossibleProductsToTrimStepInput input)
     {
-        return await _repository.GetNotPossibleProductsToTrimStepAsync(input.CarId);
+        return new ListResultDto<TrimInNotPossibleRow>(await _repository.GetNotPossibleProductsToTrimStepAsync(input.CarId));
     }
 
-    public async Task<TabularResult> GetTrimShopBodyCountAsync(MechReportsGetTrimShopBodyCountInput input)
+    public async Task<ListResultDto<TrimShopBodyCountRow>> GetTrimShopBodyCountAsync(MechReportsGetTrimShopBodyCountInput input)
     {
-        return await _repository.GetTrimShopBodyCountAsync(input.CarId);
+        return new ListResultDto<TrimShopBodyCountRow>(await _repository.GetTrimShopBodyCountAsync(input.CarId));
     }
 
-    public async Task<TabularResult> GetTrimShopCriticalBodiesAsync(MechReportsGetTrimShopCriticalBodiesInput input)
+    public async Task<ListResultDto<TrimShopCriticalBodyRow>> GetTrimShopCriticalBodiesAsync(MechReportsGetTrimShopCriticalBodiesInput input)
     {
-        return await _repository.GetTrimShopCriticalBodiesAsync(ShamsiDate.OptionalValue(input.FromDate), ShamsiDate.OptionalValue(input.ToDate), PartNumber.OptionalValue(input.PartNo), input.CriticalPartTypeId, input.SetCode);
+        return new ListResultDto<TrimShopCriticalBodyRow>(await _repository.GetTrimShopCriticalBodiesAsync(ShamsiDate.OptionalValue(input.FromDate), ShamsiDate.OptionalValue(input.ToDate), PartNumber.OptionalValue(input.PartNo), input.CriticalPartTypeId, input.SetCode));
     }
 
 }

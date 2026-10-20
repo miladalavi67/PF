@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using IKCO.ProductionFeasibility.Common;
 using IKCO.ProductionFeasibility.Controllers;
 using IKCO.ProductionFeasibility.Permissions;
+using IKCO.ProductionFeasibility.Mechanical.Results;
 using IKCO.ProductionFeasibility.Mechanical.MechParts.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -32,8 +33,8 @@ public partial class MechPartsController : PfController
     /// </remarks>
     [HttpGet("body-properties")]
     [Authorize(PfPermissions.MechParts.View)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetBodyPropertiesAsync([FromQuery] MechPartsGetBodyPropertiesInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<CarPropertiesRow>))]
+    public Task<ListResultDto<CarPropertiesRow>> GetBodyPropertiesAsync([FromQuery] MechPartsGetBodyPropertiesInput input)
         => _service.GetBodyPropertiesAsync(input);
 
     /// <summary>شرح فارسی قطعه بر اساس شماره فنی</summary>
@@ -58,8 +59,8 @@ public partial class MechPartsController : PfController
     /// </remarks>
     [HttpGet("part-in-shortage-list")]
     [Authorize(PfPermissions.MechParts.View)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetPartInShortageListAsync([FromQuery] MechPartsGetPartInShortageListInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<PartInShortageListRow>))]
+    public Task<ListResultDto<PartInShortageListRow>> GetPartInShortageListAsync([FromQuery] MechPartsGetPartInShortageListInput input)
         => _service.GetPartInShortageListAsync(input);
 
     /// <summary>محصولات مصرف‌کننده یک شماره فنی (BOM)</summary>
@@ -71,8 +72,8 @@ public partial class MechPartsController : PfController
     /// </remarks>
     [HttpGet("part-products")]
     [Authorize(PfPermissions.MechParts.View)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetPartProductsAsync([FromQuery] MechPartsGetPartProductsInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<BomProductRow>))]
+    public Task<ListResultDto<BomProductRow>> GetPartProductsAsync([FromQuery] MechPartsGetPartProductsInput input)
         => _service.GetPartProductsAsync(input);
 
     /// <summary>قطعات مصرف‌شده در یک کلاس بر اساس نوع قطعه</summary>
@@ -84,8 +85,8 @@ public partial class MechPartsController : PfController
     /// </remarks>
     [HttpGet("products-by-class-part-type")]
     [Authorize(PfPermissions.MechParts.View)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetProductsByClassAndPartTypeAsync([FromQuery] MechPartsGetProductsByClassAndPartTypeInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<BomProductRow>))]
+    public Task<ListResultDto<BomProductRow>> GetProductsByClassAndPartTypeAsync([FromQuery] MechPartsGetProductsByClassAndPartTypeInput input)
         => _service.GetProductsByClassAndPartTypeAsync(input);
 
     /// <summary>بررسی وجود بحران فعال برای شماره فنی در سالن</summary>
@@ -97,8 +98,8 @@ public partial class MechPartsController : PfController
     /// </remarks>
     [HttpGet("exists-part-no")]
     [Authorize(PfPermissions.MechParts.View)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> ExistsPartNoAsync([FromQuery] MechPartsExistsPartNoInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<CriticalPartExistRow>))]
+    public Task<ListResultDto<CriticalPartExistRow>> ExistsPartNoAsync([FromQuery] MechPartsExistsPartNoInput input)
         => _service.ExistsPartNoAsync(input);
 
     /// <summary>محصولات شماره فنی از BOP</summary>
@@ -110,8 +111,8 @@ public partial class MechPartsController : PfController
     /// </remarks>
     [HttpGet("from-bop")]
     [Authorize(PfPermissions.MechParts.View)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetFromBopAsync([FromQuery] MechPartsGetFromBopInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<CriticalProductCandidateRow>))]
+    public Task<ListResultDto<CriticalProductCandidateRow>> GetFromBopAsync([FromQuery] MechPartsGetFromBopInput input)
         => _service.GetFromBopAsync(input);
 
     /// <summary>محصولات شماره فنی از SAP بر اساس زیرکلاس‌ها</summary>
@@ -123,8 +124,8 @@ public partial class MechPartsController : PfController
     /// </remarks>
     [HttpGet("from-sap")]
     [Authorize(PfPermissions.MechParts.View)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetFromSapAsync([FromQuery] MechPartsGetFromSapInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<CriticalProductCandidateRow>))]
+    public Task<ListResultDto<CriticalProductCandidateRow>> GetFromSapAsync([FromQuery] MechPartsGetFromSapInput input)
         => _service.GetFromSapAsync(input);
 
     /// <summary>اطلاعات بحران برای ویرایش</summary>
@@ -136,8 +137,8 @@ public partial class MechPartsController : PfController
     /// </remarks>
     [HttpGet("{id:int}/for-edit")]
     [Authorize(PfPermissions.MechParts.View)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetForEditAsync(int id)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<CriticalPartForEditRow>))]
+    public Task<ListResultDto<CriticalPartForEditRow>> GetForEditAsync(int id)
         => _service.GetForEditAsync(id);
 
     /// <summary>جزئیات بحران</summary>
@@ -149,8 +150,8 @@ public partial class MechPartsController : PfController
     /// </remarks>
     [HttpGet("{id:int}")]
     [Authorize(PfPermissions.MechParts.View)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetByIdAsync(int id)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<CriticalPartRow>))]
+    public Task<ListResultDto<CriticalPartRow>> GetByIdAsync(int id)
         => _service.GetByIdAsync(id);
 
     /// <summary>محصولات بحران برای ویرایش</summary>
@@ -162,8 +163,8 @@ public partial class MechPartsController : PfController
     /// </remarks>
     [HttpGet("{id:int}/products-for-edit")]
     [Authorize(PfPermissions.MechParts.View)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetProductsForEditAsync(int id, [FromQuery] MechPartsGetProductsForEditInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<CriticalPartProductForEditRow>))]
+    public Task<ListResultDto<CriticalPartProductForEditRow>> GetProductsForEditAsync(int id, [FromQuery] MechPartsGetProductsForEditInput input)
         => _service.GetProductsForEditAsync(id, input);
 
     /// <summary>محصولات ثبت‌شده یک بحران</summary>
@@ -175,8 +176,8 @@ public partial class MechPartsController : PfController
     /// </remarks>
     [HttpGet("{criticalPartId:int}/products")]
     [Authorize(PfPermissions.MechParts.View)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetProductsAsync(int criticalPartId)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<CriticalPartProductRow>))]
+    public Task<ListResultDto<CriticalPartProductRow>> GetProductsAsync(int criticalPartId)
         => _service.GetProductsAsync(criticalPartId);
 
     /// <summary>ثبت بحران مکانیکی</summary>
@@ -210,8 +211,8 @@ public partial class MechPartsController : PfController
 
     /// <summary>ثبت/به‌روزرسانی یک محصول بحران</summary>
     /// <remarks>
-    /// معادل فرم/متد سامانه ویندوزی: <c>frmCriticalPart (محصولات)</c>.
-    /// رویه ذخیره‌شده: <c>dbo.S_CriticalPartsPruductUpdate_H_V1</c>.
+    /// معادل فرم/متد سامانه ویندوزی: <c>MechanicalParts/MechanicalCriticalPartsProductUpdate (بک‌اند قبلی) / frmCriticalPart (محصولات)</c>.
+    /// رویه ذخیره‌شده: <c>dbo.S_CriticalPartsPruductUpdate_Web</c>.
     /// رویه در صورت وجود محصول مشابه فعال تغییری نمی‌دهد؛ فراخوانی برای هر محصول جداگانه است. برای ثبت چندمحصولی از POST …/products/batch استفاده شود.
     ///
     ///     POST /api/production-feasibility/mechanical/critical-parts/{criticalPartsId:int}/products
@@ -219,8 +220,8 @@ public partial class MechPartsController : PfController
     /// </remarks>
     [HttpPost("{criticalPartsId:int}/products")]
     [Authorize(PfPermissions.MechParts.Update)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد")]
-    public Task SaveProductAsync(int criticalPartsId, [FromBody] MechPartsSaveProductInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(GlobalResultDto))]
+    public Task<GlobalResultDto> SaveProductAsync(int criticalPartsId, [FromBody] MechPartsSaveProductInput input)
         => _service.SaveProductAsync(criticalPartsId, input);
 
     /// <summary>افزودن زیرکلاس مغایر به بحران</summary>
@@ -237,17 +238,17 @@ public partial class MechPartsController : PfController
     public Task AddSubClassAsync([FromBody] MechPartsAddSubClassInput input)
         => _service.AddSubClassAsync(input);
 
-    /// <summary>حذف محصولات بحران مکانیکی</summary>
+    /// <summary>حذف بحران مکانیکی (به همراه استثناها و مجوزهای آن)</summary>
     /// <remarks>
-    /// معادل فرم/متد سامانه ویندوزی: <c>frmCriticalPartSearch (حذف)</c>.
-    /// رویه ذخیره‌شده: <c>dbo.S_CriticalPartDelete</c>.
+    /// معادل فرم/متد سامانه ویندوزی: <c>MechanicalParts/MechanicalCriticalPartDelete (بک‌اند قبلی) / frmCriticalPartSearch (حذف)</c>.
+    /// رویه ذخیره‌شده: <c>dbo.S_CriticalPartDelete_Web</c>.
     ///
     ///     DELETE /api/production-feasibility/mechanical/critical-parts/{id:int}
     /// </remarks>
     [HttpDelete("{id:int}")]
     [Authorize(PfPermissions.MechParts.Delete)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد")]
-    public Task DeleteAsync(int id)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(GlobalResultDto))]
+    public Task<GlobalResultDto> DeleteAsync(int id)
         => _service.DeleteAsync(id);
 
 }

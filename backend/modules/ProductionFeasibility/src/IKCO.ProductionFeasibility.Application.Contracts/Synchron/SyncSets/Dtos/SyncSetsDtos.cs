@@ -4,7 +4,40 @@ using System.ComponentModel.DataAnnotations;
 
 namespace IKCO.ProductionFeasibility.Synchron.SyncSets.Dtos;
 
-/// <summary>ورودی «ثبت سرآیند بحران سنکرون» — <c>dbo.S_CriticalPartsSetInsert</c></summary>
+/// <summary>ورودی «اطلاعات شماره فنی از BOM (کلاس، زیرکلاس و نوع قطعه)» — <c>dbo.SIMP_PartGetInfoByPartNo_Web</c></summary>
+public class SyncSetsGetPartInfoInput
+{
+    /// <summary>شماره فنی</summary>
+    [Required(AllowEmptyStrings = false)]
+    [StringLength(50)]
+    public string PartNo { get; set; } = default!;
+
+}
+
+/// <summary>ورودی «رنگ‌های هم‌کد با کد ۵ رقمی» — <c>dbo.S_SelectColorsSimilarTo5DigitCode</c></summary>
+public class SyncSetsGetSimilarColorsInput
+{
+    /// <summary>کد رنگ ۵ رقمی</summary>
+    [Required(AllowEmptyStrings = false)]
+    [StringLength(5)]
+    public string Code { get; set; } = default!;
+
+}
+
+/// <summary>ورودی «سالن‌های مونتاژ مدل‌های انتخاب‌شده» — <c>dbo.S_SelectSaloonsByCarModels</c></summary>
+public class SyncSetsGetSaloonsByCarModelsInput
+{
+    /// <summary>شناسه مدل‌ها (جداشده با ویرگول)</summary>
+    [Required(AllowEmptyStrings = false)]
+    [StringLength(2000)]
+    public string CarModelIds { get; set; } = default!;
+
+    /// <summary>سایت</summary>
+    public byte PlantId { get; set; }
+
+}
+
+/// <summary>ورودی «ثبت سرآیند بحران سنکرون» — <c>dbo.S_CriticalPartsSetInsert_Web</c></summary>
 public class SyncSetsCreateHeaderInput
 {
     /// <summary>شناسه مبنای ست</summary>
@@ -39,7 +72,7 @@ public class SyncSetsCreateHeaderInput
 
 }
 
-/// <summary>ورودی «ویرایش بحران سنکرون» — <c>dbo.S_CriticalPartsSetUpdate</c></summary>
+/// <summary>ورودی «ویرایش بحران سنکرون» — <c>dbo.S_CriticalPartsSetUpdate_Web</c></summary>
 public class SyncSetsUpdateHeaderInput
 {
     /// <summary>واحد مسئول</summary>
@@ -57,7 +90,7 @@ public class SyncSetsUpdateHeaderInput
 
 }
 
-/// <summary>ورودی «ثبت یک محصول بحران سنکرون» — <c>dbo.S_CriticalPartsSetProductInsert</c></summary>
+/// <summary>ورودی «ثبت یک محصول بحران سنکرون» — <c>dbo.S_CriticalPartsSetProductInsert_Web</c></summary>
 public class SyncSetsAddProductInput
 {
     /// <summary>خانواده</summary>
@@ -89,7 +122,7 @@ public class SyncSetsAddProductInput
 
 }
 
-/// <summary>ورودی «تعیین خودروی شاخص سالن بحران سنکرون» — <c>dbo.S_CriticalPartsSetSaloonUpdate</c></summary>
+/// <summary>ورودی «تعیین خودروی شاخص سالن بحران سنکرون» — <c>dbo.S_CriticalPartsSetSaloonUpdate_Web</c></summary>
 public class SyncSetsUpdateSaloonIndicatorCarInput
 {
     /// <summary>سالن</summary>

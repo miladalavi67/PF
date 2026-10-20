@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using IKCO.ProductionFeasibility.Common;
 using IKCO.ProductionFeasibility.Controllers;
 using IKCO.ProductionFeasibility.Permissions;
+using IKCO.ProductionFeasibility.Mechanical.Results;
 using IKCO.ProductionFeasibility.Mechanical.MechSearch.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -33,8 +34,8 @@ public partial class MechSearchController : PfController
     /// </remarks>
     [HttpPost("critical-parts")]
     [Authorize(PfPermissions.MechSearch.Search)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> SearchCriticalPartsAsync([FromBody] MechSearchSearchCriticalPartsInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<CriticalPartSearchRow>))]
+    public Task<ListResultDto<CriticalPartSearchRow>> SearchCriticalPartsAsync([FromBody] MechSearchSearchCriticalPartsInput input)
         => _service.SearchCriticalPartsAsync(input);
 
     /// <summary>جستجوی بحران‌ها بر اساس سالن و بازه تاریخ</summary>
@@ -46,8 +47,8 @@ public partial class MechSearchController : PfController
     /// </remarks>
     [HttpGet("critical-parts-by-trim-shop")]
     [Authorize(PfPermissions.MechSearch.Search)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> SearchByTrimShopAsync([FromQuery] MechSearchSearchByTrimShopInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<TrimShopCriticalPartRow>))]
+    public Task<ListResultDto<TrimShopCriticalPartRow>> SearchByTrimShopAsync([FromQuery] MechSearchSearchByTrimShopInput input)
         => _service.SearchByTrimShopAsync(input);
 
     /// <summary>اقلام بحرانی فعال وارد شده به شرکت</summary>
@@ -59,8 +60,8 @@ public partial class MechSearchController : PfController
     /// </remarks>
     [HttpGet("received-parts")]
     [Authorize(PfPermissions.MechSearch.Arrived)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetReceivedPartsAsync([FromQuery] MechSearchGetReceivedPartsInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<ReceivedPartRow>))]
+    public Task<ListResultDto<ReceivedPartRow>> GetReceivedPartsAsync([FromQuery] MechSearchGetReceivedPartsInput input)
         => _service.GetReceivedPartsAsync(input);
 
 }

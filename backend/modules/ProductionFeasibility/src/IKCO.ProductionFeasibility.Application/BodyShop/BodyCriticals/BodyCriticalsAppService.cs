@@ -1,7 +1,8 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using IKCO.ProductionFeasibility.Common;
 using IKCO.ProductionFeasibility.Common.ValueObjects;
 using IKCO.ProductionFeasibility.Exceptions;
+using IKCO.ProductionFeasibility.BodyShop.Results;
 using IKCO.ProductionFeasibility.BodyShop.BodyCriticals.Dtos;
 using IKCO.ProductionFeasibility.BodyShop.BodyCriticals.Repositories;
 using IKCO.ProductionFeasibility.Users;
@@ -37,9 +38,9 @@ public partial class BodyCriticalsAppService : PfAppService, IBodyCriticalsAppSe
         return new ListResultDto<PartProductRow>(await _repository.GetPartProductsAsync(new PartNumber(input.PartNo).Value, input.BIWSiteId));
     }
 
-    public async Task<TabularResult> GetCodeClassByPartNoAsync(BodyCriticalsGetCodeClassByPartNoInput input)
+    public async Task<ListResultDto<CodeClassRow>> GetCodeClassByPartNoAsync(BodyCriticalsGetCodeClassByPartNoInput input)
     {
-        return await _repository.GetCodeClassByPartNoAsync(new PartNumber(input.PartNo).Value, input.BIWSiteId);
+        return new ListResultDto<CodeClassRow>(await _repository.GetCodeClassByPartNoAsync(new PartNumber(input.PartNo).Value, input.BIWSiteId));
     }
 
     public async Task<GlobalResultDto> CreateCriticalPartAsync(BodyCriticalsCreateCriticalPartInput input)
@@ -56,29 +57,14 @@ public partial class BodyCriticalsAppService : PfAppService, IBodyCriticalsAppSe
         return EnsureSuccess(result, "ویرایش بحران بدنه‌سازی", r => r > 0);
     }
 
-    public async Task<GlobalResultDto> DisableCriticalPartsAsync(BodyCriticalsDisableCriticalPartsInput input)
+    public async Task<ListResultDto<BodyCriticalPartInfoRow>> GetCriticalPartInfoAsync(int criticalPartsId)
     {
-        var userId = await _currentUser.GetIdAsync();
-        if (!string.IsNullOrWhiteSpace(input.Reason))
-        {
-            foreach (var id in input.Ids)
-            {
-                await _repository.InsertDisableReasonAsync(input.EventTypeId, id, input.Reason.Trim() + " (حذف بحران)", userId);
-            }
-        }
-
-        var result = await _repository.DisableCriticalPartsAsync(new IdList(input.Ids).ToCommaSeparated(), userId);
-        return EnsureSuccess(result, "غیرفعال‌سازی بحران‌های بدنه‌سازی", r => r > 0);
+        return new ListResultDto<BodyCriticalPartInfoRow>(await _repository.GetCriticalPartInfoAsync(criticalPartsId));
     }
 
-    public async Task<TabularResult> GetCriticalPartInfoAsync(int criticalPartsId)
+    public async Task<ListResultDto<EventLogRow>> GetEventLogAsync(BodyCriticalsGetEventLogInput input)
     {
-        return await _repository.GetCriticalPartInfoAsync(criticalPartsId);
-    }
-
-    public async Task<TabularResult> GetEventLogAsync(BodyCriticalsGetEventLogInput input)
-    {
-        return await _repository.GetEventLogAsync(input.EventTypeId, input.ChangedRecordId);
+        return new ListResultDto<EventLogRow>(await _repository.GetEventLogAsync(input.EventTypeId, input.ChangedRecordId));
     }
 
 }

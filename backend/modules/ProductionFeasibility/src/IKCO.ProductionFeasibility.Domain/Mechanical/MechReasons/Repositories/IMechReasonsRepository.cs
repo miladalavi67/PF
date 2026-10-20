@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using IKCO.ProductionFeasibility.Common;
+using IKCO.ProductionFeasibility.Mechanical.Results;
 
 namespace IKCO.ProductionFeasibility.Mechanical.MechReasons.Repositories;
 
@@ -9,7 +10,7 @@ namespace IKCO.ProductionFeasibility.Mechanical.MechReasons.Repositories;
 public partial interface IMechReasonsRepository
 {
     /// <summary>فهرست دلایل عدم امکان تولید (frmNotPossibleProductReason) — <c>dbo.S_ProgNotPossibilityReasonSelectAll</c></summary>
-    Task<TabularResult> GetListAsync(byte? selectType);
+    Task<List<NotPossibleReasonRow>> GetListAsync(byte? selectType);
 
     /// <summary>ثبت دلیل عدم امکان تولید (frmNotPossibleProductReason) — <c>dbo.S_ProgNotPossibilityReason_Insert</c></summary>
     Task CreateAsync(string code, string descF, string descE, byte status, int userId);

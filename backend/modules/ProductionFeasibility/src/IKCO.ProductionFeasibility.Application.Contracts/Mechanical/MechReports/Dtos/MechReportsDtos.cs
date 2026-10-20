@@ -67,7 +67,7 @@ public class MechReportsGetProductionPossibilityByTrimShopInput
 
 }
 
-/// <summary>ورودی «گزارش جامع اقلام بحرانی (مکانیکی و سنکرون)» — <c>dbo.S_CriticalPartsGeneralReport</c></summary>
+/// <summary>ورودی «گزارش جامع اقلام بحرانی (مکانیکی و سنکرون)» — <c>dbo.S_CriticalPartsGeneralReport_Web</c></summary>
 public class MechReportsGetGeneralReportInput
 {
     /// <summary>نوع قطعه بحران (100 = همه)</summary>

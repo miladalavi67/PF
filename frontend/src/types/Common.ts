@@ -29,11 +29,3 @@ export interface IGlobalResultDto {
   /** پیام فارسی رویه */
   message: string | null;
 }
-
-/** خروجی جدولی رویه‌هایی که سامانه قدیم آن‌ها را در DataTable دریافت می‌کرد. ترتیب و نام ستون‌ها دقیقاً توسط رویه ذخیره‌شده تعیین می‌شود (اولین result set). */
-export interface ITabularResult {
-  /** نام ستون‌ها به ترتیب خروجی رویه */
-  columns: string[];
-  /** ردیف‌ها؛ کلید هر مقدار نام ستون است */
-  rows: Record<string, (unknown | null)>[];
-}

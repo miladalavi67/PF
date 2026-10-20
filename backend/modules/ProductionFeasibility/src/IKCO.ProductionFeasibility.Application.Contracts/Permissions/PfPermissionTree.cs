@@ -19,8 +19,8 @@ public static class PfPermissionTree
             (P.BodyCriticals.View, "مشاهده اطلاعات بدنه و شماره فنی"),
             (P.BodyCriticals.Create, "ثبت بحران بدنه‌سازی"),
             (P.BodyCriticals.Update, "ویرایش بحران بدنه‌سازی"),
-            (P.BodyCriticals.Disable, "غیرفعال‌سازی بحران بدنه‌سازی"),
             (P.BodyCriticals.License, "ثبت مجوز تولید با کسری برای بحران بدنه‌سازی"),
+            (P.BodyCriticals.Disable, "غیرفعال‌سازی بحران بدنه‌سازی"),
         }),
         new(P.BodyReports.Group, "گزارش‌های بدنه‌سازی", new[]
         {
@@ -77,7 +77,7 @@ public static class PfPermissionTree
         new(P.SyncBasis.Group, "مبنای ست‌های سنکرون", new[]
         {
             (P.SyncBasis.View, "مشاهده مبناهای ست سنکرون"),
-            (P.SyncBasis.Create, "ثبت مبنای ست سنکرون"),
+            (P.SyncBasis.Create, "ثبت ویژگی نوع قطعه سنکرون"),
             (P.SyncBasis.Update, "ویرایش مبنای ست سنکرون"),
         }),
         new(P.SyncSets.Group, "بحران‌های سنکرون", new[]
@@ -90,6 +90,7 @@ public static class PfPermissionTree
         new(P.SyncReports.Group, "گزارش‌های امکان تولید سنکرون", new[]
         {
             (P.SyncReports.Productionpossibility, "گزارش امکان تولید سنکرون"),
+            (P.SyncReports.Sap, "گزارش‌های دریافتی از SAP (سنکرون)"),
         }),
         new(P.UserAccess.Group, "دسترسی کاربران به خطوط", new[]
         {

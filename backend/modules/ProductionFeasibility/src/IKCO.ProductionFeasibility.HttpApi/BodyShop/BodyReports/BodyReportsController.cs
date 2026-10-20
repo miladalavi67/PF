@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using IKCO.ProductionFeasibility.Common;
 using IKCO.ProductionFeasibility.Controllers;
 using IKCO.ProductionFeasibility.Permissions;
+using IKCO.ProductionFeasibility.BodyShop.Results;
 using IKCO.ProductionFeasibility.BodyShop.BodyReports.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -33,8 +34,8 @@ public partial class BodyReportsController : PfController
     /// </remarks>
     [HttpPost("critical-parts/search")]
     [Authorize(PfPermissions.BodyReports.Search)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> SearchCriticalPartsAsync([FromBody] BodyReportsSearchCriticalPartsInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<BodyCriticalSearchRow>))]
+    public Task<ListResultDto<BodyCriticalSearchRow>> SearchCriticalPartsAsync([FromBody] BodyReportsSearchCriticalPartsInput input)
         => _service.SearchCriticalPartsAsync(input);
 
     /// <summary>محصولات یک بحران</summary>
@@ -46,8 +47,8 @@ public partial class BodyReportsController : PfController
     /// </remarks>
     [HttpGet("critical-parts/{criticalPartsId:int}/products")]
     [Authorize(PfPermissions.BodyReports.Search)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetCriticalPartProductsAsync(int criticalPartsId)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<BodyCriticalProductRow>))]
+    public Task<ListResultDto<BodyCriticalProductRow>> GetCriticalPartProductsAsync(int criticalPartsId)
         => _service.GetCriticalPartProductsAsync(criticalPartsId);
 
     /// <summary>ردیابی تغییرات اقلام بحرانی</summary>
@@ -60,8 +61,8 @@ public partial class BodyReportsController : PfController
     /// </remarks>
     [HttpPost("tracking-critical-parts")]
     [Authorize(PfPermissions.BodyReports.Tracking)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetTrackingCriticalPartsAsync([FromBody] BodyReportsGetTrackingCriticalPartsInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<BodyTrackingCriticalPartRow>))]
+    public Task<ListResultDto<BodyTrackingCriticalPartRow>> GetTrackingCriticalPartsAsync([FromBody] BodyReportsGetTrackingCriticalPartsInput input)
         => _service.GetTrackingCriticalPartsAsync(input);
 
     /// <summary>محصولات بحران در ردیابی</summary>
@@ -73,8 +74,8 @@ public partial class BodyReportsController : PfController
     /// </remarks>
     [HttpGet("tracking-critical-parts/{criticalPartsId:int}/products")]
     [Authorize(PfPermissions.BodyReports.Tracking)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetTrackingCriticalPartProductsAsync(int criticalPartsId)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<BodyTrackingProductRow>))]
+    public Task<ListResultDto<BodyTrackingProductRow>> GetTrackingCriticalPartProductsAsync(int criticalPartsId)
         => _service.GetTrackingCriticalPartProductsAsync(criticalPartsId);
 
     /// <summary>محصولات به تفکیک خطوط بدنه‌سازی</summary>
@@ -86,8 +87,8 @@ public partial class BodyReportsController : PfController
     /// </remarks>
     [HttpGet("products-of-sites")]
     [Authorize(PfPermissions.BodyReports.Productsofsites)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetProductsOfSitesAsync()
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<BodyProductsOfSiteRow>))]
+    public Task<ListResultDto<BodyProductsOfSiteRow>> GetProductsOfSitesAsync()
         => _service.GetProductsOfSitesAsync();
 
     /// <summary>تعداد بدنه‌های پیش‌تخصیص‌شده</summary>
@@ -99,8 +100,8 @@ public partial class BodyReportsController : PfController
     /// </remarks>
     [HttpGet("pre-assign-body-counts")]
     [Authorize(PfPermissions.BodyReports.Preassigncount)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetPreAssignBodyCountsAsync([FromQuery] BodyReportsGetPreAssignBodyCountsInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<BodyPreAssignCountRow>))]
+    public Task<ListResultDto<BodyPreAssignCountRow>> GetPreAssignBodyCountsAsync([FromQuery] BodyReportsGetPreAssignBodyCountsInput input)
         => _service.GetPreAssignBodyCountsAsync(input);
 
     /// <summary>بدنه‌های پیش‌تخصیص بحرانی</summary>
@@ -112,8 +113,8 @@ public partial class BodyReportsController : PfController
     /// </remarks>
     [HttpGet("pre-assign-critical-bodies")]
     [Authorize(PfPermissions.BodyReports.Preassigncritical)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetPreAssignCriticalBodiesAsync([FromQuery] BodyReportsGetPreAssignCriticalBodiesInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<BodyPreAssignCriticalRow>))]
+    public Task<ListResultDto<BodyPreAssignCriticalRow>> GetPreAssignCriticalBodiesAsync([FromQuery] BodyReportsGetPreAssignCriticalBodiesInput input)
         => _service.GetPreAssignCriticalBodiesAsync(input);
 
     /// <summary>مغایرت پیش‌تخصیص بدنه‌های بحرانی</summary>
@@ -125,8 +126,8 @@ public partial class BodyReportsController : PfController
     /// </remarks>
     [HttpGet("not-possible-to-assign")]
     [Authorize(PfPermissions.BodyReports.Conflicts)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetNotPossibleProductsToStepAssignAsync([FromQuery] BodyReportsGetNotPossibleProductsToStepAssignInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<BodyNotPossibleToAssignRow>))]
+    public Task<ListResultDto<BodyNotPossibleToAssignRow>> GetNotPossibleProductsToStepAssignAsync([FromQuery] BodyReportsGetNotPossibleProductsToStepAssignInput input)
         => _service.GetNotPossibleProductsToStepAssignAsync(input);
 
     /// <summary>ردیابی پارامترهای بحرانی (مجوز تولید با کسری)</summary>
@@ -138,8 +139,8 @@ public partial class BodyReportsController : PfController
     /// </remarks>
     [HttpGet("shortage-license-tracking")]
     [Authorize(PfPermissions.BodyReports.Licensetracking)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetShortageLicenseTrackingAsync([FromQuery] BodyReportsGetShortageLicenseTrackingInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<BodyLicenseTrackingRow>))]
+    public Task<ListResultDto<BodyLicenseTrackingRow>> GetShortageLicenseTrackingAsync([FromQuery] BodyReportsGetShortageLicenseTrackingInput input)
         => _service.GetShortageLicenseTrackingAsync(input);
 
     /// <summary>وضعیت مجوز تولید یک بحران</summary>
@@ -151,8 +152,8 @@ public partial class BodyReportsController : PfController
     /// </remarks>
     [HttpGet("production-possibility-status/{id:int}")]
     [Authorize(PfPermissions.BodyReports.Licensetracking)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetProductionPossibilityStatusAsync(int id)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<BodyProductionPossibilityStatusRow>))]
+    public Task<ListResultDto<BodyProductionPossibilityStatusRow>> GetProductionPossibilityStatusAsync(int id)
         => _service.GetProductionPossibilityStatusAsync(id);
 
     /// <summary>قطعات ناموفق در انتقال از SAP</summary>
@@ -164,8 +165,8 @@ public partial class BodyReportsController : PfController
     /// </remarks>
     [HttpGet("failed-sap-transfers")]
     [Authorize(PfPermissions.BodyReports.Sap)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetFailedSapTransfersAsync([FromQuery] BodyReportsGetFailedSapTransfersInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<FailedSapTransferRow>))]
+    public Task<ListResultDto<FailedSapTransferRow>> GetFailedSapTransfersAsync([FromQuery] BodyReportsGetFailedSapTransfersInput input)
         => _service.GetFailedSapTransfersAsync(input);
 
     /// <summary>زمان آخرین به‌روزرسانی داده‌های SAP</summary>
@@ -177,8 +178,8 @@ public partial class BodyReportsController : PfController
     /// </remarks>
     [HttpGet("sap-data-update-times")]
     [Authorize(PfPermissions.BodyReports.Sap)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetSapDataUpdateTimesAsync()
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<SapDataUpdateTimesRow>))]
+    public Task<ListResultDto<SapDataUpdateTimesRow>> GetSapDataUpdateTimesAsync()
         => _service.GetSapDataUpdateTimesAsync();
 
     /// <summary>شناسه آخرین تغییر مجوزها (برای به‌روزرسانی خودکار گزارش)</summary>

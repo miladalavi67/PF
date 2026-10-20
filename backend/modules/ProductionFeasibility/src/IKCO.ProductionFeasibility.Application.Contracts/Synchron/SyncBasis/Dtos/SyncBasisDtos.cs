@@ -32,6 +32,17 @@ public class SyncBasisCountBySetCodeInput
 
 }
 
+/// <summary>ورودی «ثبت ویژگی نوع قطعه سنکرون» — <c>dbo.S_InsertCriticalPartTypeProperty</c></summary>
+public class SyncBasisAddPartTypePropertyInput
+{
+    /// <summary>کد نوع قطعه</summary>
+    public int PartTypeCode { get; set; }
+
+    /// <summary>شناسه ویژگی</summary>
+    public int PropertyId { get; set; }
+
+}
+
 /// <summary>ورودی «ثبت مبنای ست سنکرون» — <c>dbo.S_InsertCriticalPartSet</c></summary>
 public class SyncBasisCreateInput
 {

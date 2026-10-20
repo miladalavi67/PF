@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using IKCO.ProductionFeasibility.Common;
 using IKCO.ProductionFeasibility.EntityFrameworkCore;
 using IKCO.ProductionFeasibility.Exceptions;
 using IKCO.ProductionFeasibility.Lookups.Repositories;
@@ -106,8 +107,60 @@ public class LookupRepository : PfDapperRepository<PfDbContext>, ILookupReposito
         if (source.Static != null)
             return source.Static().ToList();
 
+        var fromProcedure = await FromLegacyProcedureAsync(key, parentId);
+        if (fromProcedure != null)
+            return fromProcedure;
+
         var rows = await QuerySqlAsync<Row>(source.Sql!, new { ParentId = parentId }, PfCommandTimeouts.Lookup);
         return rows.Select(r => new LookupItem(r.Id, r.Code, r.Title ?? string.Empty)).ToList();
+    }
+
+    /// <summary>سایت پیش‌فرض رویه‌های SFC وقتی فهرست بدون سایت درخواست شود (PlantId = 1 در سامانه قبلی)</summary>
+    private const int DefaultPlantId = 1;
+
+    /// <summary>
+    /// فهرست‌هایی که بک‌اند قبلی (SyncParts / CriticalPartsReport) از رویه ذخیره‌شده می‌خواند با همان رویه و Dapper خوانده می‌شوند
+    /// (PFReview بند ۴ و ۸)؛ سایر فهرست‌ها همان پرس‌وجوی پارامتری روی نمای پایه هستند که بک‌اند قبلی هم با متن SQL می‌خواند.
+    /// </summary>
+    private async Task<List<LookupItem>?> FromLegacyProcedureAsync(string key, int? parentId)
+    {
+        var plantId = (byte)(parentId ?? DefaultPlantId);
+        List<LookupSpRow> rows;
+        switch (key.ToLowerInvariant())
+        {
+            case "virtual-plants":
+                var plants = await QueryRowsAsync<LookupPlantRow>("PF.GetSiteByDomainId", new SpParameters(), LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+                return plants.Where(p => p.VirtualPlantId != null)
+                    .Select(p => new LookupItem(p.VirtualPlantId!.Value, p.VirtualPlantId.Value.ToString(), p.VirtualPlantDescF ?? string.Empty)).ToList();
+            case "trim-shops" when parentId != null:
+                rows = await QueryRowsAsync<LookupSpRow>("dbo.S_GetTrimShopSaloonsByVirtualPlnatId_Web", new SpParameters().Int("@VirtualPlantId", parentId),
+                    LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+                break;
+            case "depts":
+                rows = await QueryRowsAsync<LookupSpRow>("dbo.S_DeptSelectAll", new SpParameters().TinyInt("@SelectType", 1).TinyInt("@PlantId", plantId),
+                    LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+                break;
+            case "trims":
+                rows = await QueryRowsAsync<LookupSpRow>("dbo.S_TrimSelectAll", new SpParameters().TinyInt("@PlantId", plantId).TinyInt("@SelectType", 1),
+                    LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+                break;
+            case "toodoozis":
+                rows = await QueryRowsAsync<LookupSpRow>("dbo.S_ToodooziSellectAll", new SpParameters().TinyInt("@PlantId", plantId),
+                    LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+                break;
+            case "options":
+                rows = await QueryRowsAsync<LookupSpRow>("dbo.S_OptionSelectAll", new SpParameters().TinyInt("@SelectType", 1).TinyInt("@PlantId", plantId),
+                    LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+                break;
+            case "colors":
+                rows = await QueryRowsAsync<LookupSpRow>("dbo.S_SelectColorsWith5DigitCode", new SpParameters().TinyInt("@Status", 1),
+                    LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+                break;
+            default:
+                return null;
+        }
+
+        return rows.Where(r => r.Id != null).Select(r => new LookupItem(r.Id!.Value, r.Code?.Trim(), (r.DescF ?? r.Code ?? string.Empty).Trim())).ToList();
     }
 
     private sealed class Row
@@ -115,5 +168,20 @@ public class LookupRepository : PfDapperRepository<PfDbContext>, ILookupReposito
         public int Id { get; set; }
         public string? Code { get; set; }
         public string? Title { get; set; }
+    }
+
+    /// <summary>ستون‌های مشترک رویه‌های فهرست پایه (S_DeptSelectAll، S_TrimSelectAll، S_OptionSelectAll، S_ToodooziSellectAll، رنگ، سالن)</summary>
+    private sealed class LookupSpRow : PfResultRow
+    {
+        public int? Id { get; set; }
+        public string? Code { get; set; }
+        public string? DescF { get; set; }
+    }
+
+    /// <summary>خروجی <c>PF.GetSiteByDomainId</c> (SiteDto بک‌اند قبلی)</summary>
+    private sealed class LookupPlantRow : PfResultRow
+    {
+        public int? VirtualPlantId { get; set; }
+        public string? VirtualPlantDescF { get; set; }
     }
 }

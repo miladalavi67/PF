@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using IKCO.ProductionFeasibility.BodyShop.Results;
 using IKCO.ProductionFeasibility.Common;
 using IKCO.ProductionFeasibility.StoredProcedures;
 
@@ -46,7 +47,7 @@ public partial class BodyCriticalsRepository
         return await QueryFirstOrDefaultAsync<GlobalResultDto>("PF.RegisterShortageLicense_V1", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Command);
     }
 
-    public async Task<TabularResult> BatchCreateAsync(int biwSiteId, IReadOnlyList<IReadOnlyDictionary<string, object?>> rows, int userId)
+    public async Task<List<BodyBatchCreateResultRow>> BatchCreateAsync(int biwSiteId, IReadOnlyList<IReadOnlyDictionary<string, object?>> rows, int userId)
     {
         const string procedure = "PF.S_CreateBatchCriticalPartProduct";
         var table = await CreateTableParameterAsync(procedure, "@Table", rows);
@@ -54,6 +55,28 @@ public partial class BodyCriticalsRepository
             .Int("@BIWSiteId", biwSiteId)
             .Table("@Table", table)
             .Int("@UserId", userId);
-        return await QueryTableAsync(procedure, parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Report);
+        return await QueryRowsAsync<BodyBatchCreateResultRow>(procedure, parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Report);
+    }
+
+    public async Task<GlobalResultDto?> DisableCriticalPartsAsync(string idString, int userId)
+    {
+        var parameters = new SpParameters()
+            .VarChar("@IdString", idString, -1)
+            .Int("@UserId", userId);
+        return await QueryFirstOrDefaultAsync<GlobalResultDto>("PF.S_DisableCriticalParts", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Command);
+    }
+
+    public async Task InsertDisableReasonAsync(int eventTypeId, int criticalPartId, string note, int userId)
+    {
+        var parameters = new SpParameters()
+            .Int("@CriticalPartTypeId", eventTypeId)
+            .Int("@AttributeId", 4)
+            .Int("@ChangeRecId", criticalPartId)
+            .NVarChar("@OldValue", null, 500)
+            .NVarChar("@NewValue", null, 500)
+            .VarChar("@RequestNo", null, 50)
+            .NVarChar("@Note", note, 500)
+            .Int("@UserId", userId);
+        await ExecuteAsync("PF.InsertEventLog", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Command);
     }
 }

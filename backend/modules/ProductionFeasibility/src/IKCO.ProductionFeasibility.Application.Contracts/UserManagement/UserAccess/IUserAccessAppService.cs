@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using IKCO.ProductionFeasibility.Common;
+using IKCO.ProductionFeasibility.UserManagement.Results;
 using IKCO.ProductionFeasibility.UserManagement.UserAccess.Dtos;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
@@ -10,16 +11,16 @@ namespace IKCO.ProductionFeasibility.UserManagement.UserAccess;
 public partial interface IUserAccessAppService : IApplicationService
 {
     /// <summary>فهرست کاربران امکان تولید</summary>
-    Task<TabularResult> GetAllUsersAsync();
+    Task<ListResultDto<PfUserRow>> GetAllUsersAsync();
 
     /// <summary>فهرست دسترسی کاربران به خطوط</summary>
-    Task<TabularResult> GetUsersAccessListAsync();
+    Task<ListResultDto<UserAccessRow>> GetUsersAccessListAsync();
 
     /// <summary>سایت‌های مجازی</summary>
-    Task<TabularResult> GetSitesAsync(UserAccessGetSitesInput input);
+    Task<ListResultDto<VirtualPlantRow>> GetSitesAsync(UserAccessGetSitesInput input);
 
     /// <summary>خطوط/سالن‌های یک سایت مجازی</summary>
-    Task<TabularResult> GetSaloonsByVirtualPlantAsync(UserAccessGetSaloonsByVirtualPlantInput input);
+    Task<ListResultDto<BiwSiteRow>> GetSaloonsByVirtualPlantAsync(UserAccessGetSaloonsByVirtualPlantInput input);
 
     /// <summary>حذف دسترسی کاربران</summary>
     Task<GlobalResultDto> DeleteUserAccessAsync(UserAccessDeleteUserAccessInput input);

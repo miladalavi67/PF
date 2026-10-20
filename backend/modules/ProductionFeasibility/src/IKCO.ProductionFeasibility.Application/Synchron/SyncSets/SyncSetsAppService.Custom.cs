@@ -32,14 +32,15 @@ public partial class SyncSetsAppService
             parts.Add(new SyncSetPart(listId.Value, partNo));
         }
         parts = parts.Distinct().ToList();
-        await _repository.InsertPartsAsync(criticalPartsSetId, parts);
+        EnsureSuccess(await _repository.InsertPartsAsync(criticalPartsSetId, parts), "ثبت قطعات بحران سنکرون", r => r == 1);
         if (input.ColorIds.Count > 0)
-            await _repository.InsertColorsAsync(criticalPartsSetId, input.ColorIds.Distinct().ToList());
-        await _repository.InsertSaloonsAsync(criticalPartsSetId, input.SaloonIds.Distinct().ToList());
+            EnsureSuccess(await _repository.InsertColorsAsync(criticalPartsSetId, input.ColorIds.Distinct().ToList()), "ثبت رنگ‌های بحران سنکرون", r => r == 1);
+        EnsureSuccess(await _repository.InsertSaloonsAsync(criticalPartsSetId, input.SaloonIds.Distinct().ToList()), "ثبت سالن‌های بحران سنکرون", r => r == 1);
         var products = input.Products
             .Select(p => new SyncSetProduct(p.CarGroupId, p.CarModelId, p.CarClassId, p.CarSubClassId, p.CarTrimId, p.CarToodooziId, p.CarOptionId, p.CarColorId, p.SaloonId))
             .Distinct().ToList();
-        await _repository.InsertProductsAsync(criticalPartsSetId, products);
+        foreach (var result in await _repository.InsertProductsAsync(criticalPartsSetId, products))
+            EnsureSuccess(result, "ثبت محصولات بحران سنکرون", r => r == 1);
         return new GlobalResultDto { Result = 1, Message = "ترکیب بحران سنکرون با موفقیت ثبت شد." };
     }
 }

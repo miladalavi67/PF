@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using IKCO.ProductionFeasibility.Common;
 using IKCO.ProductionFeasibility.EntityFrameworkCore;
 using IKCO.ProductionFeasibility.StoredProcedures;
+using IKCO.ProductionFeasibility.Mechanical.Results;
 using IKCO.ProductionFeasibility.Mechanical.MechReasons.Repositories;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.EntityFrameworkCore;
@@ -17,12 +18,12 @@ public partial class MechReasonsRepository : PfDapperRepository<PfDbContext>, IM
     {
     }
 
-    public async Task<TabularResult> GetListAsync(byte? selectType)
+    public async Task<List<NotPossibleReasonRow>> GetListAsync(byte? selectType)
     {
         var parameters = new SpParameters();
         if (selectType != null)
             parameters.TinyInt("@SelectType", selectType);
-        return await QueryTableAsync("dbo.S_ProgNotPossibilityReasonSelectAll", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+        return await QueryRowsAsync<NotPossibleReasonRow>("dbo.S_ProgNotPossibilityReasonSelectAll", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
     }
 
     public async Task CreateAsync(string code, string descF, string descE, byte status, int userId)

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using IKCO.ProductionFeasibility.Common;
+using IKCO.ProductionFeasibility.Synchron.Results;
 
 namespace IKCO.ProductionFeasibility.Synchron.SyncBasis.Repositories;
 
@@ -9,19 +10,22 @@ namespace IKCO.ProductionFeasibility.Synchron.SyncBasis.Repositories;
 public partial interface ISyncBasisRepository
 {
     /// <summary>فهرست مبناهای ست سنکرون (frmCriticalPartSetBasis) — <c>dbo.S_RptGetCriticalPartsSet</c></summary>
-    Task<TabularResult> GetListAsync();
+    Task<List<SetBasisReportRow>> GetListAsync();
 
     /// <summary>مبنای ست بر اساس کد (frmCriticalPartSetBasis) — <c>dbo.S_CriticalPartsSetBasisSelectByCode</c></summary>
-    Task<TabularResult> GetByCodeAsync(string code);
+    Task<List<SetBasisRow>> GetByCodeAsync(string code);
 
     /// <summary>مبنای ست بر اساس شناسه (frmCriticalPartSetBasis) — <c>dbo.S_CriticalPartsSetBasisSelectById</c></summary>
-    Task<TabularResult> GetByIdAsync(string id);
+    Task<List<SetBasisRow>> GetByIdAsync(string id);
 
     /// <summary>مبناهای ست بر اساس وضعیت (frmCriticalPartSetBasis) — <c>dbo.S_CriticalPartsSetBasisSelectByStatus</c></summary>
-    Task<TabularResult> GetByStatusAsync(byte? status);
+    Task<List<SetBasisRow>> GetByStatusAsync(byte? status);
 
     /// <summary>تعداد ست‌های ثبت‌شده با کد ست (frmCriticalPartSet) — <c>dbo.S_CriticalPartsSetCountSetCode</c></summary>
-    Task<TabularResult> CountBySetCodeAsync(string setCode);
+    Task<int?> CountBySetCodeAsync(string setCode);
+
+    /// <summary>ثبت ویژگی نوع قطعه سنکرون (SyncParts/SyncPartsInsertCriticalPartTypeProperty (بک‌اند قبلی)) — <c>dbo.S_InsertCriticalPartTypeProperty</c></summary>
+    Task AddPartTypePropertyAsync(int partTypeCode, int propertyId);
 
     /// <summary>ثبت مبنای ست سنکرون (frmCriticalPartSetBasis.btnSave) — <c>dbo.S_InsertCriticalPartSet</c></summary>
     Task CreateAsync(string code, string descF, int carClass, int partTypeId, int levelType, int userId, bool isTrim, bool isOption, bool isToodoozi, bool isColor);

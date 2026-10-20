@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using IKCO.ProductionFeasibility.Common;
 using IKCO.ProductionFeasibility.EntityFrameworkCore;
 using IKCO.ProductionFeasibility.StoredProcedures;
+using IKCO.ProductionFeasibility.Mechanical.Results;
 using IKCO.ProductionFeasibility.Mechanical.MechExceptions.Repositories;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.EntityFrameworkCore;
@@ -17,7 +18,7 @@ public partial class MechExceptionsRepository : PfDapperRepository<PfDbContext>,
     {
     }
 
-    public async Task<TabularResult> GetExceptionListAsync(string? bodyNo, string? dateFrom, string? dateEnd, int state)
+    public async Task<List<ProductExceptionRow>> GetExceptionListAsync(string? bodyNo, string? dateFrom, string? dateEnd, int state)
     {
         var parameters = new SpParameters()
             .Int("@State", state);
@@ -27,28 +28,28 @@ public partial class MechExceptionsRepository : PfDapperRepository<PfDbContext>,
             parameters.NVarChar("@DateFrom", dateFrom, 12);
         if (dateEnd != null)
             parameters.NVarChar("@DateEnd", dateEnd, 12);
-        return await QueryTableAsync("dbo.S_CriticalProductExceptionList", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Report);
+        return await QueryRowsAsync<ProductExceptionRow>("dbo.S_CriticalProductExceptionList", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Report);
     }
 
-    public async Task<TabularResult> GetLicensesAsync(int id)
+    public async Task<List<ExceptionLicenseRow>> GetLicensesAsync(int id)
     {
         var parameters = new SpParameters()
             .Int("@Id", id);
-        return await QueryTableAsync("dbo.S_CriticalPartsProductExceptionsLisenceList", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+        return await QueryRowsAsync<ExceptionLicenseRow>("dbo.S_CriticalPartsProductExceptionsLisenceList", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
     }
 
-    public async Task<TabularResult> GetLicenseBodiesAsync(int id)
+    public async Task<List<ExceptionLicenseBodyRow>> GetLicenseBodiesAsync(int id)
     {
         var parameters = new SpParameters()
             .Int("@Id", id);
-        return await QueryTableAsync("dbo.S_CriticalPartsProductExceptionsLicenseBodyNoList", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+        return await QueryRowsAsync<ExceptionLicenseBodyRow>("dbo.S_CriticalPartsProductExceptionsLicenseBodyNoList", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
     }
 
-    public async Task<TabularResult> GetLicenseLogAsync(string partNo)
+    public async Task<List<ExceptionLicenseRow>> GetLicenseLogAsync(string partNo)
     {
         var parameters = new SpParameters()
             .VarChar("@PartNo", partNo, 50);
-        return await QueryTableAsync("dbo.S_CriticalPartsProductExceptionsLisenceLog", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Report);
+        return await QueryRowsAsync<ExceptionLicenseRow>("dbo.S_CriticalPartsProductExceptionsLisenceLog", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Report);
     }
 
     public async Task CreateLicenseAsync(int criticalPartsProductExceptionsId, int possibleLicenseCount, string letterNo, string? description, int userId)
@@ -78,14 +79,14 @@ public partial class MechExceptionsRepository : PfDapperRepository<PfDbContext>,
         await ExecuteAsync("dbo.S_DisableCriticalPartsProductsException", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Command);
     }
 
-    public async Task<TabularResult> GetPartNumbersInExceptionsAsync(string filterValues, byte trimId, byte filterType, string? partNumber)
+    public async Task<List<ExceptionPartNumberRow>> GetPartNumbersInExceptionsAsync(string filterValues, byte trimId, byte filterType, string? partNumber)
     {
         var parameters = new SpParameters()
             .VarChar("@FilterValues", filterValues, -1)
             .TinyInt("@TrimId", trimId)
             .TinyInt("@FilterType", filterType)
             .VarChar("@PartNumber", partNumber ?? string.Empty, 50);
-        return await QueryTableAsync("dbo.S_RPT_GetPartNumbersInCriticalPartsProductsException", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Report);
+        return await QueryRowsAsync<ExceptionPartNumberRow>("dbo.S_RPT_GetPartNumbersInCriticalPartsProductsException", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Report);
     }
 
 }

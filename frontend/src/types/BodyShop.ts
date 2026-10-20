@@ -45,6 +45,91 @@ export const batchCriticalPartRowRules: Partial<Record<keyof IBatchCriticalPartR
   quantity: { min: { value: 1, message: "«ضریب مصرف» باید بین 1 و 100 باشد" }, max: { value: 100, message: "«ضریب مصرف» باید بین 1 و 100 باشد" } },
 };
 
+/** نتیجه ثبت گروهی بحران با اکسل (PF.S_CreateBatchCriticalPartProduct) منبع ستون‌ها: DTO پاسخ بک‌اند قبلی (SFC.Domain.Shared) */
+export interface IBodyBatchCreateResultRow {
+  /** پیام */
+  Message: string | null;
+  /** کد کلاس */
+  CarClassCode: string | null;
+  /** شماره بدنه */
+  BodyNO: string | null;
+  /** شماره فنی */
+  PartNo: string | null;
+  /** شرح قطعه */
+  PartDescF: string | null;
+  /** ستون‌های دیگر خروجی رویه که در مدل تعریف نشده‌اند (ExtraColumns) */
+  [column: string]: unknown;
+}
+
+/** ترتیب ستون‌های خروجی رویه برای IBodyBatchCreateResultRow (نمایش در جدول) */
+export const bodyBatchCreateResultRowColumns = ["Message", "CarClassCode", "BodyNO", "PartNo", "PartDescF"] as const;
+
+/** اطلاعات بحران بدنه‌سازی برای ویرایش (PF.S_CriticalPartsInfo) منبع ستون‌ها: کلاس _Result مدل EF فرم ویندوزی PF */
+export interface IBodyCriticalPartInfoRow {
+  /** شناسه بحران */
+  Id: number | null;
+  /** شناسه محصول */
+  CarId: number | null;
+  /** شماره فنی */
+  PartNo: string | null;
+  /** شرح قطعه */
+  PartDescF: string | null;
+  /** موجودی گروهی */
+  TotalStock: number | null;
+  /** موجودی خام */
+  RawStock: number | null;
+  /** گروه قطعه */
+  PartGroup: string | null;
+  /** شماره فنی جایگزین */
+  AlternativePartNo: string | null;
+  /** توضیحات قطعه */
+  CriticalPartNote: string | null;
+  /** توضیحات وضعیت تولید */
+  ProductionStateNote: string | null;
+  /** شماره بدنه */
+  BodyNO: string | null;
+  /** شماره نامه */
+  ProductionStateLetterNo: string | null;
+  /** شناسه خط بدنه‌سازی */
+  BIWSiteId: number | null;
+  /** تاریخ و زمان ثبت */
+  CreateDateTime: string | null;
+  /** سالن */
+  SaloonDescF: string | null;
+  /** شناسه کلاس */
+  CarClassId: string | null;
+  /** ستون‌های دیگر خروجی رویه که در مدل تعریف نشده‌اند (ExtraColumns) */
+  [column: string]: unknown;
+}
+
+/** ترتیب ستون‌های خروجی رویه برای IBodyCriticalPartInfoRow (نمایش در جدول) */
+export const bodyCriticalPartInfoRowColumns = ["Id", "CarId", "PartNo", "PartDescF", "TotalStock", "RawStock", "PartGroup", "AlternativePartNo", "CriticalPartNote", "ProductionStateNote", "BodyNO", "ProductionStateLetterNo", "BIWSiteId", "CreateDateTime", "SaloonDescF", "CarClassId"] as const;
+
+/** محصولات یک بحران بدنه‌سازی (PF.Get_BodyCriticalSearch_Product_Web) منبع ستون‌ها: DTO پاسخ بک‌اند قبلی (SFC.Domain.Shared) */
+export interface IBodyCriticalProductRow {
+  /** شناسه */
+  Id: number | null;
+  /** شماره بدنه */
+  BodyNO: string | null;
+  /** خانواده محصول */
+  CarGroupeDesc: string | null;
+  /** کد خانواده */
+  CarGroupeCode: string | null;
+  /** مدل */
+  CarModelDesc: string | null;
+  /** کد کلاس */
+  CarClassCode: string | null;
+  /** کلاس */
+  CarClassDesc: string | null;
+  /** ضریب مصرف */
+  UsageFactor: number | null;
+  /** ستون‌های دیگر خروجی رویه که در مدل تعریف نشده‌اند (ExtraColumns) */
+  [column: string]: unknown;
+}
+
+/** ترتیب ستون‌های خروجی رویه برای IBodyCriticalProductRow (نمایش در جدول) */
+export const bodyCriticalProductRowColumns = ["Id", "BodyNO", "CarGroupeDesc", "CarGroupeCode", "CarModelDesc", "CarClassCode", "CarClassDesc", "UsageFactor"] as const;
+
 /** ورودی ثبت گروهی بحران‌های بدنه‌سازی (PF.S_CreateBatchCriticalPartProduct) */
 export interface IBodyCriticalsBatchCreateInput {
   /** شناسه خط بدنه‌سازی */
@@ -114,7 +199,7 @@ export const bodyCriticalsCreateProductsInputRules: Partial<Record<keyof IBodyCr
   items: { validate: (v: unknown) => (Array.isArray(v) && v.length >= 1) || "حداقل یک مورد برای «کلاس‌های انتخاب‌شده» انتخاب کنید", maxLength: { value: 200, message: "تعداد «کلاس‌های انتخاب‌شده» بیش از حد مجاز است" } },
 };
 
-/** ورودی «غیرفعال‌سازی بحران‌های بدنه‌سازی» — PF.S_DisableCriticalParts */
+/** ورودی «غیرفعال‌سازی (حذف) بحران‌های بدنه‌سازی» — PF.InsertEventLog و PF.S_DisableCriticalParts */
 export interface IBodyCriticalsDisableCriticalPartsInput {
   /** شناسه بحران‌ها */
   ids: number[];
@@ -128,6 +213,49 @@ export interface IBodyCriticalsDisableCriticalPartsInput {
 export const bodyCriticalsDisableCriticalPartsInputRules: Partial<Record<keyof IBodyCriticalsDisableCriticalPartsInput, IFieldRules>> = {
   ids: { validate: (v: unknown) => (Array.isArray(v) && v.length >= 1) || "حداقل یک مورد برای «شناسه بحران‌ها» انتخاب کنید" },
 };
+
+/** جستجوی اقلام بحرانی بدنه‌سازی (PF.S_BodyCriticalSearch_Web) منبع ستون‌ها: DTO پاسخ بک‌اند قبلی (SFC.Domain.Shared) */
+export interface IBodyCriticalSearchRow {
+  /** شناسه بحران */
+  Id: number | null;
+  /** شماره فنی */
+  PartNo: string | null;
+  /** شرح قطعه */
+  PartDescF: string | null;
+  /** موجودی گروهی */
+  TotalStock: number | null;
+  /** موجودی خام */
+  RawStock: number | null;
+  /** شماره بدنه */
+  BodyNO: string | null;
+  /** شرایط تولید */
+  ProductionPosDesF: string | null;
+  /** گروه قطعه */
+  PartGroup: string | null;
+  /** توضیحات قطعه */
+  CriticalPartNote: string | null;
+  /** سایت */
+  VirtualPlantDescF: string | null;
+  /** خط بدنه‌سازی */
+  BIWSiteDescF: string | null;
+  /** شماره نامه */
+  ProductionStateLetterNo: string | null;
+  /** شماره فنی جایگزین */
+  AlternativePartNo: string | null;
+  /** تاریخ و زمان ثبت */
+  CreateDateTime: string | null;
+  /** تاریخ و زمان آخرین تغییر */
+  LastUpdateDateTime: string | null;
+  /** فعال */
+  Status: boolean | null;
+  /** وضعیت */
+  StatusDescF: string | null;
+  /** ستون‌های دیگر خروجی رویه که در مدل تعریف نشده‌اند (ExtraColumns) */
+  [column: string]: unknown;
+}
+
+/** ترتیب ستون‌های خروجی رویه برای IBodyCriticalSearchRow (نمایش در جدول) */
+export const bodyCriticalSearchRowColumns = ["Id", "PartNo", "PartDescF", "TotalStock", "RawStock", "BodyNO", "ProductionPosDesF", "PartGroup", "CriticalPartNote", "VirtualPlantDescF", "BIWSiteDescF", "ProductionStateLetterNo", "AlternativePartNo", "CreateDateTime", "LastUpdateDateTime", "Status", "StatusDescF"] as const;
 
 /** ورودی «اطلاعات بدنه» — dbo.SEXT_BodyInfo_V2 */
 export interface IBodyCriticalsGetBodyInfoInput {
@@ -290,6 +418,156 @@ export interface IBodyInfoRow {
   saloonDescF: string | null;
 }
 
+/** ردیابی پارامترهای بحرانی (PF.GetShortageLicenseTrackingSelectAll) منبع ستون‌ها: DTO پاسخ بک‌اند قبلی (SFC.Domain.Shared) / کلاس _Result مدل EF فرم ویندوزی PF */
+export interface IBodyLicenseTrackingRow {
+  /** شناسه */
+  Id: number | null;
+  /** نوع بحران */
+  CriticalPartTypeId: number | null;
+  /** شناسه بحران */
+  CriticalPartId: number | null;
+  /** شرایط تولید */
+  ProductionPossibilityId: number | null;
+  /** شرایط تولید */
+  ProductionPossibilityDescF: string | null;
+  /** تعداد مجاز تولید با کسری */
+  PossibleProductionNo: number | null;
+  /** مجاز تا تاریخ */
+  ProductionPossibilityToDate: string | null;
+  /** مجاز تا ساعت */
+  ProductionPossibilityToTime: string | null;
+  /** مجوز مصرف‌شده */
+  UsedLicense: number | null;
+  /** وضعیت */
+  STATUS: string | null;
+  /** تاریخ و زمان ثبت */
+  CreateDateTime: string | null;
+  /** کاربر */
+  UserName: string | null;
+  /** آخرین ویرایش‌کننده */
+  LastUpdateByName: string | null;
+  /** تاریخ و زمان آخرین تغییر */
+  LastUpdateDateTime: string | null;
+  /** ستون‌های دیگر خروجی رویه که در مدل تعریف نشده‌اند (ExtraColumns) */
+  [column: string]: unknown;
+}
+
+/** ترتیب ستون‌های خروجی رویه برای IBodyLicenseTrackingRow (نمایش در جدول) */
+export const bodyLicenseTrackingRowColumns = ["Id", "CriticalPartTypeId", "CriticalPartId", "ProductionPossibilityId", "ProductionPossibilityDescF", "PossibleProductionNo", "ProductionPossibilityToDate", "ProductionPossibilityToTime", "UsedLicense", "STATUS", "CreateDateTime", "UserName", "LastUpdateByName", "LastUpdateDateTime"] as const;
+
+/** مغایرت پیش‌تخصیص بدنه‌های بحرانی (PF.S_NotPossibleProductsToStepAssign_SelectAll) منبع ستون‌ها: DTO پاسخ بک‌اند قبلی (SFC.Domain.Shared) */
+export interface IBodyNotPossibleToAssignRow {
+  /** ردیف */
+  RowNumber: number | null;
+  /** شناسه */
+  Id: number | null;
+  /** شماره بدنه */
+  BodyNO: string | null;
+  /** شماره فنی */
+  PartNo: string | null;
+  /** شرح قطعه */
+  PartDescF: string | null;
+  /** تاریخ ثبت */
+  CreateDate: string | null;
+  /** شرح مغایرت */
+  ErrorDescF: string | null;
+  /** نوع بحران */
+  CriticalPartType: string | null;
+  /** ستون‌های دیگر خروجی رویه که در مدل تعریف نشده‌اند (ExtraColumns) */
+  [column: string]: unknown;
+}
+
+/** ترتیب ستون‌های خروجی رویه برای IBodyNotPossibleToAssignRow (نمایش در جدول) */
+export const bodyNotPossibleToAssignRowColumns = ["RowNumber", "Id", "BodyNO", "PartNo", "PartDescF", "CreateDate", "ErrorDescF", "CriticalPartType"] as const;
+
+/** تعداد بدنه‌های پیش‌تخصیص‌شده (PF.S_PreAssignBodyCoun_List) منبع ستون‌ها: کلاس _Result مدل EF فرم ویندوزی PF */
+export interface IBodyPreAssignCountRow {
+  /** خط بدنه‌سازی */
+  BIWSite: string | null;
+  /** کد کلاس */
+  ClassCode: string | null;
+  /** تعداد بدنه پیش‌تخصیص */
+  PreAssignBodyCount: number | null;
+  /** ستون‌های دیگر خروجی رویه که در مدل تعریف نشده‌اند (ExtraColumns) */
+  [column: string]: unknown;
+}
+
+/** ترتیب ستون‌های خروجی رویه برای IBodyPreAssignCountRow (نمایش در جدول) */
+export const bodyPreAssignCountRowColumns = ["BIWSite", "ClassCode", "PreAssignBodyCount"] as const;
+
+/** بدنه‌های پیش‌تخصیص بحرانی (PF.S_PreAssignCriticalBody_SelectAll) منبع ستون‌ها: DTO پاسخ بک‌اند قبلی (SFC.Domain.Shared) */
+export interface IBodyPreAssignCriticalRow {
+  /** ردیف */
+  RowNumber: number | null;
+  /** شناسه */
+  Id: number | null;
+  /** شماره بدنه */
+  BodyNO: string | null;
+  /** شماره فنی */
+  PartNo: string | null;
+  /** شرح قطعه */
+  PartDescF: string | null;
+  /** تاریخ ثبت */
+  CreateDate: string | null;
+  /** ستون‌های دیگر خروجی رویه که در مدل تعریف نشده‌اند (ExtraColumns) */
+  [column: string]: unknown;
+}
+
+/** ترتیب ستون‌های خروجی رویه برای IBodyPreAssignCriticalRow (نمایش در جدول) */
+export const bodyPreAssignCriticalRowColumns = ["RowNumber", "Id", "BodyNO", "PartNo", "PartDescF", "CreateDate"] as const;
+
+/** وضعیت مجوز تولید یک بحران (PF.GetProductionPssibilityStatus_V1) منبع ستون‌ها: DTO پاسخ بک‌اند قبلی (SFC.Domain.Shared) / کلاس _Result مدل EF فرم ویندوزی PF */
+export interface IBodyProductionPossibilityStatusRow {
+  /** شناسه بحران */
+  Id: number | null;
+  /** شماره فنی */
+  PartNo: string | null;
+  /** شرح قطعه */
+  PartDescF: string | null;
+  /** نوع کاهش تولید */
+  ProductionFallId: number | null;
+  /** شرایط تولید */
+  ProductionPossibilityId: number | null;
+  /** شرایط تولید */
+  ProductionPossibilityDescF: string | null;
+  /** تعداد مجاز تولید با کسری */
+  PossibleProductionNo: number | null;
+  /** مجاز تا تاریخ */
+  ProductionPossibilityToDate: string | null;
+  /** مجاز تا ساعت */
+  ProductionPossibilityToTime: string | null;
+  /** مجوز مصرف‌شده */
+  UsedLicense: number | null;
+  /** توضیحات */
+  Note: string | null;
+  /** شماره نامه */
+  ProductionStateLetterNo: string | null;
+  /** ستون‌های دیگر خروجی رویه که در مدل تعریف نشده‌اند (ExtraColumns) */
+  [column: string]: unknown;
+}
+
+/** ترتیب ستون‌های خروجی رویه برای IBodyProductionPossibilityStatusRow (نمایش در جدول) */
+export const bodyProductionPossibilityStatusRowColumns = ["Id", "PartNo", "PartDescF", "ProductionFallId", "ProductionPossibilityId", "ProductionPossibilityDescF", "PossibleProductionNo", "ProductionPossibilityToDate", "ProductionPossibilityToTime", "UsedLicense", "Note", "ProductionStateLetterNo"] as const;
+
+/** محصولات به تفکیک خطوط بدنه‌سازی (PF.S_VINBIWSite_CarModel_SelectAll) منبع ستون‌ها: کلاس _Result مدل EF فرم ویندوزی PF */
+export interface IBodyProductsOfSiteRow {
+  /** ردیف */
+  Row: number | null;
+  /** خط بدنه‌سازی */
+  VINBIWSiteDescF: string | null;
+  /** شناسه خط */
+  BIWSIteId: number | null;
+  /** کد مدل */
+  CarModelCode: string | null;
+  /** مدل */
+  CarModelDescF: string | null;
+  /** ستون‌های دیگر خروجی رویه که در مدل تعریف نشده‌اند (ExtraColumns) */
+  [column: string]: unknown;
+}
+
+/** ترتیب ستون‌های خروجی رویه برای IBodyProductsOfSiteRow (نمایش در جدول) */
+export const bodyProductsOfSiteRowColumns = ["Row", "VINBIWSiteDescF", "BIWSIteId", "CarModelCode", "CarModelDescF"] as const;
+
 /** ورودی «قطعات ناموفق در انتقال از SAP» — PF.S_FailedPartTransferd_Sap_Log */
 export interface IBodyReportsGetFailedSapTransfersInput {
   /** از تاریخ */
@@ -403,6 +681,101 @@ export const bodyReportsSearchCriticalPartsInputRules: Partial<Record<keyof IBod
   toDate: { maxLength: { value: 10, message: "«تا تاریخ» حداکثر 10 کاراکتر است" }, pattern: { value: /^1[3-5]\d{2}\/(0[1-9]|1[0-2])\/(0[1-9]|[12]\d|3[01])$/, message: "تاریخ باید با قالب yyyy/MM/dd شمسی باشد." } },
 };
 
+/** ردیابی تغییرات اقلام بحرانی بدنه‌سازی (PF.GetTrackingCriticalParts_V2) منبع ستون‌ها: DTO پاسخ بک‌اند قبلی (SFC.Domain.Shared) */
+export interface IBodyTrackingCriticalPartRow {
+  /** ردیف */
+  RowNumber: number | null;
+  /** شناسه بحران */
+  Id: number | null;
+  /** شماره فنی */
+  PartNo: string | null;
+  /** شرح قطعه */
+  PartDescF: string | null;
+  /** موجودی گروهی */
+  TotalStock: number | null;
+  /** موجودی خام */
+  RawStock: number | null;
+  /** توضیحات بحران */
+  CriticalDescription: string | null;
+  /** مجموع */
+  Total: number | null;
+  /** شرایط تولید */
+  DescF: string | null;
+  /** توضیحات */
+  Description: string | null;
+  /** گروه قطعه */
+  PartGroup: string | null;
+  /** امکان تولید */
+  ProductionPos: number | null;
+  /** امکان تولید به ازای بدنه */
+  ProductionPosPerBody: number | null;
+  /** تعداد مجاز تولید با کسری */
+  PossibleProductionNo: number | null;
+  /** مجوز مصرف‌شده */
+  UsedLicense: number | null;
+  /** خط بدنه‌سازی */
+  BIWSiteDescF: string | null;
+  /** شماره فنی جایگزین */
+  AlternativePartNo: string | null;
+  /** تاریخ و زمان ثبت */
+  CreateDateTime: string | null;
+  /** تاریخ و زمان آخرین تغییر */
+  LastUpdateDateTime: string | null;
+  /** تعداد بدنه پیش‌تخصیص */
+  PreAssignBodyCount: number | null;
+  /** تعداد بدنه پیش‌تخصیص پس از ثبت */
+  PreAssignBodyCountAfterRegistration: number | null;
+  /** وضعیت */
+  Status: string | null;
+  /** نوع قطعه */
+  PartType: string | null;
+  /** ستون‌های دیگر خروجی رویه که در مدل تعریف نشده‌اند (ExtraColumns) */
+  [column: string]: unknown;
+}
+
+/** ترتیب ستون‌های خروجی رویه برای IBodyTrackingCriticalPartRow (نمایش در جدول) */
+export const bodyTrackingCriticalPartRowColumns = ["RowNumber", "Id", "PartNo", "PartDescF", "TotalStock", "RawStock", "CriticalDescription", "Total", "DescF", "Description", "PartGroup", "ProductionPos", "ProductionPosPerBody", "PossibleProductionNo", "UsedLicense", "BIWSiteDescF", "AlternativePartNo", "CreateDateTime", "LastUpdateDateTime", "PreAssignBodyCount", "PreAssignBodyCountAfterRegistration", "Status", "PartType"] as const;
+
+/** محصولات بحران در ردیابی (PF.GetTrackingCriticalParts_Product) منبع ستون‌ها: کلاس _Result مدل EF فرم ویندوزی PF */
+export interface IBodyTrackingProductRow {
+  /** ردیف */
+  RowNumber: number | null;
+  /** شناسه */
+  Id: number | null;
+  /** شماره بدنه */
+  BodyNO: string | null;
+  /** خانواده محصول */
+  CarGroupeDesc: string | null;
+  /** کد خانواده */
+  CarGroupeCode: string | null;
+  /** مدل */
+  CarModelDesc: string | null;
+  /** کد کلاس */
+  CarClassCode: string | null;
+  /** کلاس */
+  CarClassDesc: string | null;
+  /** زیرکلاس */
+  CarSubClassDesc: string | null;
+  /** کد زیرکلاس */
+  CarSubClassCode: string | null;
+  /** ستون‌های دیگر خروجی رویه که در مدل تعریف نشده‌اند (ExtraColumns) */
+  [column: string]: unknown;
+}
+
+/** ترتیب ستون‌های خروجی رویه برای IBodyTrackingProductRow (نمایش در جدول) */
+export const bodyTrackingProductRowColumns = ["RowNumber", "Id", "BodyNO", "CarGroupeDesc", "CarGroupeCode", "CarModelDesc", "CarClassCode", "CarClassDesc", "CarSubClassDesc", "CarSubClassCode"] as const;
+
+/** کد کلاس مصرف‌کننده شماره فنی (PF.S_GetCodeClassByPartNo) منبع ستون‌ها: DTO پاسخ بک‌اند قبلی (SFC.Domain.Shared) */
+export interface ICodeClassRow {
+  /** کد کلاس */
+  Class_Code: string | null;
+  /** ستون‌های دیگر خروجی رویه که در مدل تعریف نشده‌اند (ExtraColumns) */
+  [column: string]: unknown;
+}
+
+/** ترتیب ستون‌های خروجی رویه برای ICodeClassRow (نمایش در جدول) */
+export const codeClassRowColumns = ["Class_Code"] as const;
+
 /** یک کلاس مصرف‌کننده بحران با ضریب مصرف */
 export interface ICriticalPartProductItem {
   /** شناسه کلاس */
@@ -416,6 +789,50 @@ export const criticalPartProductItemRules: Partial<Record<keyof ICriticalPartPro
   carClassId: { min: { value: 1, message: "«شناسه کلاس» باید حداقل 1 باشد" } },
   usageFactor: { min: { value: 1, message: "«ضریب مصرف» باید بین 1 و 100 باشد" }, max: { value: 100, message: "«ضریب مصرف» باید بین 1 و 100 باشد" } },
 };
+
+/** رویدادهای یک بحران (PF.S_EventLogList) منبع ستون‌ها: DTO پاسخ بک‌اند قبلی (SFC.Domain.Shared) / کلاس _Result مدل EF فرم ویندوزی PF */
+export interface IEventLogRow {
+  /** شناسه رویداد */
+  EventLogId: number | null;
+  /** نوع رویداد */
+  AtrributeDescF: string | null;
+  /** توضیحات وضعیت تولید */
+  ProductionStateNote: string | null;
+  /** شرح قطعه */
+  PartNoDesc: string | null;
+  /** مقدار قبلی */
+  oldvalue: string | null;
+  /** مقدار جدید */
+  newvalue: string | null;
+  /** شماره درخواست */
+  Requestno: string | null;
+  /** توضیحات */
+  note: string | null;
+  /** تاریخ رویداد */
+  EventDate: string | null;
+  /** کاربر */
+  UserName: string | null;
+  /** ستون‌های دیگر خروجی رویه که در مدل تعریف نشده‌اند (ExtraColumns) */
+  [column: string]: unknown;
+}
+
+/** ترتیب ستون‌های خروجی رویه برای IEventLogRow (نمایش در جدول) */
+export const eventLogRowColumns = ["EventLogId", "AtrributeDescF", "ProductionStateNote", "PartNoDesc", "oldvalue", "newvalue", "Requestno", "note", "EventDate", "UserName"] as const;
+
+/** قطعات ناموفق در انتقال از SAP (S_FailedPartTransferd_Sap_Log) منبع ستون‌ها: DTO پاسخ بک‌اند قبلی (SFC.Domain.Shared) / متن رویه در SFCDB2.md */
+export interface IFailedSapTransferRow {
+  /** تاریخ و زمان */
+  CreateDateTime: string | null;
+  /** شماره فنی */
+  PartNo: string | null;
+  /** شرح قطعه */
+  PartDesc: string | null;
+  /** ستون‌های دیگر خروجی رویه که در مدل تعریف نشده‌اند (ExtraColumns) */
+  [column: string]: unknown;
+}
+
+/** ترتیب ستون‌های خروجی رویه برای IFailedSapTransferRow (نمایش در جدول) */
+export const failedSapTransferRowColumns = ["CreateDateTime", "PartNo", "PartDesc"] as const;
 
 /** محصولات مصرف‌کننده یک شماره فنی (BOM) */
 export interface IPartProductRow {
@@ -440,6 +857,19 @@ export interface IPartProductRow {
   /** زیرکلاس */
   subclass: string | null;
 }
+
+/** زمان آخرین به‌روزرسانی داده‌های SAP (S_GetSapDataUpdateTimes) منبع ستون‌ها: DTO پاسخ بک‌اند قبلی (SFC.Domain.Shared) */
+export interface ISapDataUpdateTimesRow {
+  /** آخرین به‌روزرسانی اقلام بحرانی SAP */
+  CriticalMasterUpdateDateTime: string | null;
+  /** آخرین به‌روزرسانی رزرو SAP */
+  ReserveMasterUpdateTime: string | null;
+  /** ستون‌های دیگر خروجی رویه که در مدل تعریف نشده‌اند (ExtraColumns) */
+  [column: string]: unknown;
+}
+
+/** ترتیب ستون‌های خروجی رویه برای ISapDataUpdateTimesRow (نمایش در جدول) */
+export const sapDataUpdateTimesRowColumns = ["CriticalMasterUpdateDateTime", "ReserveMasterUpdateTime"] as const;
 
 /** یک ردیف پاسخ SAP */
 export interface ISapWhereUsedItemDto {

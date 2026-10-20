@@ -8,13 +8,13 @@
 | bodyCriticalsService | getBodyCriticalsCodeClassByPartNo | GET | `api/production-feasibility/body-shop/critical-parts/code-class-by-part-no` | `bodyshop.criticalparts.view` | کدهای کلاس مصرف‌کننده شماره فنی |
 | bodyCriticalsService | createBodyCriticalsCriticalPart | POST | `api/production-feasibility/body-shop/critical-parts` | `bodyshop.criticalparts.create` | ثبت بحران بدنه‌سازی |
 | bodyCriticalsService | updateBodyCriticalsCriticalPart | PUT | `api/production-feasibility/body-shop/critical-parts/{criticalPartsId:int}` | `bodyshop.criticalparts.update` | ویرایش بحران بدنه‌سازی |
-| bodyCriticalsService | disableBodyCriticalsCriticalParts | POST | `api/production-feasibility/body-shop/critical-parts/disable` | `bodyshop.criticalparts.disable` | غیرفعال‌سازی بحران‌های بدنه‌سازی |
 | bodyCriticalsService | getBodyCriticalsCriticalPartInfo | GET | `api/production-feasibility/body-shop/critical-parts/{criticalPartsId:int}/info` | `bodyshop.criticalparts.view` | اطلاعات یک بحران بدنه‌سازی برای ویرایش |
 | bodyCriticalsService | getBodyCriticalsEventLog | GET | `api/production-feasibility/body-shop/critical-parts/event-log` | `bodyshop.criticalparts.view` | گزارش رویدادهای یک بحران |
 | bodyCriticalsService | createBodyCriticalsProducts | POST | `api/production-feasibility/body-shop/critical-parts/{criticalPartsId:int}/products` | `bodyshop.criticalparts.create` | ثبت کلاس‌های مصرف‌کننده یک بحران بدنه‌سازی |
 | bodyCriticalsService | registerBodyCriticalsLicense | POST | `api/production-feasibility/body-shop/critical-parts/licenses` | `bodyshop.criticalparts.license` | ثبت مجوز تولید با کسری (تغییر شرایط تولید) |
 | bodyCriticalsService | batchBodyCriticalsCreate | POST | `api/production-feasibility/body-shop/critical-parts/batch` | `bodyshop.criticalparts.create` | ثبت گروهی بحران‌ها از اکسل |
 | bodyCriticalsService | getBodyCriticalsSapWhereUsed | GET | `api/production-feasibility/body-shop/critical-parts/sap/where-used` | `bodyshop.criticalparts.view` | زیرکلاس‌های مصرف‌کننده شماره فنی از SAP |
+| bodyCriticalsService | disableBodyCriticalsCriticalParts | POST | `api/production-feasibility/body-shop/critical-parts/disable` | `bodyshop.criticalparts.disable` | غیرفعال‌سازی (حذف) بحران‌های بدنه‌سازی |
 | bodyReportsService | searchBodyReportsCriticalParts | POST | `api/production-feasibility/body-shop/reports/critical-parts/search` | `bodyshop.reports.search` | جستجوی اقلام بحرانی بدنه‌سازی |
 | bodyReportsService | getBodyReportsCriticalPartProducts | GET | `api/production-feasibility/body-shop/reports/critical-parts/{criticalPartsId:int}/products` | `bodyshop.reports.search` | محصولات یک بحران |
 | bodyReportsService | getBodyReportsTrackingCriticalParts | POST | `api/production-feasibility/body-shop/reports/tracking-critical-parts` | `bodyshop.reports.tracking` | ردیابی تغییرات اقلام بحرانی |
@@ -61,7 +61,7 @@
 | mechPartsService | updateMechParts | PUT | `api/production-feasibility/mechanical/critical-parts/{id:int}` | `mechanical.criticalparts.update` | ویرایش بحران مکانیکی |
 | mechPartsService | saveMechPartsProduct | POST | `api/production-feasibility/mechanical/critical-parts/{criticalPartsId:int}/products` | `mechanical.criticalparts.update` | ثبت/به‌روزرسانی یک محصول بحران |
 | mechPartsService | addMechPartsSubClass | POST | `api/production-feasibility/mechanical/critical-parts/add-subclass` | `mechanical.criticalparts.compare` | افزودن زیرکلاس مغایر به بحران |
-| mechPartsService | deleteMechParts | DELETE | `api/production-feasibility/mechanical/critical-parts/{id:int}` | `mechanical.criticalparts.delete` | حذف محصولات بحران مکانیکی |
+| mechPartsService | deleteMechParts | DELETE | `api/production-feasibility/mechanical/critical-parts/{id:int}` | `mechanical.criticalparts.delete` | حذف بحران مکانیکی (به همراه استثناها و مجوزهای آن) |
 | mechPartsService | saveMechPartsProducts | POST | `api/production-feasibility/mechanical/critical-parts/{criticalPartsId:int}/products/batch` | `mechanical.criticalparts.update` | ثبت چند محصول برای یک بحران مکانیکی |
 | mechPartsService | compareMechPartsSubClasses | POST | `api/production-feasibility/mechanical/critical-parts/compare-subclasses` | `mechanical.criticalparts.compare` | مقایسه زیرکلاس‌های SAP با SFC |
 | mechReasonsService | getMechReasonsList | GET | `api/production-feasibility/mechanical/not-possible-reasons` | `mechanical.notpossiblereasons.view` | فهرست دلایل عدم امکان تولید |
@@ -92,9 +92,13 @@
 | syncBasisService | getSyncBasisById | GET | `api/production-feasibility/synchron/basis/{id}` | `synchron.basis.view` | مبنای ست بر اساس شناسه |
 | syncBasisService | getSyncBasisByStatus | GET | `api/production-feasibility/synchron/basis/by-status` | `synchron.basis.view` | مبناهای ست بر اساس وضعیت |
 | syncBasisService | countSyncBasisBySetCode | GET | `api/production-feasibility/synchron/basis/count-by-code` | `synchron.basis.view` | تعداد ست‌های ثبت‌شده با کد ست |
+| syncBasisService | addSyncBasisPartTypeProperty | POST | `api/production-feasibility/synchron/basis/part-type-properties` | `synchron.basis.create` | ثبت ویژگی نوع قطعه سنکرون |
 | syncBasisService | createSyncBasis | POST | `api/production-feasibility/synchron/basis` | `synchron.basis.create` | ثبت مبنای ست سنکرون |
 | syncBasisService | updateSyncBasis | PUT | `api/production-feasibility/synchron/basis/{id:int}` | `synchron.basis.update` | ویرایش مبنای ست سنکرون |
 | syncReportsService | getSyncReportsProductionPossibility | POST | `api/production-feasibility/synchron/reports/production-possibility` | `synchron.reports.productionpossibility` | گزارش امکان تولید سنکرون |
+| syncReportsService | getSyncReportsSapCriticalPartsMaster | GET | `api/production-feasibility/synchron/reports/sap-critical-parts-master` | `synchron.reports.sap` | اقلام بحرانی دریافتی از SAP |
+| syncReportsService | getSyncReportsSapReserveMaster | GET | `api/production-feasibility/synchron/reports/sap-reserve-master` | `synchron.reports.sap` | رزروهای دریافتی از SAP |
+| syncReportsService | getSyncReportsAsnReport | GET | `api/production-feasibility/synchron/reports/asn` | `synchron.reports.sap` | گزارش ASN (اعلان ورود محموله) |
 | syncSetsService | getSyncSetsById | GET | `api/production-feasibility/synchron/sets/{id:int}` | `synchron.sets.view` | اطلاعات بحران سنکرون |
 | syncSetsService | getSyncSetsParts | GET | `api/production-feasibility/synchron/sets/{criticalPartsSetId:int}/parts` | `synchron.sets.view` | قطعات بحران سنکرون |
 | syncSetsService | getSyncSetsPartsWithShortageList | GET | `api/production-feasibility/synchron/sets/{criticalPartsSetId:int}/parts-with-shortage-list` | `synchron.sets.view` | قطعات بحران سنکرون به همراه فهرست مرجع کسری |
@@ -103,6 +107,10 @@
 | syncSetsService | getSyncSetsProducts | GET | `api/production-feasibility/synchron/sets/{criticalPartsSetId:int}/products` | `synchron.sets.view` | محصولات بحران سنکرون |
 | syncSetsService | getSyncSetsProductDetails | GET | `api/production-feasibility/synchron/sets/{criticalPartsSetId:int}/product-details` | `synchron.sets.view` | جزئیات محصولات بحران سنکرون |
 | syncSetsService | getSyncSetsNotEnteredIndicatorCarsCount | GET | `api/production-feasibility/synchron/sets/{criticalPartsSetId:int}/not-entered-indicator-cars-count` | `synchron.sets.view` | تعداد سالن‌های بدون خودروی شاخص |
+| syncSetsService | getSyncSetsSetSaloons | GET | `api/production-feasibility/synchron/sets/{criticalPartsSetId:int}/set-saloons` | `synchron.sets.view` | سالن‌های ثبت‌شده بحران سنکرون |
+| syncSetsService | getSyncSetsPartInfo | GET | `api/production-feasibility/synchron/sets/part-info` | `synchron.sets.view` | اطلاعات شماره فنی از BOM (کلاس، زیرکلاس و نوع قطعه) |
+| syncSetsService | getSyncSetsSimilarColors | GET | `api/production-feasibility/synchron/sets/similar-colors` | `synchron.sets.view` | رنگ‌های هم‌کد با کد ۵ رقمی |
+| syncSetsService | getSyncSetsSaloonsByCarModels | GET | `api/production-feasibility/synchron/sets/saloons-by-car-models` | `synchron.sets.view` | سالن‌های مونتاژ مدل‌های انتخاب‌شده |
 | syncSetsService | createSyncSetsHeader | POST | `api/production-feasibility/synchron/sets` | `synchron.sets.create` | ثبت سرآیند بحران سنکرون |
 | syncSetsService | updateSyncSetsHeader | PUT | `api/production-feasibility/synchron/sets/{id:int}` | `synchron.sets.update` | ویرایش بحران سنکرون |
 | syncSetsService | addSyncSetsProduct | POST | `api/production-feasibility/synchron/sets/{criticalPartsSetId:int}/products` | `synchron.sets.update` | ثبت یک محصول بحران سنکرون |

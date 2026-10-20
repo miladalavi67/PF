@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using IKCO.ProductionFeasibility.Common;
 using IKCO.ProductionFeasibility.Common.ValueObjects;
 using IKCO.ProductionFeasibility.Exceptions;
+using IKCO.ProductionFeasibility.Mechanical.Results;
 using IKCO.ProductionFeasibility.Mechanical.MechLicenses.Dtos;
 using IKCO.ProductionFeasibility.Mechanical.MechLicenses.Repositories;
 using IKCO.ProductionFeasibility.Users;
@@ -21,29 +22,29 @@ public partial class MechLicensesAppService : PfAppService, IMechLicensesAppServ
         _currentUser = currentUser;
     }
 
-    public async Task<TabularResult> GetTrackingInfoAsync(MechLicensesGetTrackingInfoInput input)
+    public async Task<ListResultDto<ShortageLicenseTrackingRow>> GetTrackingInfoAsync(MechLicensesGetTrackingInfoInput input)
     {
-        return await _repository.GetTrackingInfoAsync(input.CriticalPartTypeId, input.CriticalPartId);
+        return new ListResultDto<ShortageLicenseTrackingRow>(await _repository.GetTrackingInfoAsync(input.CriticalPartTypeId, input.CriticalPartId));
     }
 
-    public async Task<TabularResult> GetTrackingListAsync(MechLicensesGetTrackingListInput input)
+    public async Task<ListResultDto<ShortageLicenseTrackingRow>> GetTrackingListAsync(MechLicensesGetTrackingListInput input)
     {
-        return await _repository.GetTrackingListAsync(input.CriticalPartTypeId, input.CriticalPartId);
+        return new ListResultDto<ShortageLicenseTrackingRow>(await _repository.GetTrackingListAsync(input.CriticalPartTypeId, input.CriticalPartId));
     }
 
-    public async Task<TabularResult> SearchTrackingAsync(MechLicensesSearchTrackingInput input)
+    public async Task<ListResultDto<LicenseTrackingSearchRow>> SearchTrackingAsync(MechLicensesSearchTrackingInput input)
     {
-        return await _repository.SearchTrackingAsync(input.FromDate, input.ToDate, PartNumber.OptionalValue(input.PartNo), input.SetCode);
+        return new ListResultDto<LicenseTrackingSearchRow>(await _repository.SearchTrackingAsync(input.FromDate, input.ToDate, PartNumber.OptionalValue(input.PartNo), input.SetCode));
     }
 
-    public async Task<TabularResult> SearchTrackingCriticalsAsync(MechLicensesSearchTrackingCriticalsInput input)
+    public async Task<ListResultDto<LicenseTrackingCriticalRow>> SearchTrackingCriticalsAsync(MechLicensesSearchTrackingCriticalsInput input)
     {
-        return await _repository.SearchTrackingCriticalsAsync(input.FromDate, input.ToDate, PartNumber.OptionalValue(input.PartNo), input.SetCode);
+        return new ListResultDto<LicenseTrackingCriticalRow>(await _repository.SearchTrackingCriticalsAsync(input.FromDate, input.ToDate, PartNumber.OptionalValue(input.PartNo), input.SetCode));
     }
 
-    public async Task<TabularResult> GetBodiesRelatedToUsedLicenseAsync(MechLicensesGetBodiesRelatedToUsedLicenseInput input)
+    public async Task<ListResultDto<UsedLicenseBodyRow>> GetBodiesRelatedToUsedLicenseAsync(MechLicensesGetBodiesRelatedToUsedLicenseInput input)
     {
-        return await _repository.GetBodiesRelatedToUsedLicenseAsync(input.CriticalPartTypeId, input.CriticalPartId);
+        return new ListResultDto<UsedLicenseBodyRow>(await _repository.GetBodiesRelatedToUsedLicenseAsync(input.CriticalPartTypeId, input.CriticalPartId));
     }
 
 }

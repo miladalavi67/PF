@@ -210,7 +210,7 @@ public class MechPartsUpdateInput
 
 }
 
-/// <summary>ورودی «ثبت/به‌روزرسانی یک محصول بحران» — <c>dbo.S_CriticalPartsPruductUpdate_H_V1</c></summary>
+/// <summary>ورودی «ثبت/به‌روزرسانی یک محصول بحران» — <c>dbo.S_CriticalPartsPruductUpdate_Web</c></summary>
 public class MechPartsSaveProductInput
 {
     /// <summary>شناسه محصول</summary>

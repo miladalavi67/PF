@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using IKCO.ProductionFeasibility.Common;
 using IKCO.ProductionFeasibility.Controllers;
 using IKCO.ProductionFeasibility.Permissions;
+using IKCO.ProductionFeasibility.Mechanical.Results;
 using IKCO.ProductionFeasibility.Mechanical.MechLicenses.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -32,8 +33,8 @@ public partial class MechLicensesController : PfController
     /// </remarks>
     [HttpGet("tracking-info")]
     [Authorize(PfPermissions.MechLicenses.View)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetTrackingInfoAsync([FromQuery] MechLicensesGetTrackingInfoInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<ShortageLicenseTrackingRow>))]
+    public Task<ListResultDto<ShortageLicenseTrackingRow>> GetTrackingInfoAsync([FromQuery] MechLicensesGetTrackingInfoInput input)
         => _service.GetTrackingInfoAsync(input);
 
     /// <summary>تاریخچه مجوزهای یک بحران</summary>
@@ -45,8 +46,8 @@ public partial class MechLicensesController : PfController
     /// </remarks>
     [HttpGet("tracking")]
     [Authorize(PfPermissions.MechLicenses.View)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetTrackingListAsync([FromQuery] MechLicensesGetTrackingListInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<ShortageLicenseTrackingRow>))]
+    public Task<ListResultDto<ShortageLicenseTrackingRow>> GetTrackingListAsync([FromQuery] MechLicensesGetTrackingListInput input)
         => _service.GetTrackingListAsync(input);
 
     /// <summary>گزارش پارامترهای تولید با کسری تعریف‌شده</summary>
@@ -59,8 +60,8 @@ public partial class MechLicensesController : PfController
     /// </remarks>
     [HttpPost("tracking/search")]
     [Authorize(PfPermissions.MechLicenses.Report)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> SearchTrackingAsync([FromBody] MechLicensesSearchTrackingInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<LicenseTrackingSearchRow>))]
+    public Task<ListResultDto<LicenseTrackingSearchRow>> SearchTrackingAsync([FromBody] MechLicensesSearchTrackingInput input)
         => _service.SearchTrackingAsync(input);
 
     /// <summary>بحران‌های دارای مجوز تولید با کسری</summary>
@@ -73,8 +74,8 @@ public partial class MechLicensesController : PfController
     /// </remarks>
     [HttpPost("tracking/search-criticals")]
     [Authorize(PfPermissions.MechLicenses.Report)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> SearchTrackingCriticalsAsync([FromBody] MechLicensesSearchTrackingCriticalsInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<LicenseTrackingCriticalRow>))]
+    public Task<ListResultDto<LicenseTrackingCriticalRow>> SearchTrackingCriticalsAsync([FromBody] MechLicensesSearchTrackingCriticalsInput input)
         => _service.SearchTrackingCriticalsAsync(input);
 
     /// <summary>بدنه‌های مصرف‌کننده مجوز تولید</summary>
@@ -86,8 +87,8 @@ public partial class MechLicensesController : PfController
     /// </remarks>
     [HttpGet("used-license-bodies")]
     [Authorize(PfPermissions.MechLicenses.Report)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetBodiesRelatedToUsedLicenseAsync([FromQuery] MechLicensesGetBodiesRelatedToUsedLicenseInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<UsedLicenseBodyRow>))]
+    public Task<ListResultDto<UsedLicenseBodyRow>> GetBodiesRelatedToUsedLicenseAsync([FromQuery] MechLicensesGetBodiesRelatedToUsedLicenseInput input)
         => _service.GetBodiesRelatedToUsedLicenseAsync(input);
 
 }

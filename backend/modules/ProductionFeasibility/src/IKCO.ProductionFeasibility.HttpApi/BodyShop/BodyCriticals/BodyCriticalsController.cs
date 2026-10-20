@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using IKCO.ProductionFeasibility.Common;
 using IKCO.ProductionFeasibility.Controllers;
 using IKCO.ProductionFeasibility.Permissions;
+using IKCO.ProductionFeasibility.BodyShop.Results;
 using IKCO.ProductionFeasibility.BodyShop.BodyCriticals.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -72,8 +73,8 @@ public partial class BodyCriticalsController : PfController
     /// </remarks>
     [HttpGet("code-class-by-part-no")]
     [Authorize(PfPermissions.BodyCriticals.View)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetCodeClassByPartNoAsync([FromQuery] BodyCriticalsGetCodeClassByPartNoInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<CodeClassRow>))]
+    public Task<ListResultDto<CodeClassRow>> GetCodeClassByPartNoAsync([FromQuery] BodyCriticalsGetCodeClassByPartNoInput input)
         => _service.GetCodeClassByPartNoAsync(input);
 
     /// <summary>ثبت بحران بدنه‌سازی</summary>
@@ -105,21 +106,6 @@ public partial class BodyCriticalsController : PfController
     public Task<GlobalResultDto> UpdateCriticalPartAsync(int criticalPartsId, [FromBody] BodyCriticalsUpdateCriticalPartInput input)
         => _service.UpdateCriticalPartAsync(criticalPartsId, input);
 
-    /// <summary>غیرفعال‌سازی بحران‌های بدنه‌سازی</summary>
-    /// <remarks>
-    /// معادل فرم/متد سامانه ویندوزی: <c>frmBodyCriticalSearch (غیرفعال‌سازی)</c>.
-    /// رویه ذخیره‌شده: <c>PF.S_DisableCriticalParts</c>.
-    /// شناسه بحران‌ها با ویرگول به رویه ارسال می‌شود (بدون ویرگول انتهایی).
-    ///
-    ///     POST /api/production-feasibility/body-shop/critical-parts/disable
-    ///     { "ids": "string" }
-    /// </remarks>
-    [HttpPost("disable")]
-    [Authorize(PfPermissions.BodyCriticals.Disable)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(GlobalResultDto))]
-    public Task<GlobalResultDto> DisableCriticalPartsAsync([FromBody] BodyCriticalsDisableCriticalPartsInput input)
-        => _service.DisableCriticalPartsAsync(input);
-
     /// <summary>اطلاعات یک بحران بدنه‌سازی برای ویرایش</summary>
     /// <remarks>
     /// معادل فرم/متد سامانه ویندوزی: <c>BL_BodyCritical.CriticalPartsInfo (frmBodyCriticalParts در حالت ویرایش)</c>.
@@ -129,8 +115,8 @@ public partial class BodyCriticalsController : PfController
     /// </remarks>
     [HttpGet("{criticalPartsId:int}/info")]
     [Authorize(PfPermissions.BodyCriticals.View)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetCriticalPartInfoAsync(int criticalPartsId)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<BodyCriticalPartInfoRow>))]
+    public Task<ListResultDto<BodyCriticalPartInfoRow>> GetCriticalPartInfoAsync(int criticalPartsId)
         => _service.GetCriticalPartInfoAsync(criticalPartsId);
 
     /// <summary>گزارش رویدادهای یک بحران</summary>
@@ -142,8 +128,8 @@ public partial class BodyCriticalsController : PfController
     /// </remarks>
     [HttpGet("event-log")]
     [Authorize(PfPermissions.BodyCriticals.View)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetEventLogAsync([FromQuery] BodyCriticalsGetEventLogInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<EventLogRow>))]
+    public Task<ListResultDto<EventLogRow>> GetEventLogAsync([FromQuery] BodyCriticalsGetEventLogInput input)
         => _service.GetEventLogAsync(input);
 
 }

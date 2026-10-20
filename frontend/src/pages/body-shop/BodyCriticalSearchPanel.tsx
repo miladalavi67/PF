@@ -9,7 +9,6 @@ import {
   IkcoStack,
   IkcoSwitch,
   IkcoTextArea,
-  IkcoTextField,
   IkcoTypography,
 } from "@ikco/frontend-kit";
 import { PermissionGuard, useCan } from "@ikco/mfe-core";
@@ -22,14 +21,15 @@ import ExcelExportButton from "../../components/ExcelExportButton";
 import SectionPanel from "../../components/SectionPanel";
 import LookupAutocomplete from "../../components/LookupAutocomplete";
 import TabularDialog from "../../components/TabularDialog";
-import { disableBodyCriticalsCriticalParts, getBodyCriticalsEventLog, getBodyCriticalsPartDescription } from "../../server/services/bodyCriticalsService";
+import { disableBodyCriticalsCriticalParts, getBodyCriticalsEventLog } from "../../server/services/bodyCriticalsService";
 import { getBodyReportsCriticalPartProducts, getBodyReportsShortageLicenseTracking, searchBodyReportsCriticalParts } from "../../server/services/bodyReportsService";
 import { bodyReportsSearchCriticalPartsInputRules } from "../../types/BodyShop";
-import type { ITabularResult } from "../../types/Common";
+import type { ITabularResult } from "../../types/tabular";
 import { ApiPermissions } from "../../types/permissions";
 import { columnHeaders } from "../../utils/columnHeaders";
 import { resultColumns, tabularRows, type IGridRow } from "../../utils/tabularUtility";
 import BodyLicenseDialog from "./BodyLicenseDialog";
+import PartNumberField from "../../components/PartNumberField";
 import ActionBar from "../../components/ActionBar";
 
 interface Filters {
@@ -87,13 +87,12 @@ interface Props {
 export default function BodyCriticalSearchPanel({ mode, onEdit, onPick, onExit }: Props) {
   const canUpdate = useCan(ApiPermissions.bodyCriticals.update);
   const canLicense = useCan(ApiPermissions.bodyCriticals.license);
-  const { control, register, handleSubmit, reset, watch, setValue, getValues, formState: { errors } } = useForm<Filters>({ defaultValues: defaults });
+  const { control, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm<Filters>({ defaultValues: defaults });
   const [result, setResult] = useState<ITabularResult | null>(null);
   const [products, setProducts] = useState<ITabularResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [selection, setSelection] = useState<number[]>([]);
   const [activeId, setActiveId] = useState(0);
-  const [partDesc, setPartDesc] = useState("");
   const [confirm, setConfirm] = useState(false);
   const [disabling, setDisabling] = useState(false);
   // حالت «حذف با ذکر دلیل» (txtReasonOfDelete / btnAcceptDelete / btnCancelDelete فرم ویندوزی)
@@ -137,16 +136,6 @@ export default function BodyCriticalSearchPanel({ mode, onEdit, onPick, onExit }
   const showProducts = async (id: number) => {
     setActiveId(id);
     setProducts(await getBodyReportsCriticalPartProducts(id));
-  };
-
-  const loadPartDesc = async () => {
-    const partNo = getValues("partNumber").trim();
-    if (!partNo) {
-      setPartDesc("");
-      return;
-    }
-    const desc = await getBodyCriticalsPartDescription({ partNo });
-    setPartDesc(typeof desc === "string" ? desc : "");
   };
 
   const requireActive = (action: () => void) => {
@@ -194,7 +183,6 @@ export default function BodyCriticalSearchPanel({ mode, onEdit, onPick, onExit }
     setProducts(null);
     setSelection([]);
     setActiveId(0);
-    setPartDesc("");
     cancelDelete();
   };
 
@@ -210,26 +198,29 @@ export default function BodyCriticalSearchPanel({ mode, onEdit, onPick, onExit }
             <Controller name="typeId" control={control} render={({ field }) => <LookupAutocomplete lookupKey="body-critical-part-types" label="نوع بحران" value={field.value} onChange={field.onChange} />} />
           </IkcoGrid>
           <IkcoGrid size={size}>
-            <Controller name="productionPossibilityId" control={control} render={({ field }) => <LookupAutocomplete lookupKey="production-possibilities" label="وضعیت امکان تولید" value={field.value} onChange={field.onChange} />} />
+            <Controller name="productionPossibilityId" control={control} render={({ field }) => <LookupAutocomplete allLabel="همه موارد" lookupKey="production-possibilities" label="وضعیت امکان تولید" value={field.value} onChange={field.onChange} />} />
           </IkcoGrid>
           <IkcoGrid size={size}>
             <Controller name="plantId" control={control} render={({ field }) => <LookupAutocomplete lookupKey="virtual-plants" label="سایت" value={field.value} onChange={(v) => { field.onChange(v); setValue("vinBiwSite", null); }} />} />
           </IkcoGrid>
           <IkcoGrid size={size}>
-            <Controller name="vinBiwSite" control={control} render={({ field }) => <LookupAutocomplete lookupKey="body-saloons" label="سالن" value={field.value} parentId={watch("plantId")} onChange={field.onChange} />} />
+            <Controller name="vinBiwSite" control={control} render={({ field }) => <LookupAutocomplete allLabel="همه موارد" lookupKey="body-saloons" label="سالن" value={field.value} parentId={watch("plantId")} onChange={field.onChange} />} />
           </IkcoGrid>
-          <IkcoGrid size={size}>
-            <IkcoTextField label="شماره فنی" {...register("partNumber", { ...bodyReportsSearchCriticalPartsInputRules.partNumber, onBlur: () => void loadPartDesc() })} error={!!errors.partNumber} helperText={errors.partNumber?.message} />
-          </IkcoGrid>
-          <IkcoGrid size={size}>
-            <IkcoTextField label="شرح شماره فنی" value={partDesc} disabled />
-          </IkcoGrid>
+          <Controller
+            name="partNumber"
+            control={control}
+            rules={bodyReportsSearchCriticalPartsInputRules.partNumber}
+            render={({ field }) => (
+              <PartNumberField source="body" value={field.value} onChange={field.onChange} maxLength={100} size={size} descSize={size} error={!!errors.partNumber} helperText={errors.partNumber?.message} />
+            )}
+          />
           <IkcoGrid size={size}>
             <Controller name="activeOnly" control={control} render={({ field }) => <IkcoSwitch label={`وضعیت اقلام بحرانی: ${field.value ? "فعال" : "غیرفعال"}`} checked={field.value} onChange={(_, c) => field.onChange(c)} />} />
           </IkcoGrid>
         </IkcoGrid>
-        <IkcoGrid container spacing={2} alignItems="center">
-          <IkcoGrid size={{ xs: 12, sm: 4, md: 2 }}>
+        {/* چک‌باکس به اندازه محتوا تا فیلدها کنار آن قرار گیرند (PFReview بند ۲) */}
+        <IkcoGrid container spacing={1} alignItems="center">
+          <IkcoGrid size={{ xs: 12, sm: "auto" }}>
             <Controller name="byDate" control={control} render={({ field }) => <IkcoCheckbox label="انتخاب تاریخ" checked={field.value} onChange={(_, c) => field.onChange(c)} />} />
           </IkcoGrid>
           <IkcoGrid size={{ xs: 6, sm: 4, md: 3 }}>
@@ -239,8 +230,8 @@ export default function BodyCriticalSearchPanel({ mode, onEdit, onPick, onExit }
             <Controller name="toDate" control={control} render={({ field }) => <IkcoDatePicker label="تا" value={field.value} disabled={!byDate} onChange={field.onChange} />} />
           </IkcoGrid>
         </IkcoGrid>
-        <IkcoGrid container spacing={2} alignItems="center">
-          <IkcoGrid size={{ xs: 12, sm: 3, md: 2 }}>
+        <IkcoGrid container spacing={1} alignItems="center">
+          <IkcoGrid size={{ xs: 12, sm: "auto" }}>
             <Controller name="byProduct" control={control} render={({ field }) => <IkcoCheckbox label="انتخاب محصول" checked={field.value} onChange={(_, c) => field.onChange(c)} />} />
           </IkcoGrid>
           <IkcoGrid size={{ xs: 12, sm: 3, md: 3 }}>

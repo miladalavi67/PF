@@ -1,7 +1,7 @@
 import { IkcoButton, IkcoCard, IkcoCardContent, IkcoCheckbox, IkcoChip, IkcoDataGrid, IkcoGrid, IkcoRadioGroup, IkcoStack, IkcoTypography } from "@ikco/frontend-kit";
 import { PermissionGuard } from "@ikco/mfe-core";
 import { CleaningServices, Edit, History, LocalShipping, Print, Refresh, Search, Sync, Visibility } from "@mui/icons-material";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import ExcelExportButton from "../../../components/ExcelExportButton";
 import FormDialog from "../../../components/FormDialog";
@@ -10,7 +10,7 @@ import LookupMultiSelect from "../../../components/LookupMultiSelect";
 import TabularDialog from "../../../components/TabularDialog";
 import { getMechLicensesTrackingList } from "../../../server/services/mechLicensesService";
 import { getMechReportsFailedSapTransfers, getMechReportsProductionPossibility, getMechReportsSapCriticalLog, getMechReportsStockLog } from "../../../server/services/mechReportsService";
-import type { ITabularResult } from "../../../types/Common";
+import type { ITabularResult } from "../../../types/tabular";
 import { ApiPermissions } from "../../../types/permissions";
 import { columnHeaders } from "../../../utils/columnHeaders";
 import { firstOfMonthJalali, todayJalali } from "../../../utils/dateUtility";
@@ -20,6 +20,8 @@ import MechContrastDialog from "../dialogs/MechContrastDialog";
 import MechAsnDialog from "../dialogs/MechAsnDialog";
 import MechCriticalRegister from "../MechCriticalRegister";
 import ActionBar from "../../../components/ActionBar";
+import useLiveRefresh from "../../../hooks/useLiveRefresh";
+import type { IMechReportsGetProductionPossibilityInput } from "../../../types/Mechanical";
 
 const legend: { label: string; color: "warning" | "success" | "info" | "error" | "default" }[] = [
   { label: "بحران جدید", color: "warning" },
@@ -62,26 +64,35 @@ export default function MechProductionPossibilityReport() {
   const rows = useMemo(() => tabularRows(result), [result]);
   const productRows = useMemo(() => (active ? [active] : []), [active]);
 
-  const run = async () => {
-    setLoading(true);
+  const lastInput = useRef<IMechReportsGetProductionPossibilityInput | null>(null);
+
+  const load = async (input: IMechReportsGetProductionPossibilityInput, silent = false) => {
+    if (!silent) setLoading(true);
     try {
-      setResult(
-        await getMechReportsProductionPossibility({
-          saloonId: allSaloons || saloons.length === 0 ? "-1" : saloons.join(","),
-          crisisTypeId: Number(crisis),
-          criticalPartTypeId: Number(kind),
-          subClassId: subClassId ?? 0,
-          partNo: null,
-          carModelId: modelId ?? 0,
-          carClassId: classId ?? 0,
-        }),
-      );
-      setActive(null);
+      setResult(await getMechReportsProductionPossibility(input));
+      lastInput.current = input;
+      if (!silent) setActive(null);
       setRefreshedAt(new Date().toLocaleString("fa-IR"));
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
+
+  const run = () =>
+    load({
+      saloonId: allSaloons || saloons.length === 0 ? "-1" : saloons.join(","),
+      crisisTypeId: Number(crisis),
+      criticalPartTypeId: Number(kind),
+      subClassId: subClassId ?? 0,
+      partNo: null,
+      carModelId: modelId ?? 0,
+      carClassId: classId ?? 0,
+    });
+
+  // تغییر بحران‌ها/مجوزها در پایگاه داده (SignalR) گزارش اجراشده را با همان شرایط تازه می‌کند
+  const live = useLiveRefresh("trim-tracking", () => {
+    if (lastInput.current) void load(lastInput.current, true);
+  });
 
   const clearFilters = () => {
     setAllSaloons(true);
@@ -127,19 +138,20 @@ export default function MechProductionPossibilityReport() {
                 <IkcoRadioGroup row value={kind} onChange={(_, v) => setKind(v)} options={[{ value: "-1", label: "همه موارد" }, { value: "1", label: "قطعات سنکرون" }, { value: "0", label: "قطعات مکانیکی" }]} />
               </IkcoGrid>
               <IkcoGrid size={{ xs: 12, md: 4 }}>
-                <LookupAutocomplete lookupKey="car-models" label="محصول" value={modelId} onChange={(v) => { setModelId(v); setClassId(null); setSubClassId(null); }} />
+                <LookupAutocomplete allLabel="همه موارد" lookupKey="car-models" label="محصول" value={modelId} onChange={(v) => { setModelId(v); setClassId(null); setSubClassId(null); }} />
               </IkcoGrid>
               <IkcoGrid size={{ xs: 12, md: 4 }}>
-                <LookupAutocomplete lookupKey="car-classes" label="کلاس" value={classId} parentId={modelId} requireParent onChange={(v) => { setClassId(v); setSubClassId(null); }} />
+                <LookupAutocomplete allLabel="همه موارد" lookupKey="car-classes" label="کلاس" value={classId} parentId={modelId} requireParent onChange={(v) => { setClassId(v); setSubClassId(null); }} />
               </IkcoGrid>
               <IkcoGrid size={{ xs: 12, md: 4 }}>
-                <LookupAutocomplete lookupKey="sub-classes" label="زیرکلاس" value={subClassId} parentId={classId} requireParent onChange={setSubClassId} />
+                <LookupAutocomplete allLabel="همه موارد" lookupKey="sub-classes" label="زیرکلاس" value={subClassId} parentId={classId} requireParent onChange={setSubClassId} />
               </IkcoGrid>
               <IkcoGrid size={12}>
                 <IkcoStack direction="row" spacing={1} flexWrap="wrap" useFlexGap alignItems="center">
                   {legend.map((l) => (
                     <IkcoChip key={l.label} label={l.label} status={l.color} size="small" />
                   ))}
+                  <IkcoChip size="small" status={live.connected ? "success" : "default"} label={live.connected ? "به‌روزرسانی زنده: متصل" : "به‌روزرسانی زنده: قطع"} />
                   <IkcoTypography variant="caption">{refreshedAt ? `آخرین بروزرسانی: ${refreshedAt}` : ""}</IkcoTypography>
                 </IkcoStack>
               </IkcoGrid>

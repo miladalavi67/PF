@@ -21,7 +21,7 @@ import ConfirmDialog from "../../../components/ConfirmDialog";
 import ExcelExportButton from "../../../components/ExcelExportButton";
 import LookupAutocomplete from "../../../components/LookupAutocomplete";
 import { addMechPartsSubClass, compareMechPartsSubClasses } from "../../../server/services/mechPartsService";
-import type { ITabularResult } from "../../../types/Common";
+import type { ITabularResult } from "../../../types/tabular";
 import type { ISubClassPartRow } from "../../../types/Mechanical";
 import { ApiPermissions } from "../../../types/permissions";
 import { columnHeaders } from "../../../utils/columnHeaders";

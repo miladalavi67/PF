@@ -27,7 +27,7 @@ import ConfirmDialog from "../../components/ConfirmDialog";
 import ExcelExportButton from "../../components/ExcelExportButton";
 import LookupAutocomplete from "../../components/LookupAutocomplete";
 import { createMechReasons, deleteMechReasons, getMechReasonsList, updateMechReasons } from "../../server/services/mechReasonsService";
-import type { ITabularResult } from "../../types/Common";
+import type { ITabularResult } from "../../types/tabular";
 import { mechReasonsCreateInputRules } from "../../types/Mechanical";
 import { ApiPermissions } from "../../types/permissions";
 import { columnHeaders } from "../../utils/columnHeaders";

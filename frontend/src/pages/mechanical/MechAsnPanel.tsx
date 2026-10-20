@@ -1,12 +1,12 @@
-import { IkcoButton, IkcoCard, IkcoCardContent, IkcoDataGrid, IkcoDatePicker, IkcoGrid, IkcoRadioGroup, IkcoStack, IkcoTextField, IkcoTypography } from "@ikco/frontend-kit";
+import { IkcoButton, IkcoCard, IkcoCardContent, IkcoDataGrid, IkcoDatePicker, IkcoGrid, IkcoRadioGroup, IkcoStack, IkcoTypography } from "@ikco/frontend-kit";
 import { PermissionGuard } from "@ikco/mfe-core";
 import { Refresh } from "@mui/icons-material";
 import { useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import ExcelExportButton from "../../components/ExcelExportButton";
-import { getMechPartsPartDescription } from "../../server/services/mechPartsService";
+import PartNumberField from "../../components/PartNumberField";
 import { getMechReportsAsnReport } from "../../server/services/mechReportsService";
-import type { ITabularResult } from "../../types/Common";
+import type { ITabularResult } from "../../types/tabular";
 import { ApiPermissions } from "../../types/permissions";
 import { columnHeaders } from "../../utils/columnHeaders";
 import { firstOfMonthJalali, todayJalali } from "../../utils/dateUtility";
@@ -23,22 +23,11 @@ export default function MechAsnPanel() {
   const [fromDate, setFromDate] = useState<string | null>(firstOfMonthJalali());
   const [toDate, setToDate] = useState<string | null>(todayJalali());
   const [partNo, setPartNo] = useState("");
-  const [partDesc, setPartDesc] = useState("");
   const [result, setResult] = useState<ITabularResult | null>(null);
   const [loading, setLoading] = useState(false);
 
   const columns = useMemo(() => resultColumns(result, columnHeaders), [result]);
   const rows = useMemo(() => tabularRows(result), [result]);
-
-  const loadDesc = async () => {
-    const value = partNo.trim();
-    if (!value) {
-      setPartDesc("");
-      return;
-    }
-    const desc = await getMechPartsPartDescription({ partNo: value });
-    setPartDesc(typeof desc === "string" ? desc.trim() : "");
-  };
 
   const run = async () => {
     if (!fromDate || !toDate) {
@@ -72,12 +61,7 @@ export default function MechAsnPanel() {
               <IkcoGrid size={{ xs: 6, md: 2 }}>
                 <IkcoDatePicker label="تا تاریخ" value={toDate} onChange={setToDate} />
               </IkcoGrid>
-              <IkcoGrid size={{ xs: 12, md: 3 }}>
-                <IkcoTextField label="شماره فنی" value={partNo} disabled={byPart !== "part"} onChange={(e) => setPartNo(e.target.value)} onBlur={() => void loadDesc()} slotProps={{ htmlInput: { maxLength: 50 } }} />
-              </IkcoGrid>
-              <IkcoGrid size={{ xs: 12, md: 5 }}>
-                <IkcoTextField label="شرح" value={partDesc} disabled />
-              </IkcoGrid>
+              <PartNumberField value={partNo} onChange={setPartNo} disabled={byPart !== "part"} descLabel="شرح" size={{ xs: 12, md: 3 }} descSize={{ xs: 12, md: 5 }} />
             </IkcoGrid>
           </IkcoStack>
         </IkcoCardContent>

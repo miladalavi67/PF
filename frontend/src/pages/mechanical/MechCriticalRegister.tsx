@@ -34,7 +34,7 @@ import {
   saveMechPartsProducts,
   updateMechParts,
 } from "../../server/services/mechPartsService";
-import type { ITabularResult } from "../../types/Common";
+import type { ITabularResult } from "../../types/tabular";
 import { mechPartsCreateInputRules } from "../../types/Mechanical";
 import { ApiPermissions } from "../../types/permissions";
 import { columnHeaders } from "../../utils/columnHeaders";
@@ -374,10 +374,10 @@ export default function MechCriticalRegister({ editId: editIdProp, onDone }: Pro
           <IkcoGrid size={{ xs: 6, sm: 4, md: 3 }}>
             <IkcoTextField label="موجودی قطعه" type="number" disabled={!partOpen} {...register("stock", { required: true, min: 0 })} />
           </IkcoGrid>
-          <IkcoGrid size={{ xs: 12, sm: 4, md: 4 }}>
+          <IkcoGrid size={{ xs: 12, md: "auto" }}>
             <Controller name="isOutOfSap" control={control} render={({ field }) => <IkcoCheckbox label="عدم اعمال تغییرات توسط SAP" disabled={!partOpen} checked={field.value} onChange={(_, c) => field.onChange(c)} />} />
           </IkcoGrid>
-          <IkcoGrid size={{ xs: 12, md: 4 }}>
+          <IkcoGrid size={{ xs: 12, md: "grow" }}>
             <IkcoTextArea label="آلترناتیوها" rows={2} disabled={!partOpen} {...register("alterNativePartNo", mechPartsCreateInputRules.alterNativePartNo)} error={!!errors.alterNativePartNo} helperText={errors.alterNativePartNo?.message} />
           </IkcoGrid>
           <IkcoGrid size={{ xs: 12, md: 4 }}>

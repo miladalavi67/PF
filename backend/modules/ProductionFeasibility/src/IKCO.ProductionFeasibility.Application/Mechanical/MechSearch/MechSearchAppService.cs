@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using IKCO.ProductionFeasibility.Common;
 using IKCO.ProductionFeasibility.Common.ValueObjects;
 using IKCO.ProductionFeasibility.Exceptions;
+using IKCO.ProductionFeasibility.Mechanical.Results;
 using IKCO.ProductionFeasibility.Mechanical.MechSearch.Dtos;
 using IKCO.ProductionFeasibility.Mechanical.MechSearch.Repositories;
 using IKCO.ProductionFeasibility.Users;
@@ -21,19 +22,19 @@ public partial class MechSearchAppService : PfAppService, IMechSearchAppService
         _currentUser = currentUser;
     }
 
-    public async Task<TabularResult> SearchCriticalPartsAsync(MechSearchSearchCriticalPartsInput input)
+    public async Task<ListResultDto<CriticalPartSearchRow>> SearchCriticalPartsAsync(MechSearchSearchCriticalPartsInput input)
     {
-        return await _repository.SearchCriticalPartsAsync(PartNumber.OptionalValue(input.PartNo), input.SetCode, ShamsiDate.OptionalValue(input.FromDate), ShamsiDate.OptionalValue(input.ToDate), input.TrimShopIds, input.Status, input.CriticalPartTypeId);
+        return new ListResultDto<CriticalPartSearchRow>(await _repository.SearchCriticalPartsAsync(PartNumber.OptionalValue(input.PartNo), input.SetCode, ShamsiDate.OptionalValue(input.FromDate), ShamsiDate.OptionalValue(input.ToDate), input.TrimShopIds, input.Status, input.CriticalPartTypeId));
     }
 
-    public async Task<TabularResult> SearchByTrimShopAsync(MechSearchSearchByTrimShopInput input)
+    public async Task<ListResultDto<TrimShopCriticalPartRow>> SearchByTrimShopAsync(MechSearchSearchByTrimShopInput input)
     {
-        return await _repository.SearchByTrimShopAsync(PartNumber.OptionalValue(input.PartNo), ShamsiDate.OptionalValue(input.FromDate), ShamsiDate.OptionalValue(input.ToDate), input.TrimShopId, input.Type);
+        return new ListResultDto<TrimShopCriticalPartRow>(await _repository.SearchByTrimShopAsync(PartNumber.OptionalValue(input.PartNo), ShamsiDate.OptionalValue(input.FromDate), ShamsiDate.OptionalValue(input.ToDate), input.TrimShopId, input.Type));
     }
 
-    public async Task<TabularResult> GetReceivedPartsAsync(MechSearchGetReceivedPartsInput input)
+    public async Task<ListResultDto<ReceivedPartRow>> GetReceivedPartsAsync(MechSearchGetReceivedPartsInput input)
     {
-        return await _repository.GetReceivedPartsAsync(new ShamsiDate(input.FromDate).Value, new ShamsiDate(input.ToDate).Value);
+        return new ListResultDto<ReceivedPartRow>(await _repository.GetReceivedPartsAsync(new ShamsiDate(input.FromDate).Value, new ShamsiDate(input.ToDate).Value));
     }
 
 }

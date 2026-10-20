@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using IKCO.ProductionFeasibility.Common;
 using IKCO.ProductionFeasibility.Controllers;
 using IKCO.ProductionFeasibility.Permissions;
+using IKCO.ProductionFeasibility.Mechanical.Results;
 using IKCO.ProductionFeasibility.Mechanical.MechExceptions.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -33,8 +34,8 @@ public partial class MechExceptionsController : PfController
     /// </remarks>
     [HttpPost("search")]
     [Authorize(PfPermissions.MechExceptions.View)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetExceptionListAsync([FromBody] MechExceptionsGetExceptionListInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<ProductExceptionRow>))]
+    public Task<ListResultDto<ProductExceptionRow>> GetExceptionListAsync([FromBody] MechExceptionsGetExceptionListInput input)
         => _service.GetExceptionListAsync(input);
 
     /// <summary>مجوزهای استثنا</summary>
@@ -46,8 +47,8 @@ public partial class MechExceptionsController : PfController
     /// </remarks>
     [HttpGet("{id:int}/licenses")]
     [Authorize(PfPermissions.MechExceptions.View)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetLicensesAsync(int id)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<ExceptionLicenseRow>))]
+    public Task<ListResultDto<ExceptionLicenseRow>> GetLicensesAsync(int id)
         => _service.GetLicensesAsync(id);
 
     /// <summary>بدنه‌های مصرف‌کننده مجوز استثنا</summary>
@@ -59,8 +60,8 @@ public partial class MechExceptionsController : PfController
     /// </remarks>
     [HttpGet("{id:int}/license-bodies")]
     [Authorize(PfPermissions.MechExceptions.View)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetLicenseBodiesAsync(int id)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<ExceptionLicenseBodyRow>))]
+    public Task<ListResultDto<ExceptionLicenseBodyRow>> GetLicenseBodiesAsync(int id)
         => _service.GetLicenseBodiesAsync(id);
 
     /// <summary>تاریخچه مجوزهای استثنا برای شماره فنی</summary>
@@ -72,8 +73,8 @@ public partial class MechExceptionsController : PfController
     /// </remarks>
     [HttpGet("license-log")]
     [Authorize(PfPermissions.MechExceptions.View)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetLicenseLogAsync([FromQuery] MechExceptionsGetLicenseLogInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<ExceptionLicenseRow>))]
+    public Task<ListResultDto<ExceptionLicenseRow>> GetLicenseLogAsync([FromQuery] MechExceptionsGetLicenseLogInput input)
         => _service.GetLicenseLogAsync(input);
 
     /// <summary>ثبت مجوز برای استثنا</summary>
@@ -127,8 +128,8 @@ public partial class MechExceptionsController : PfController
     /// </remarks>
     [HttpPost("part-numbers-report")]
     [Authorize(PfPermissions.MechExceptions.View)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetPartNumbersInExceptionsAsync([FromBody] MechExceptionsGetPartNumbersInExceptionsInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<ExceptionPartNumberRow>))]
+    public Task<ListResultDto<ExceptionPartNumberRow>> GetPartNumbersInExceptionsAsync([FromBody] MechExceptionsGetPartNumbersInExceptionsInput input)
         => _service.GetPartNumbersInExceptionsAsync(input);
 
 }

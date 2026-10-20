@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using IKCO.ProductionFeasibility.Common;
 using IKCO.ProductionFeasibility.Controllers;
 using IKCO.ProductionFeasibility.Permissions;
+using IKCO.ProductionFeasibility.Synchron.Results;
 using IKCO.ProductionFeasibility.Synchron.SyncBasis.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -32,8 +33,8 @@ public partial class SyncBasisController : PfController
     /// </remarks>
     [HttpGet]
     [Authorize(PfPermissions.SyncBasis.View)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetListAsync()
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<SetBasisReportRow>))]
+    public Task<ListResultDto<SetBasisReportRow>> GetListAsync()
         => _service.GetListAsync();
 
     /// <summary>مبنای ست بر اساس کد</summary>
@@ -45,8 +46,8 @@ public partial class SyncBasisController : PfController
     /// </remarks>
     [HttpGet("by-code")]
     [Authorize(PfPermissions.SyncBasis.View)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetByCodeAsync([FromQuery] SyncBasisGetByCodeInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<SetBasisRow>))]
+    public Task<ListResultDto<SetBasisRow>> GetByCodeAsync([FromQuery] SyncBasisGetByCodeInput input)
         => _service.GetByCodeAsync(input);
 
     /// <summary>مبنای ست بر اساس شناسه</summary>
@@ -58,8 +59,8 @@ public partial class SyncBasisController : PfController
     /// </remarks>
     [HttpGet("{id}")]
     [Authorize(PfPermissions.SyncBasis.View)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetByIdAsync(string id)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<SetBasisRow>))]
+    public Task<ListResultDto<SetBasisRow>> GetByIdAsync(string id)
         => _service.GetByIdAsync(id);
 
     /// <summary>مبناهای ست بر اساس وضعیت</summary>
@@ -71,22 +72,37 @@ public partial class SyncBasisController : PfController
     /// </remarks>
     [HttpGet("by-status")]
     [Authorize(PfPermissions.SyncBasis.View)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetByStatusAsync([FromQuery] SyncBasisGetByStatusInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<SetBasisRow>))]
+    public Task<ListResultDto<SetBasisRow>> GetByStatusAsync([FromQuery] SyncBasisGetByStatusInput input)
         => _service.GetByStatusAsync(input);
 
     /// <summary>تعداد ست‌های ثبت‌شده با کد ست</summary>
     /// <remarks>
     /// معادل فرم/متد سامانه ویندوزی: <c>frmCriticalPartSet</c>.
     /// رویه ذخیره‌شده: <c>dbo.S_CriticalPartsSetCountSetCode</c>.
+    /// تنها ستون خروجی رویه (n) به صورت عدد برگردانده می‌شود.
     ///
     ///     GET /api/production-feasibility/synchron/basis/count-by-code
     /// </remarks>
     [HttpGet("count-by-code")]
     [Authorize(PfPermissions.SyncBasis.View)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> CountBySetCodeAsync([FromQuery] SyncBasisCountBySetCodeInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(int))]
+    public Task<int> CountBySetCodeAsync([FromQuery] SyncBasisCountBySetCodeInput input)
         => _service.CountBySetCodeAsync(input);
+
+    /// <summary>ثبت ویژگی نوع قطعه سنکرون</summary>
+    /// <remarks>
+    /// معادل فرم/متد سامانه ویندوزی: <c>SyncParts/SyncPartsInsertCriticalPartTypeProperty (بک‌اند قبلی)</c>.
+    /// رویه ذخیره‌شده: <c>dbo.S_InsertCriticalPartTypeProperty</c>.
+    ///
+    ///     POST /api/production-feasibility/synchron/basis/part-type-properties
+    ///     { "partTypeCode": 0, "propertyId": 0 }
+    /// </remarks>
+    [HttpPost("part-type-properties")]
+    [Authorize(PfPermissions.SyncBasis.Create)]
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد")]
+    public Task AddPartTypePropertyAsync([FromBody] SyncBasisAddPartTypePropertyInput input)
+        => _service.AddPartTypePropertyAsync(input);
 
     /// <summary>ثبت مبنای ست سنکرون</summary>
     /// <remarks>

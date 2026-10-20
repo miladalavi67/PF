@@ -26,7 +26,7 @@ import toast from "react-hot-toast";
 import ExcelExportButton from "../../components/ExcelExportButton";
 import LookupAutocomplete from "../../components/LookupAutocomplete";
 import { createSyncBasis, getSyncBasisByStatus, updateSyncBasis } from "../../server/services/syncBasisService";
-import type { ITabularResult } from "../../types/Common";
+import type { ITabularResult } from "../../types/tabular";
 import { syncBasisCreateInputRules } from "../../types/Synchron";
 import { ApiPermissions } from "../../types/permissions";
 import { columnHeaders } from "../../utils/columnHeaders";

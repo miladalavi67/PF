@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using IKCO.ProductionFeasibility.Common;
 using IKCO.ProductionFeasibility.Common.ValueObjects;
 using IKCO.ProductionFeasibility.Exceptions;
+using IKCO.ProductionFeasibility.UserManagement.Results;
 using IKCO.ProductionFeasibility.UserManagement.UserAccess.Dtos;
 using IKCO.ProductionFeasibility.UserManagement.UserAccess.Repositories;
 using IKCO.ProductionFeasibility.Users;
@@ -21,24 +22,24 @@ public partial class UserAccessAppService : PfAppService, IUserAccessAppService
         _currentUser = currentUser;
     }
 
-    public async Task<TabularResult> GetAllUsersAsync()
+    public async Task<ListResultDto<PfUserRow>> GetAllUsersAsync()
     {
-        return await _repository.GetAllUsersAsync();
+        return new ListResultDto<PfUserRow>(await _repository.GetAllUsersAsync());
     }
 
-    public async Task<TabularResult> GetUsersAccessListAsync()
+    public async Task<ListResultDto<UserAccessRow>> GetUsersAccessListAsync()
     {
-        return await _repository.GetUsersAccessListAsync();
+        return new ListResultDto<UserAccessRow>(await _repository.GetUsersAccessListAsync());
     }
 
-    public async Task<TabularResult> GetSitesAsync(UserAccessGetSitesInput input)
+    public async Task<ListResultDto<VirtualPlantRow>> GetSitesAsync(UserAccessGetSitesInput input)
     {
-        return await _repository.GetSitesAsync(input.PersonalCode, input.SaloonTypeId);
+        return new ListResultDto<VirtualPlantRow>(await _repository.GetSitesAsync(input.PersonalCode, input.SaloonTypeId));
     }
 
-    public async Task<TabularResult> GetSaloonsByVirtualPlantAsync(UserAccessGetSaloonsByVirtualPlantInput input)
+    public async Task<ListResultDto<BiwSiteRow>> GetSaloonsByVirtualPlantAsync(UserAccessGetSaloonsByVirtualPlantInput input)
     {
-        return await _repository.GetSaloonsByVirtualPlantAsync(input.PlantId);
+        return new ListResultDto<BiwSiteRow>(await _repository.GetSaloonsByVirtualPlantAsync(input.PlantId));
     }
 
     public async Task<GlobalResultDto> DeleteUserAccessAsync(UserAccessDeleteUserAccessInput input)

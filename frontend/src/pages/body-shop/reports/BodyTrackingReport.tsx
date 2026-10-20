@@ -1,19 +1,20 @@
 import { IkcoButton, IkcoCard, IkcoCardContent, IkcoChip, IkcoDataGrid, IkcoGrid, IkcoStack, IkcoTypography } from "@ikco/frontend-kit";
 import { PermissionGuard } from "@ikco/mfe-core";
 import { History, Search } from "@mui/icons-material";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import ExcelExportButton from "../../../components/ExcelExportButton";
 import LookupAutocomplete from "../../../components/LookupAutocomplete";
 import TabularDialog from "../../../components/TabularDialog";
 import { getBodyCriticalsEventLog } from "../../../server/services/bodyCriticalsService";
-import { getBodyReportsLastChangeOnLicense, getBodyReportsTrackingCriticalPartProducts, getBodyReportsTrackingCriticalParts } from "../../../server/services/bodyReportsService";
-import type { ITabularResult } from "../../../types/Common";
+import { getBodyReportsTrackingCriticalPartProducts, getBodyReportsTrackingCriticalParts } from "../../../server/services/bodyReportsService";
+import type { ITabularResult } from "../../../types/tabular";
 import { ApiPermissions } from "../../../types/permissions";
 import { columnHeaders } from "../../../utils/columnHeaders";
 import { resultColumns, tabularRows, type IGridRow } from "../../../utils/tabularUtility";
 import ActionBar from "../../../components/ActionBar";
+import useLiveRefresh from "../../../hooks/useLiveRefresh";
 
 interface Filters {
   plantId: number | null;
@@ -45,7 +46,7 @@ const criticalId = (row: IGridRow) => Number((row as Record<string, unknown>)["I
  * گزارش ردیابی تغییرات اقلام بحرانی (frmRPTTrackingCriticalParts).
  * Backend: POST /api/production-feasibility/body-shop/reports/tracking-critical-parts (PF.GetTrackingCriticalParts_V2)، دسترسی bodyshop.reports.tracking.
  * با کلیک روی یک بحران، محصولات آن در جدول پایین بارگذاری می‌شود؛ LOG رویدادهای بحران انتخاب‌شده را در modal نشان می‌دهد؛
- * آخرین تغییر مجوزها هر ۳۰ ثانیه بررسی و در صورت تغییر، گزارش دوباره بارگذاری می‌شود.
+ * تغییر مجوزها و بحران‌ها در پایگاه داده با SignalR (کانال body-tracking) اعلام و گزارش با همان شرایط دوباره بارگذاری می‌شود.
  */
 export default function BodyTrackingReport() {
   const { control, handleSubmit, watch, setValue } = useForm<Filters>({ defaultValues: defaults });
@@ -55,7 +56,6 @@ export default function BodyTrackingReport() {
   const [activeId, setActiveId] = useState(0);
   const [showLog, setShowLog] = useState(false);
   const lastFilters = useRef<Filters | null>(null);
-  const lastStamp = useRef<string | number | null>(null);
 
   const columns = useMemo(() => resultColumns(result, columnHeaders).filter((c) => c.field !== "Id"), [result]);
   const rows = useMemo(() => tabularRows(result), [result]);
@@ -85,18 +85,10 @@ export default function BodyTrackingReport() {
     }
   }, []);
 
-  useEffect(() => {
-    const timer = window.setInterval(async () => {
-      try {
-        const stamp = (await getBodyReportsLastChangeOnLicense()) as string | number | null;
-        if (lastStamp.current !== null && stamp !== null && stamp !== lastStamp.current && lastFilters.current) await execute(lastFilters.current, true);
-        if (stamp !== null) lastStamp.current = stamp;
-      } catch {
-        // خطای شبکه قبلاً توسط axios اعلام می‌شود
-      }
-    }, 30000);
-    return () => window.clearInterval(timer);
-  }, [execute]);
+  // جایگزین Service Broker فرم ویندوزی (RealTimeDetectChangeOnLicense): تغییر مجوزها/بحران‌ها با SignalR اعلام و گزارش با همان شرایط تازه می‌شود
+  const live = useLiveRefresh("body-tracking", () => {
+    if (lastFilters.current) void execute(lastFilters.current, true);
+  });
 
   const selectRow = async (id: number) => {
     setActiveId(id);
@@ -114,6 +106,7 @@ export default function BodyTrackingReport() {
               {legend.map((l) => (
                 <IkcoChip key={l.label} label={l.label} status={l.color} size="small" />
               ))}
+              <IkcoChip size="small" status={live.connected ? "success" : "default"} label={live.connected ? "به‌روزرسانی زنده: متصل" : "به‌روزرسانی زنده: قطع"} />
             </IkcoStack>
             <IkcoGrid container spacing={2}>
               <IkcoGrid size={size}>
@@ -123,22 +116,22 @@ export default function BodyTrackingReport() {
                 <Controller name="typeId" control={control} render={({ field }) => <LookupAutocomplete lookupKey="body-critical-part-types" label="نوع بحران" value={field.value} onChange={field.onChange} />} />
               </IkcoGrid>
               <IkcoGrid size={size}>
-                <Controller name="vinBiwSite" control={control} render={({ field }) => <LookupAutocomplete lookupKey="body-saloons" label="سالن" value={field.value} parentId={watch("plantId")} requireParent onChange={field.onChange} />} />
+                <Controller name="vinBiwSite" control={control} render={({ field }) => <LookupAutocomplete allLabel="همه موارد" lookupKey="body-saloons" label="سالن" value={field.value} parentId={watch("plantId")} requireParent onChange={field.onChange} />} />
               </IkcoGrid>
               <IkcoGrid size={size}>
-                <Controller name="productionPossibilityId" control={control} render={({ field }) => <LookupAutocomplete lookupKey="production-possibilities" label="وضعیت امکان تولید" value={field.value} onChange={field.onChange} />} />
+                <Controller name="productionPossibilityId" control={control} render={({ field }) => <LookupAutocomplete allLabel="همه موارد" lookupKey="production-possibilities" label="وضعیت امکان تولید" value={field.value} onChange={field.onChange} />} />
               </IkcoGrid>
               <IkcoGrid size={size}>
-                <Controller name="carGroupId" control={control} render={({ field }) => <LookupAutocomplete lookupKey="car-groups" label="گروه" value={field.value} onChange={(v) => { field.onChange(v); setValue("carModelId", null); setValue("carClassId", null); setValue("subClassId", null); }} />} />
+                <Controller name="carGroupId" control={control} render={({ field }) => <LookupAutocomplete allLabel="همه موارد" lookupKey="car-groups" label="گروه" value={field.value} onChange={(v) => { field.onChange(v); setValue("carModelId", null); setValue("carClassId", null); setValue("subClassId", null); }} />} />
               </IkcoGrid>
               <IkcoGrid size={size}>
-                <Controller name="carModelId" control={control} render={({ field }) => <LookupAutocomplete lookupKey="car-models" label="محصول" value={field.value} parentId={watch("carGroupId")} requireParent onChange={(v) => { field.onChange(v); setValue("carClassId", null); setValue("subClassId", null); }} />} />
+                <Controller name="carModelId" control={control} render={({ field }) => <LookupAutocomplete allLabel="همه موارد" lookupKey="car-models" label="محصول" value={field.value} parentId={watch("carGroupId")} requireParent onChange={(v) => { field.onChange(v); setValue("carClassId", null); setValue("subClassId", null); }} />} />
               </IkcoGrid>
               <IkcoGrid size={size}>
-                <Controller name="carClassId" control={control} render={({ field }) => <LookupAutocomplete lookupKey="car-classes" label="کلاس" value={field.value} parentId={watch("carModelId")} requireParent onChange={(v) => { field.onChange(v); setValue("subClassId", null); }} />} />
+                <Controller name="carClassId" control={control} render={({ field }) => <LookupAutocomplete allLabel="همه موارد" lookupKey="car-classes" label="کلاس" value={field.value} parentId={watch("carModelId")} requireParent onChange={(v) => { field.onChange(v); setValue("subClassId", null); }} />} />
               </IkcoGrid>
               <IkcoGrid size={size}>
-                <Controller name="subClassId" control={control} render={({ field }) => <LookupAutocomplete lookupKey="sub-classes" label="زیرکلاس" value={field.value} parentId={watch("carClassId")} requireParent onChange={field.onChange} />} />
+                <Controller name="subClassId" control={control} render={({ field }) => <LookupAutocomplete allLabel="همه موارد" lookupKey="sub-classes" label="زیرکلاس" value={field.value} parentId={watch("carClassId")} requireParent onChange={field.onChange} />} />
               </IkcoGrid>
             </IkcoGrid>
           </IkcoStack>

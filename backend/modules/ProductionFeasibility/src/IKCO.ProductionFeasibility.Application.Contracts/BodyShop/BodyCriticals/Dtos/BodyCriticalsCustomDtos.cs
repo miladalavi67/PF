@@ -155,3 +155,19 @@ public class SapWhereUsedItemDto
     /// <summary>مقدار مصرف</summary>
     public decimal? Quantity { get; set; }
 }
+
+/// <summary>ورودی «غیرفعال‌سازی (حذف) بحران‌های بدنه‌سازی» — <c>PF.InsertEventLog</c> و <c>PF.S_DisableCriticalParts</c></summary>
+public class BodyCriticalsDisableCriticalPartsInput
+{
+    /// <summary>شناسه بحران‌ها</summary>
+    [Required]
+    [MinLength(1)]
+    public List<int> Ids { get; set; } = new();
+
+    /// <summary>نوع بحران (کلید رویدادنگاری)؛ همراه با دلیل ثبت می‌شود</summary>
+    public int EventTypeId { get; set; }
+
+    /// <summary>دلیل حذف بحران؛ در فرم ویندوزی با پسوند «(حذف بحران)» در لاگ ثبت می‌شد</summary>
+    [MaxLength(500)]
+    public string? Reason { get; set; }
+}

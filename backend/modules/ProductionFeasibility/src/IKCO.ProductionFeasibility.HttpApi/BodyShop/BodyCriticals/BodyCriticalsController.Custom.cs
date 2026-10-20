@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using IKCO.ProductionFeasibility.BodyShop.BodyCriticals.Dtos;
+using IKCO.ProductionFeasibility.BodyShop.Results;
 using IKCO.ProductionFeasibility.Common;
 using IKCO.ProductionFeasibility.Permissions;
 using Microsoft.AspNetCore.Authorization;
@@ -48,8 +49,8 @@ public partial class BodyCriticalsController
     /// </remarks>
     [HttpPost("batch")]
     [Authorize(PfPermissions.BodyCriticals.Create)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> BatchCreateAsync([FromBody] BodyCriticalsBatchCreateInput input) => _service.BatchCreateAsync(input);
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<BodyBatchCreateResultRow>))]
+    public Task<ListResultDto<BodyBatchCreateResultRow>> BatchCreateAsync([FromBody] BodyCriticalsBatchCreateInput input) => _service.BatchCreateAsync(input);
 
     /// <summary>زیرکلاس‌های مصرف‌کننده شماره فنی از SAP</summary>
     /// <remarks>
@@ -63,4 +64,18 @@ public partial class BodyCriticalsController
     [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<SapWhereUsedItemDto>))]
     public Task<ListResultDto<SapWhereUsedItemDto>> GetSapWhereUsedAsync([FromQuery] BodyCriticalsGetSapWhereUsedInput input)
         => _service.GetSapWhereUsedAsync(input);
+
+    /// <summary>غیرفعال‌سازی (حذف) بحران‌های بدنه‌سازی</summary>
+    /// <remarks>
+    /// معادل حذف در <c>frmBodyCriticalSearch</c>: رویه <c>PF.InsertEventLog</c> (دلیل حذف) برای هر بحران و سپس <c>PF.S_DisableCriticalParts</c>
+    /// در یک تراکنش. شناسه بحران‌ها با ویرگول به رویه ارسال می‌شود.
+    ///
+    ///     POST /api/production-feasibility/body-shop/critical-parts/disable
+    ///     { "ids": [15, 16], "eventTypeId": 3, "reason": "اتمام کسری" }
+    /// </remarks>
+    [HttpPost("disable")]
+    [Authorize(PfPermissions.BodyCriticals.Disable)]
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(GlobalResultDto))]
+    public Task<GlobalResultDto> DisableCriticalPartsAsync([FromBody] BodyCriticalsDisableCriticalPartsInput input)
+        => _service.DisableCriticalPartsAsync(input);
 }

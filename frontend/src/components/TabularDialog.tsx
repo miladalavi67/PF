@@ -1,7 +1,7 @@
 import { IkcoButton, IkcoDataGrid } from "@ikco/frontend-kit";
 import { Refresh } from "@mui/icons-material";
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
-import type { ITabularResult } from "../types/Common";
+import type { ITabularResult } from "../types/tabular";
 import { columnHeaders } from "../utils/columnHeaders";
 import { resultColumns, tabularRows } from "../utils/tabularUtility";
 import ExcelExportButton from "./ExcelExportButton";

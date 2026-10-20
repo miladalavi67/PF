@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using IKCO.ProductionFeasibility.Common;
 using IKCO.ProductionFeasibility.Common.ValueObjects;
 using IKCO.ProductionFeasibility.Exceptions;
+using IKCO.ProductionFeasibility.Mechanical.Results;
 using IKCO.ProductionFeasibility.Mechanical.MechExceptions.Dtos;
 using IKCO.ProductionFeasibility.Mechanical.MechExceptions.Repositories;
 using IKCO.ProductionFeasibility.Users;
@@ -21,24 +22,24 @@ public partial class MechExceptionsAppService : PfAppService, IMechExceptionsApp
         _currentUser = currentUser;
     }
 
-    public async Task<TabularResult> GetExceptionListAsync(MechExceptionsGetExceptionListInput input)
+    public async Task<ListResultDto<ProductExceptionRow>> GetExceptionListAsync(MechExceptionsGetExceptionListInput input)
     {
-        return await _repository.GetExceptionListAsync(BodyNumber.OptionalValue(input.BodyNo), input.DateFrom, input.DateEnd, input.State);
+        return new ListResultDto<ProductExceptionRow>(await _repository.GetExceptionListAsync(BodyNumber.OptionalValue(input.BodyNo), input.DateFrom, input.DateEnd, input.State));
     }
 
-    public async Task<TabularResult> GetLicensesAsync(int id)
+    public async Task<ListResultDto<ExceptionLicenseRow>> GetLicensesAsync(int id)
     {
-        return await _repository.GetLicensesAsync(id);
+        return new ListResultDto<ExceptionLicenseRow>(await _repository.GetLicensesAsync(id));
     }
 
-    public async Task<TabularResult> GetLicenseBodiesAsync(int id)
+    public async Task<ListResultDto<ExceptionLicenseBodyRow>> GetLicenseBodiesAsync(int id)
     {
-        return await _repository.GetLicenseBodiesAsync(id);
+        return new ListResultDto<ExceptionLicenseBodyRow>(await _repository.GetLicenseBodiesAsync(id));
     }
 
-    public async Task<TabularResult> GetLicenseLogAsync(MechExceptionsGetLicenseLogInput input)
+    public async Task<ListResultDto<ExceptionLicenseRow>> GetLicenseLogAsync(MechExceptionsGetLicenseLogInput input)
     {
-        return await _repository.GetLicenseLogAsync(new PartNumber(input.PartNo).Value);
+        return new ListResultDto<ExceptionLicenseRow>(await _repository.GetLicenseLogAsync(new PartNumber(input.PartNo).Value));
     }
 
     public async Task CreateLicenseAsync(MechExceptionsCreateLicenseInput input)
@@ -59,9 +60,9 @@ public partial class MechExceptionsAppService : PfAppService, IMechExceptionsApp
         await _repository.DisableExceptionsAsync(new IdList(input.Ids).ToCommaSeparated(), userId);
     }
 
-    public async Task<TabularResult> GetPartNumbersInExceptionsAsync(MechExceptionsGetPartNumbersInExceptionsInput input)
+    public async Task<ListResultDto<ExceptionPartNumberRow>> GetPartNumbersInExceptionsAsync(MechExceptionsGetPartNumbersInExceptionsInput input)
     {
-        return await _repository.GetPartNumbersInExceptionsAsync(input.FilterValues, input.TrimId, input.FilterType, PartNumber.OptionalValue(input.PartNumber));
+        return new ListResultDto<ExceptionPartNumberRow>(await _repository.GetPartNumbersInExceptionsAsync(input.FilterValues, input.TrimId, input.FilterType, PartNumber.OptionalValue(input.PartNumber)));
     }
 
 }

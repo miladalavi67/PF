@@ -1,10 +1,10 @@
-import { IkcoButton, IkcoCard, IkcoCardContent, IkcoDataGrid, IkcoDatePicker, IkcoGrid, IkcoStack, IkcoSwitch, IkcoTextField, IkcoTypography } from "@ikco/frontend-kit";
+import { IkcoButton, IkcoCard, IkcoCardContent, IkcoDataGrid, IkcoDatePicker, IkcoGrid, IkcoStack, IkcoSwitch, IkcoTypography } from "@ikco/frontend-kit";
 import { PermissionGuard } from "@ikco/mfe-core";
 import { Search } from "@mui/icons-material";
 import { useMemo, useState } from "react";
 import toast from "react-hot-toast";
-import { getBodyCriticalsPartDescription } from "../server/services/bodyCriticalsService";
-import type { ITabularResult } from "../types/Common";
+import PartNumberField from "./PartNumberField";
+import type { ITabularResult } from "../types/tabular";
 import { columnHeaders } from "../utils/columnHeaders";
 import { firstOfMonthJalali, todayJalali } from "../utils/dateUtility";
 import { resultColumns, tabularRows } from "../utils/tabularUtility";
@@ -32,7 +32,6 @@ interface Props {
 export default function DateOrPartReport({ title, listTitle, permission, run }: Props) {
   const [byDate, setByDate] = useState(true);
   const [partNo, setPartNo] = useState("");
-  const [partDesc, setPartDesc] = useState("");
   const [fromDate, setFromDate] = useState<string | null>(firstOfMonthJalali());
   const [toDate, setToDate] = useState<string | null>(todayJalali());
   const [result, setResult] = useState<ITabularResult | null>(null);
@@ -40,16 +39,6 @@ export default function DateOrPartReport({ title, listTitle, permission, run }: 
 
   const columns = useMemo(() => resultColumns(result, columnHeaders), [result]);
   const rows = useMemo(() => tabularRows(result), [result]);
-
-  const loadDesc = async () => {
-    const value = partNo.trim();
-    if (!value) {
-      setPartDesc("");
-      return;
-    }
-    const desc = await getBodyCriticalsPartDescription({ partNo: value });
-    setPartDesc(typeof desc === "string" ? desc : "");
-  };
 
   const search = async () => {
     if (!byDate && !partNo.trim()) {
@@ -73,16 +62,11 @@ export default function DateOrPartReport({ title, listTitle, permission, run }: 
       <IkcoTypography variant="h6">{title}</IkcoTypography>
       <IkcoCard>
         <IkcoCardContent>
-          <IkcoGrid container spacing={2} alignItems="center">
-            <IkcoGrid size={{ xs: 12, md: 3 }}>
-              <IkcoSwitch label={`شرایط جستجو: ${byDate ? "بر اساس تاریخ" : "بر اساس شماره فنی"}`} checked={byDate} onChange={(_, c) => { setByDate(c); if (c) { setPartNo(""); setPartDesc(""); } }} />
+          <IkcoGrid container spacing={1} alignItems="center">
+            <IkcoGrid size={{ xs: 12, md: "auto" }}>
+              <IkcoSwitch label={`شرایط جستجو: ${byDate ? "بر اساس تاریخ" : "بر اساس شماره فنی"}`} checked={byDate} onChange={(_, c) => { setByDate(c); if (c) { setPartNo(""); } }} />
             </IkcoGrid>
-            <IkcoGrid size={{ xs: 12, md: 2 }}>
-              <IkcoTextField label="شماره فنی" value={partNo} disabled={byDate} onChange={(e) => setPartNo(e.target.value)} onBlur={() => void loadDesc()} slotProps={{ htmlInput: { maxLength: 30 } }} />
-            </IkcoGrid>
-            <IkcoGrid size={{ xs: 12, md: 3 }}>
-              <IkcoTextField label="شرح شماره فنی" value={partDesc} disabled />
-            </IkcoGrid>
+            <PartNumberField source="body" value={partNo} onChange={setPartNo} disabled={byDate} maxLength={30} size={{ xs: 12, md: 2 }} descSize={{ xs: 12, md: 3 }} />
             <IkcoGrid size={{ xs: 6, md: 2 }}>
               <IkcoDatePicker label="از" value={fromDate} disabled={!byDate} onChange={setFromDate} />
             </IkcoGrid>

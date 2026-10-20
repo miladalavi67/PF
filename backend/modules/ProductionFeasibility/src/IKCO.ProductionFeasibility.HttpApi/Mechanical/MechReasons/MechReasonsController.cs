@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using IKCO.ProductionFeasibility.Common;
 using IKCO.ProductionFeasibility.Controllers;
 using IKCO.ProductionFeasibility.Permissions;
+using IKCO.ProductionFeasibility.Mechanical.Results;
 using IKCO.ProductionFeasibility.Mechanical.MechReasons.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -32,8 +33,8 @@ public partial class MechReasonsController : PfController
     /// </remarks>
     [HttpGet]
     [Authorize(PfPermissions.MechReasons.View)]
-    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(TabularResult))]
-    public Task<TabularResult> GetListAsync([FromQuery] MechReasonsGetListInput input)
+    [SwaggerResponse(StatusCodes.Status200OK, "عملیات با موفقیت انجام شد", typeof(ListResultDto<NotPossibleReasonRow>))]
+    public Task<ListResultDto<NotPossibleReasonRow>> GetListAsync([FromQuery] MechReasonsGetListInput input)
         => _service.GetListAsync(input);
 
     /// <summary>ثبت دلیل عدم امکان تولید</summary>

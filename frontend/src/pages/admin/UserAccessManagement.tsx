@@ -23,7 +23,7 @@ import {
   getUserAccessUsersAccessList,
   insertUserAccess,
 } from "../../server/services/userAccessService";
-import type { ITabularResult } from "../../types/Common";
+import type { ITabularResult } from "../../types/tabular";
 import { ApiPermissions } from "../../types/permissions";
 import { columnHeaders } from "../../utils/columnHeaders";
 import { resultColumns, tabularRows } from "../../utils/tabularUtility";
@@ -98,6 +98,11 @@ export default function UserAccessManagement() {
     })();
     void loadAccess();
   }, [loadAccess]);
+
+  // مانند DropDownList فرم ویندوزی: سایت پیش‌فرض اولین گزینه است
+  useEffect(() => {
+    if (siteId === null && sites.length > 0) setSiteId(sites[0].id);
+  }, [sites, siteId]);
 
   useEffect(() => {
     setLineIds([]);

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using IKCO.ProductionFeasibility.Common;
 using IKCO.ProductionFeasibility.EntityFrameworkCore;
 using IKCO.ProductionFeasibility.StoredProcedures;
+using IKCO.ProductionFeasibility.UserManagement.Results;
 using IKCO.ProductionFeasibility.UserManagement.UserAccess.Repositories;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.EntityFrameworkCore;
@@ -17,31 +18,31 @@ public partial class UserAccessRepository : PfDapperRepository<PfDbContext>, IUs
     {
     }
 
-    public async Task<TabularResult> GetAllUsersAsync()
+    public async Task<List<PfUserRow>> GetAllUsersAsync()
     {
         var parameters = new SpParameters();
-        return await QueryTableAsync("PF.GetAllUsers", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+        return await QueryRowsAsync<PfUserRow>("PF.GetAllUsers", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
     }
 
-    public async Task<TabularResult> GetUsersAccessListAsync()
+    public async Task<List<UserAccessRow>> GetUsersAccessListAsync()
     {
         var parameters = new SpParameters();
-        return await QueryTableAsync("PF.GetUsersAccessList", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+        return await QueryRowsAsync<UserAccessRow>("PF.GetUsersAccessList", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
     }
 
-    public async Task<TabularResult> GetSitesAsync(string? personalCode, int? saloonTypeId)
+    public async Task<List<VirtualPlantRow>> GetSitesAsync(string? personalCode, int? saloonTypeId)
     {
         var parameters = new SpParameters()
             .VarChar("@PersonalCode", personalCode, 20)
             .Int("@SaloonTypeId", saloonTypeId);
-        return await QueryTableAsync("PF.GetSiteByDomainId", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+        return await QueryRowsAsync<VirtualPlantRow>("PF.GetSiteByDomainId", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
     }
 
-    public async Task<TabularResult> GetSaloonsByVirtualPlantAsync(int plantId)
+    public async Task<List<BiwSiteRow>> GetSaloonsByVirtualPlantAsync(int plantId)
     {
         var parameters = new SpParameters()
             .Int("@plantId", plantId);
-        return await QueryTableAsync("PF.GetSaloonByVirtualPlantId", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+        return await QueryRowsAsync<BiwSiteRow>("PF.GetSaloonByVirtualPlantId", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
     }
 
     public async Task<GlobalResultDto?> DeleteUserAccessAsync(string idStr)

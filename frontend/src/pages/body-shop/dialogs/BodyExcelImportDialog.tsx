@@ -8,7 +8,7 @@ import LookupAutocomplete from "../../../components/LookupAutocomplete";
 import TabularDialog from "../../../components/TabularDialog";
 import { batchBodyCriticalsCreate } from "../../../server/services/bodyCriticalsService";
 import type { IBatchCriticalPartRow } from "../../../types/BodyShop";
-import type { ITabularResult } from "../../../types/Common";
+import type { ITabularResult } from "../../../types/tabular";
 import { downloadSampleExcel, readExcelRows } from "../../../utils/excelUtility";
 
 interface Props {

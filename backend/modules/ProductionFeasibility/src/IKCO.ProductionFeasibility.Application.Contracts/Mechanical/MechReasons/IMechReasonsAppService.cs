@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using IKCO.ProductionFeasibility.Common;
+using IKCO.ProductionFeasibility.Mechanical.Results;
 using IKCO.ProductionFeasibility.Mechanical.MechReasons.Dtos;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
@@ -10,7 +11,7 @@ namespace IKCO.ProductionFeasibility.Mechanical.MechReasons;
 public partial interface IMechReasonsAppService : IApplicationService
 {
     /// <summary>فهرست دلایل عدم امکان تولید</summary>
-    Task<TabularResult> GetListAsync(MechReasonsGetListInput input);
+    Task<ListResultDto<NotPossibleReasonRow>> GetListAsync(MechReasonsGetListInput input);
 
     /// <summary>ثبت دلیل عدم امکان تولید</summary>
     Task CreateAsync(MechReasonsCreateInput input);

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using IKCO.ProductionFeasibility.Common;
 using IKCO.ProductionFeasibility.EntityFrameworkCore;
 using IKCO.ProductionFeasibility.StoredProcedures;
+using IKCO.ProductionFeasibility.Mechanical.Results;
 using IKCO.ProductionFeasibility.Mechanical.MechParts.Repositories;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.EntityFrameworkCore;
@@ -17,14 +18,14 @@ public partial class MechPartsRepository : PfDapperRepository<PfDbContext>, IMec
     {
     }
 
-    public async Task<TabularResult> GetBodyPropertiesAsync(string bodyNo, byte plantId, byte? mode)
+    public async Task<List<CarPropertiesRow>> GetBodyPropertiesAsync(string bodyNo, byte plantId, byte? mode)
     {
         var parameters = new SpParameters()
             .NChar("@BodyNo", bodyNo, 8)
             .TinyInt("@PlantId", plantId);
         if (mode != null)
             parameters.TinyInt("@Mode", mode);
-        return await QueryTableAsync("dbo.S_CarPropertiesSelectForCriticalParts", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+        return await QueryRowsAsync<CarPropertiesRow>("dbo.S_CarPropertiesSelectForCriticalParts", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
     }
 
     public async Task<string?> GetPartDescriptionAsync(string partNo)
@@ -35,80 +36,80 @@ public partial class MechPartsRepository : PfDapperRepository<PfDbContext>, IMec
         return scalar is null or DBNull ? null : Convert.ToString(scalar);
     }
 
-    public async Task<TabularResult> GetPartInShortageListAsync(string partNo)
+    public async Task<List<PartInShortageListRow>> GetPartInShortageListAsync(string partNo)
     {
         var parameters = new SpParameters()
             .VarChar("@PartNo", partNo, 20);
-        return await QueryTableAsync("dbo.SIMP_SelectParInShortagePartList", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+        return await QueryRowsAsync<PartInShortageListRow>("dbo.SIMP_SelectParInShortagePartList", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
     }
 
-    public async Task<TabularResult> GetPartProductsAsync(string partNo)
+    public async Task<List<BomProductRow>> GetPartProductsAsync(string partNo)
     {
         var parameters = new SpParameters()
             .VarChar("@PartNo", partNo, 20);
-        return await QueryTableAsync("dbo.SIMP_SelectProductsUsePartNo", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+        return await QueryRowsAsync<BomProductRow>("dbo.SIMP_SelectProductsUsePartNo", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
     }
 
-    public async Task<TabularResult> GetProductsByClassAndPartTypeAsync(string carClassCode, byte partTypeCode)
+    public async Task<List<BomProductRow>> GetProductsByClassAndPartTypeAsync(string carClassCode, byte partTypeCode)
     {
         var parameters = new SpParameters()
             .Char("@CarClassCode", carClassCode, 5)
             .TinyInt("@PartTypeCode", partTypeCode);
-        return await QueryTableAsync("dbo.SIMP_SelectProductsUseAllPartNosByClassCodePartType", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+        return await QueryRowsAsync<BomProductRow>("dbo.SIMP_SelectProductsUseAllPartNosByClassCodePartType", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
     }
 
-    public async Task<TabularResult> ExistsPartNoAsync(string partNo, int trimShopId)
+    public async Task<List<CriticalPartExistRow>> ExistsPartNoAsync(string partNo, int trimShopId)
     {
         var parameters = new SpParameters()
             .NVarChar("@PartNo", partNo, 200)
             .Int("@TrimShopId", trimShopId);
-        return await QueryTableAsync("dbo.S_CriticalPartsExistPartNo", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+        return await QueryRowsAsync<CriticalPartExistRow>("dbo.S_CriticalPartsExistPartNo", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
     }
 
-    public async Task<TabularResult> GetFromBopAsync(string partNo, int trimShopId)
+    public async Task<List<CriticalProductCandidateRow>> GetFromBopAsync(string partNo, int trimShopId)
     {
         var parameters = new SpParameters()
             .VarChar("@PartNo", partNo, 20)
             .Int("@TrimShopId", trimShopId);
-        return await QueryTableAsync("dbo.S_CriticalPartsSelectFromBOP", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+        return await QueryRowsAsync<CriticalProductCandidateRow>("dbo.S_CriticalPartsSelectFromBOP", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
     }
 
-    public async Task<TabularResult> GetFromSapAsync(string subClassCode, string partNo)
+    public async Task<List<CriticalProductCandidateRow>> GetFromSapAsync(string subClassCode, string partNo)
     {
         var parameters = new SpParameters()
             .VarChar("@SubClassCode", subClassCode, 1000)
             .VarChar("@PartNo", partNo, 100);
-        return await QueryTableAsync("dbo.S_CriticalPartsSelectFromSAP", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+        return await QueryRowsAsync<CriticalProductCandidateRow>("dbo.S_CriticalPartsSelectFromSAP", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
     }
 
-    public async Task<TabularResult> GetForEditAsync(int id)
+    public async Task<List<CriticalPartForEditRow>> GetForEditAsync(int id)
     {
         var parameters = new SpParameters()
             .Int("@ID", id);
-        return await QueryTableAsync("dbo.S_SelectCriticalPartForEdit", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+        return await QueryRowsAsync<CriticalPartForEditRow>("dbo.S_SelectCriticalPartForEdit", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
     }
 
-    public async Task<TabularResult> GetByIdAsync(int id)
+    public async Task<List<CriticalPartRow>> GetByIdAsync(int id)
     {
         var parameters = new SpParameters()
             .Int("@Id", id);
-        return await QueryTableAsync("dbo.S_CriticalPartsSelectById", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+        return await QueryRowsAsync<CriticalPartRow>("dbo.S_CriticalPartsSelectById", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
     }
 
-    public async Task<TabularResult> GetProductsForEditAsync(int id, int? shopTrimId)
+    public async Task<List<CriticalPartProductForEditRow>> GetProductsForEditAsync(int id, int? shopTrimId)
     {
         var parameters = new SpParameters()
             .Int("@ID", id);
         if (shopTrimId != null)
             parameters.Int("@ShopTrimId", shopTrimId);
-        return await QueryTableAsync("dbo.S_CriticalPartProductsSelectForEdit_V1", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+        return await QueryRowsAsync<CriticalPartProductForEditRow>("dbo.S_CriticalPartProductsSelectForEdit_V1", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
     }
 
-    public async Task<TabularResult> GetProductsAsync(int criticalPartId)
+    public async Task<List<CriticalPartProductRow>> GetProductsAsync(int criticalPartId)
     {
         var parameters = new SpParameters()
             .Int("@CriticalPartId", criticalPartId);
-        return await QueryTableAsync("dbo.S_CriticalPartProductsSelectByCriticalPartId_V2", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
+        return await QueryRowsAsync<CriticalPartProductRow>("dbo.S_CriticalPartProductsSelectByCriticalPartId_V2", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Lookup);
     }
 
     public async Task<int?> CreateAsync(int carId, string partNo, string partDesc, byte plantId, string partGroup, string? alterNativePartNo, string? criticalPartNote, int stock, int used, int possibleProductionNo, int trimShopId, int usageFactor, int deptId, int userId, bool? isOutOfSap)
@@ -152,7 +153,7 @@ public partial class MechPartsRepository : PfDapperRepository<PfDbContext>, IMec
         await ExecuteAsync("dbo.S_CriticalPartsUpdate", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Command);
     }
 
-    public async Task SaveProductAsync(int carId, int criticalPartsId, int carGroupId, int carModelId, int carClassId, int subClassId, int colorId, int? trimId, int optionId, int userId, int isNew, int trimShopId, short plantId, byte quantity)
+    public async Task<GlobalResultDto?> SaveProductAsync(int carId, int criticalPartsId, int carGroupId, int carModelId, int carClassId, int subClassId, int colorId, int? trimId, int optionId, int userId, int isNew, int trimShopId, short plantId, byte quantity)
     {
         var parameters = new SpParameters()
             .Int("@CarId", carId)
@@ -170,7 +171,7 @@ public partial class MechPartsRepository : PfDapperRepository<PfDbContext>, IMec
             .TinyInt("@Quantity", quantity);
         if (trimId != null)
             parameters.Int("@TrimId", trimId);
-        await ExecuteAsync("dbo.S_CriticalPartsPruductUpdate_H_V1", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Command);
+        return await QueryFirstOrDefaultAsync<GlobalResultDto>("dbo.S_CriticalPartsPruductUpdate_Web", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Command);
     }
 
     public async Task AddSubClassAsync(int criticalPartsId, string subClassCode, int userId, int trimShopId)
@@ -183,11 +184,11 @@ public partial class MechPartsRepository : PfDapperRepository<PfDbContext>, IMec
         await ExecuteAsync("dbo.S_AddContrastOfSubClasses", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Command);
     }
 
-    public async Task DeleteAsync(int id)
+    public async Task<GlobalResultDto?> DeleteAsync(int id)
     {
         var parameters = new SpParameters()
             .Int("@id", id);
-        await ExecuteAsync("dbo.S_CriticalPartDelete", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Command);
+        return await QueryFirstOrDefaultAsync<GlobalResultDto>("dbo.S_CriticalPartDelete_Web", parameters, LegacyCallStyle.AdoNet, PfCommandTimeouts.Command);
     }
 
 }

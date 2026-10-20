@@ -22,7 +22,7 @@ import toast from "react-hot-toast";
 import FormDialog from "../../../components/FormDialog";
 import { getMechPartsBodyProperties } from "../../../server/services/mechPartsService";
 import { getSyncSetsById, getSyncSetsNotEnteredIndicatorCarsCount, getSyncSetsSaloons, updateSyncSetsSaloonIndicatorCar } from "../../../server/services/syncSetsService";
-import type { ITabularResult } from "../../../types/Common";
+import type { ITabularResult } from "../../../types/tabular";
 import { ApiPermissions } from "../../../types/permissions";
 import { columnHeaders } from "../../../utils/columnHeaders";
 import { resultColumns, tabularRows, type IGridRow } from "../../../utils/tabularUtility";
@@ -59,9 +59,7 @@ export default function SyncIndicatorCarsDialog({ open, close, setId }: { open: 
     try {
       setHeader(await getSyncSetsById(setId));
       setSaloons(await getSyncSetsSaloons(setId));
-      const count = await getSyncSetsNotEnteredIndicatorCarsCount(setId);
-      const first = count.rows[0] as Record<string, unknown> | undefined;
-      setMissing(first ? Number(Object.values(first)[0] ?? 0) : null);
+      setMissing(await getSyncSetsNotEnteredIndicatorCarsCount(setId));
     } finally {
       setLoading(false);
     }

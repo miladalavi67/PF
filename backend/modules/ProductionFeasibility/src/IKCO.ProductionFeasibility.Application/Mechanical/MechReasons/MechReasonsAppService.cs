@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using IKCO.ProductionFeasibility.Common;
 using IKCO.ProductionFeasibility.Common.ValueObjects;
 using IKCO.ProductionFeasibility.Exceptions;
+using IKCO.ProductionFeasibility.Mechanical.Results;
 using IKCO.ProductionFeasibility.Mechanical.MechReasons.Dtos;
 using IKCO.ProductionFeasibility.Mechanical.MechReasons.Repositories;
 using IKCO.ProductionFeasibility.Users;
@@ -21,9 +22,9 @@ public partial class MechReasonsAppService : PfAppService, IMechReasonsAppServic
         _currentUser = currentUser;
     }
 
-    public async Task<TabularResult> GetListAsync(MechReasonsGetListInput input)
+    public async Task<ListResultDto<NotPossibleReasonRow>> GetListAsync(MechReasonsGetListInput input)
     {
-        return await _repository.GetListAsync(input.SelectType);
+        return new ListResultDto<NotPossibleReasonRow>(await _repository.GetListAsync(input.SelectType));
     }
 
     public async Task CreateAsync(MechReasonsCreateInput input)
