@@ -1,5 +1,6 @@
 import type { IkcoGridColDef } from "@ikco/frontend-kit";
 import type { ITabularResult } from "../types/tabular";
+import type { IGridColumn } from "./gridColumns";
 import { toPersianDate } from "./dateUtility";
 
 /** ردیف گرید با شناسه یکتای سمت کلاینت (برای خروجی‌هایی که ستون Id ندارند) */
@@ -56,23 +57,28 @@ function tabularColumns(
 
 const isoDate = /^\d{4}-\d{2}-\d{2}T/;
 
+function isoDateFormatter(value: unknown) {
+  if (typeof value !== "string" || !isoDate.test(value)) return (value as string) ?? "";
+  const date = new Date(value);
+  const time = value.length > 10 ? value.slice(11, 19) : "";
+  return `${toPersianDate(date) ?? ""}${time && time !== "00:00:00" ? " " + time : ""}`;
+}
+
 /**
- * ستون‌های گرید دقیقاً بر اساس ستون‌های خروجی رویه (به ترتیب خروجی) با عنوان فارسی از فرهنگ headers؛
- * ستونی که در headers نیست با نام اصلی نمایش داده می‌شود. مقدارهای تاریخ ISO به تاریخ شمسی تبدیل می‌شوند.
+ * ستون‌های گرید برای خروجی رویه. با spec (تعریف گرید فرم ویندوزی در utils/gridColumns) فقط ستون‌های همان تعریف به همان ترتیب و عنوان
+ * نمایش داده می‌شوند و سایر ستون‌های خروجی رویه پنهان می‌مانند؛ تطبیق نام فیلد با نام ستون خروجی بدون حساسیت به حروف است.
+ * بدون spec همه ستون‌های خروجی (به ترتیب خروجی) با عنوان فارسی از فرهنگ headers. مقدارهای تاریخ ISO به تاریخ شمسی تبدیل می‌شوند.
  */
-function resultColumns(result: ITabularResult | null | undefined, headers: Record<string, string>): IkcoGridColDef[] {
+function resultColumns(result: ITabularResult | null | undefined, headers: Record<string, string>, spec?: readonly IGridColumn[]): IkcoGridColDef[] {
   const rows = result?.rows ?? [];
-  return (result?.columns ?? []).map((field) => {
+  const actual = new Map((result?.columns ?? []).map((name) => [name.toLowerCase(), name]));
+  const fields: { field: string; headerName: string; width?: number }[] = spec
+    ? spec.map((s) => ({ field: s.field === "__rowId" ? s.field : (actual.get(s.field.toLowerCase()) ?? s.field), headerName: s.header, width: s.width }))
+    : (result?.columns ?? []).map((field) => ({ field, headerName: headers[field] ?? field }));
+  return fields.map(({ field, headerName, width }) => {
     const sample = rows.find((r) => r[field] !== null && r[field] !== undefined)?.[field];
-    const column: IkcoGridColDef = { field, headerName: headers[field] ?? field, minWidth: 120, flex: 1 };
-    if (typeof sample === "string" && isoDate.test(sample)) {
-      column.valueFormatter = (value: unknown) => {
-        if (typeof value !== "string" || !isoDate.test(value)) return (value as string) ?? "";
-        const date = new Date(value);
-        const time = value.length > 10 ? value.slice(11, 19) : "";
-        return `${toPersianDate(date) ?? ""}${time && time !== "00:00:00" ? " " + time : ""}`;
-      };
-    }
+    const column: IkcoGridColDef = width ? { field, headerName, width } : { field, headerName, minWidth: 120, flex: 1 };
+    if (typeof sample === "string" && isoDate.test(sample)) column.valueFormatter = isoDateFormatter;
     return column;
   });
 }

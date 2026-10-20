@@ -1,6 +1,7 @@
 import ReportPage, { type IReportFilter } from "../../../components/ReportPage";
 import { getBodyReportsProductsOfSites } from "../../../server/services/bodyReportsService";
 import { ApiPermissions } from "../../../types/permissions";
+import { gridColumns } from "../../../utils/gridColumns";
 
 const filters: IReportFilter[] = [
 
@@ -17,6 +18,7 @@ export default function BodyProductsOfSitesReport() {
       title="گزارش محصولات به تفکیک خطوط بدنه‌سازی"
       permission={ApiPermissions.bodyReports.productsofsites}
       filters={filters}
+      columns={gridColumns.bodyProductsOfSites}
       run={() => getBodyReportsProductsOfSites()}
       autoRun
     />

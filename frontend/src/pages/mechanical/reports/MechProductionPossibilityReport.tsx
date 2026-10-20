@@ -1,9 +1,11 @@
-import { IkcoButton, IkcoCard, IkcoCardContent, IkcoCheckbox, IkcoChip, IkcoDataGrid, IkcoGrid, IkcoRadioGroup, IkcoStack, IkcoTypography } from "@ikco/frontend-kit";
+import { IkcoButton, IkcoCard, IkcoCardContent, IkcoCheckbox, IkcoChip, IkcoGrid, IkcoRadioGroup, IkcoStack, IkcoTypography } from "@ikco/frontend-kit";
 import { PermissionGuard } from "@ikco/mfe-core";
 import { CleaningServices, Edit, History, LocalShipping, Print, Refresh, Search, Sync, Visibility } from "@mui/icons-material";
 import { useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import ExcelExportButton from "../../../components/ExcelExportButton";
+import TrackingGrid, { TrackingLegend, type ILegendItem } from "../../../components/TrackingGrid";
+import { diffTracking, rowNumber, type ITrackingTone } from "../../../utils/trackingUtility";
 import FormDialog from "../../../components/FormDialog";
 import LookupAutocomplete from "../../../components/LookupAutocomplete";
 import LookupMultiSelect from "../../../components/LookupMultiSelect";
@@ -22,14 +24,32 @@ import MechCriticalRegister from "../MechCriticalRegister";
 import ActionBar from "../../../components/ActionBar";
 import useLiveRefresh from "../../../hooks/useLiveRefresh";
 import type { IMechReportsGetProductionPossibilityInput } from "../../../types/Mechanical";
+import { gridColumns } from "../../../utils/gridColumns";
 
-const legend: { label: string; color: "warning" | "success" | "info" | "error" | "default" }[] = [
-  { label: "بحران جدید", color: "warning" },
-  { label: "بلامانع طی 1 ساعت اخیر", color: "success" },
-  { label: "تغییر در موجودی", color: "info" },
-  { label: "امکان تولید کمتر از 20", color: "error" },
-  { label: "آستانه بحران، امکان تولید 0 تا 40", color: "default" },
+/** راهنمای رنگ بحران‌ها (رنگ مربع‌های فرم ویندوزی frmRPTProductionPossibility) */
+const legend: ILegendItem[] = [
+  { label: "بحران جدید", color: "#FFD700" },
+  { label: "بلا مانع طی 1 ساعت اخیر", color: "#98FB98" },
+  { label: "تغییر در موجودی", color: "#87CEEB" },
+  { label: "امکان تولید کمتر از 20", color: "#FF0000" },
 ];
+
+const rowKey = (row: Record<string, unknown>) => `${row["CriticalPartTypeId"] ?? ""}-${row["Id"] ?? ""}`;
+
+/**
+ * رنگ ردیف (فرم SFC فقط resx دارد؛ قاعده از SetColors فرم متناظر PF، frmRPTTrackingTrimCriticalPart، با آستانه‌های راهنمای فرم SFC):
+ * بحران جدید زمینه طلایی؛ بحران بلامانع‌شده در یک ساعت اخیر (Status = 2، که رویه فقط تا یک ساعت برمی‌گرداند) زمینه سبز؛
+ * امکان تولید (BodyProdPossibilityNo) کمتر از 20 قرمز؛ با تیک «آستانه بحران» امکان تولید 0 تا 40 صورتی؛ در غیر این صورت تغییر موجودی آبی.
+ */
+const toneOf = (row: Record<string, unknown>, marks: Map<string, "new" | "stock">, threshold: boolean): ITrackingTone => {
+  const mark = marks.get(rowKey(row));
+  const pos = rowNumber(row, "BodyProdPossibilityNo");
+  const tone: ITrackingTone = { background: mark === "new" ? "new" : rowNumber(row, "Status") === 2 ? "resolved" : undefined };
+  if (pos !== null && pos < 20) tone.foreground = "critical";
+  else if (threshold && pos !== null && pos >= 0 && pos <= 40) tone.foreground = "threshold";
+  else if (mark === "stock") tone.foreground = "stockChanged";
+  return tone;
+};
 
 const value = (row: IGridRow | null, ...keys: string[]) => {
   const r = (row ?? {}) as Record<string, unknown>;
@@ -59,8 +79,11 @@ export default function MechProductionPossibilityReport() {
   const [refreshedAt, setRefreshedAt] = useState("");
   const [active, setActive] = useState<IGridRow | null>(null);
   const [dialog, setDialog] = useState<Dialog>(null);
+  const [threshold, setThreshold] = useState(false);
+  const [marks, setMarks] = useState<Map<string, "new" | "stock">>(new Map());
+  const lastRows = useRef<Record<string, unknown>[] | null>(null);
 
-  const columns = useMemo(() => resultColumns(result, columnHeaders), [result]);
+  const columns = useMemo(() => resultColumns(result, columnHeaders, gridColumns.mechProductionPossibility), [result]);
   const rows = useMemo(() => tabularRows(result), [result]);
   const productRows = useMemo(() => (active ? [active] : []), [active]);
 
@@ -69,7 +92,11 @@ export default function MechProductionPossibilityReport() {
   const load = async (input: IMechReportsGetProductionPossibilityInput, silent = false) => {
     if (!silent) setLoading(true);
     try {
-      setResult(await getMechReportsProductionPossibility(input));
+      const data = await getMechReportsProductionPossibility(input);
+      // بازخوانی زنده: بحران جدید و تغییر موجودی نسبت به نتیجه قبلی رنگی می‌شود
+      setMarks(silent ? diffTracking(lastRows.current, data.rows, rowKey, ["Stock", "BodyCount"]) : new Map());
+      lastRows.current = data.rows;
+      setResult(data);
       lastInput.current = input;
       if (!silent) setActive(null);
       setRefreshedAt(new Date().toLocaleString("fa-IR"));
@@ -138,31 +165,37 @@ export default function MechProductionPossibilityReport() {
                 <IkcoRadioGroup row value={kind} onChange={(_, v) => setKind(v)} options={[{ value: "-1", label: "همه موارد" }, { value: "1", label: "قطعات سنکرون" }, { value: "0", label: "قطعات مکانیکی" }]} />
               </IkcoGrid>
               <IkcoGrid size={{ xs: 12, md: 4 }}>
-                <LookupAutocomplete allLabel="همه موارد" lookupKey="car-models" label="محصول" value={modelId} onChange={(v) => { setModelId(v); setClassId(null); setSubClassId(null); }} />
+                <LookupAutocomplete lookupKey="car-models" label="محصول" value={modelId} onChange={(v) => { setModelId(v); setClassId(null); setSubClassId(null); }} />
               </IkcoGrid>
               <IkcoGrid size={{ xs: 12, md: 4 }}>
-                <LookupAutocomplete allLabel="همه موارد" lookupKey="car-classes" label="کلاس" value={classId} parentId={modelId} requireParent onChange={(v) => { setClassId(v); setSubClassId(null); }} />
+                <LookupAutocomplete lookupKey="car-classes" label="کلاس" value={classId} parentId={modelId} requireParent onChange={(v) => { setClassId(v); setSubClassId(null); }} />
               </IkcoGrid>
               <IkcoGrid size={{ xs: 12, md: 4 }}>
-                <LookupAutocomplete allLabel="همه موارد" lookupKey="sub-classes" label="زیرکلاس" value={subClassId} parentId={classId} requireParent onChange={setSubClassId} />
+                <LookupAutocomplete lookupKey="sub-classes" label="زیرکلاس" value={subClassId} parentId={classId} requireParent onChange={setSubClassId} />
               </IkcoGrid>
               <IkcoGrid size={12}>
-                <IkcoStack direction="row" spacing={1} flexWrap="wrap" useFlexGap alignItems="center">
-                  {legend.map((l) => (
-                    <IkcoChip key={l.label} label={l.label} status={l.color} size="small" />
-                  ))}
+                <TrackingLegend
+                  items={[
+                    ...legend,
+                    {
+                      label: "آستانه بحران، امکان تولید 0 تا 40",
+                      color: "#FF00FF",
+                      extra: <IkcoCheckbox label="" checked={threshold} onChange={(_, c) => setThreshold(c)} />,
+                    },
+                  ]}
+                >
                   <IkcoChip size="small" status={live.connected ? "success" : "default"} label={live.connected ? "به‌روزرسانی زنده: متصل" : "به‌روزرسانی زنده: قطع"} />
                   <IkcoTypography variant="caption">{refreshedAt ? `آخرین بروزرسانی: ${refreshedAt}` : ""}</IkcoTypography>
-                </IkcoStack>
+                </TrackingLegend>
               </IkcoGrid>
             </IkcoGrid>
           </IkcoCardContent>
         </IkcoCard>
       )}
 
-      <IkcoDataGrid columns={columns} rows={rows} loading={loading} getRowId={(r) => r.__rowId} onRowClick={(p) => setActive(p.row as IGridRow)} autoHeight />
+      <TrackingGrid tone={(r) => toneOf(r, marks, threshold)} columns={columns} rows={rows} loading={loading} getRowId={(r) => r.__rowId} onRowClick={(p) => setActive(p.row as IGridRow)} autoHeight />
       <IkcoTypography variant="subtitle1">محصولات</IkcoTypography>
-      <IkcoDataGrid columns={columns} rows={productRows} getRowId={(r) => r.__rowId} autoHeight />
+      <TrackingGrid tone={(r) => toneOf(r, marks, threshold)} columns={columns} rows={productRows} getRowId={(r) => r.__rowId} autoHeight />
 
       <ActionBar>
           <PermissionGuard can={ApiPermissions.mechReports.productionpossibility} fallback={<IkcoTypography color="error">شما به اجرای این گزارش دسترسی ندارید.</IkcoTypography>}>
@@ -204,10 +237,10 @@ export default function MechProductionPossibilityReport() {
           <IkcoTypography variant="caption">{result ? `تعداد: ${rows.length}` : "شرایط را وارد و «بازخوانی» را انتخاب کنید"}</IkcoTypography>
         </ActionBar>
 
-      <TabularDialog open={dialog === "stock"} close={() => setDialog(null)} title="LOG" load={() => getMechReportsStockLog({ partNo })} />
-      <TabularDialog open={dialog === "license"} close={() => setDialog(null)} title="لاگ مجوزها" load={() => getMechLicensesTrackingList({ criticalPartTypeId: criticalType, criticalPartId: criticalId })} />
-      <TabularDialog open={dialog === "sap"} close={() => setDialog(null)} title="لاگ SAP" load={() => getMechReportsSapCriticalLog({ partNo })} />
-      <TabularDialog open={dialog === "sapDiff"} close={() => setDialog(null)} title="لاگ مغایرت SAP" load={() => getMechReportsFailedSapTransfers({ fromDate: firstOfMonthJalali(), toDate: todayJalali() })} />
+      <TabularDialog open={dialog === "stock"} close={() => setDialog(null)} title="LOG" columns={gridColumns.mechStockLog} load={() => getMechReportsStockLog({ partNo })} />
+      <TabularDialog open={dialog === "license"} close={() => setDialog(null)} title="لاگ مجوزها" columns={gridColumns.mechLicenseTrackingList} load={() => getMechLicensesTrackingList({ criticalPartTypeId: criticalType, criticalPartId: criticalId })} />
+      <TabularDialog open={dialog === "sap"} close={() => setDialog(null)} title="لاگ SAP" columns={gridColumns.mechSapLog} load={() => getMechReportsSapCriticalLog({ partNo })} />
+      <TabularDialog open={dialog === "sapDiff"} close={() => setDialog(null)} title="لاگ مغایرت SAP" columns={gridColumns.mechFailedSap} load={() => getMechReportsFailedSapTransfers({ fromDate: firstOfMonthJalali(), toDate: todayJalali() })} />
       <MechAsnDialog open={dialog === "asn"} close={() => setDialog(null)} />
       <MechContrastDialog open={dialog === "contrast"} close={() => setDialog(null)} />
       <FormDialog open={dialog === "edit"} close={() => setDialog(null)} title="تغییر در مشخصات اقلام بحرانی" maxWidth="xl" closeText="انصراف">

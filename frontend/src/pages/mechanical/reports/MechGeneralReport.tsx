@@ -12,6 +12,7 @@ import { ApiPermissions } from "../../../types/permissions";
 import { columnHeaders } from "../../../utils/columnHeaders";
 import { resultColumns, tabularRows, type IGridRow } from "../../../utils/tabularUtility";
 import ActionBar from "../../../components/ActionBar";
+import { gridColumns } from "../../../utils/gridColumns";
 
 const field = (row: IGridRow | undefined, ...keys: string[]) => {
   const r = (row ?? {}) as Record<string, unknown>;
@@ -34,9 +35,9 @@ export default function MechGeneralReport() {
   const [active, setActive] = useState<IGridRow | null>(null);
   const [showLog, setShowLog] = useState(false);
 
-  const columns = useMemo(() => resultColumns(result, columnHeaders), [result]);
+  const columns = useMemo(() => resultColumns(result, columnHeaders, gridColumns.mechGeneralReport), [result]);
   const rows = useMemo(() => tabularRows(result), [result]);
-  const incomingColumns = useMemo(() => resultColumns(incoming, columnHeaders), [incoming]);
+  const incomingColumns = useMemo(() => resultColumns(incoming, columnHeaders, gridColumns.mechIncomingBodies), [incoming]);
   const incomingRows = useMemo(() => tabularRows(incoming), [incoming]);
 
   const run = async () => {
@@ -105,7 +106,7 @@ export default function MechGeneralReport() {
           <IkcoTypography variant="caption">{result ? `تعداد: ${rows.length}` : "شرایط را وارد و «بازخوانی» را انتخاب کنید"}</IkcoTypography>
         </ActionBar>
 
-      <TabularDialog open={showLog} close={setShowLog} title="LOG" load={() => getMechReportsStockLog({ partNo: String(field(active ?? undefined, "PartNo", "Partno", "PartNumber") ?? "").trim() })} />
+      <TabularDialog open={showLog} close={setShowLog} title="LOG" columns={gridColumns.mechStockLog} load={() => getMechReportsStockLog({ partNo: String(field(active ?? undefined, "PartNo", "Partno", "PartNumber") ?? "").trim() })} />
     </IkcoStack>
   );
 }

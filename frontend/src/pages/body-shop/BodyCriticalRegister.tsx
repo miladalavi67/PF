@@ -41,6 +41,7 @@ import BodyCriticalSearchDialog from "./dialogs/BodyCriticalSearchDialog";
 import BodyExcelImportDialog from "./dialogs/BodyExcelImportDialog";
 import BodyPreAssignCountDialog from "./dialogs/BodyPreAssignCountDialog";
 import ActionBar from "../../components/ActionBar";
+import { gridColumns } from "../../utils/gridColumns";
 
 interface FormValues {
   bodyNumber: string;
@@ -157,7 +158,7 @@ export default function BodyCriticalRegister({ editId: editIdProp, onDone }: Pro
     })();
   }, [editId, isEdit, reset]);
 
-  const existingColumns = useMemo(() => resultColumns(existing, columnHeaders), [existing]);
+  const existingColumns = useMemo(() => resultColumns(existing, columnHeaders, gridColumns.bodyCriticalProducts), [existing]);
   const existingRows: IGridRow[] = useMemo(() => tabularRows(existing), [existing]);
 
   const clearForm = () => {
@@ -471,7 +472,7 @@ export default function BodyCriticalRegister({ editId: editIdProp, onDone }: Pro
         }}
       />
       <BodyPreAssignCountDialog open={dialog === "count"} close={() => setDialog(null)} initialBodyNumber={getValues("bodyNumber")} />
-      <TabularDialog open={dialog === "log"} close={() => setDialog(null)} title="گزارش رویدادها" load={() => getBodyCriticalsEventLog({ eventTypeId: 0, changedRecordId: editId })} />
+      <TabularDialog open={dialog === "log"} close={() => setDialog(null)} title="گزارش رویدادها" columns={gridColumns.eventLog} load={() => getBodyCriticalsEventLog({ eventTypeId: 0, changedRecordId: editId })} />
     </IkcoStack>
   );
 }

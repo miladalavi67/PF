@@ -28,6 +28,7 @@ import { ApiPermissions } from "../../types/permissions";
 import { columnHeaders } from "../../utils/columnHeaders";
 import { resultColumns, tabularRows } from "../../utils/tabularUtility";
 import ActionBar from "../../components/ActionBar";
+import { gridColumns } from "../../utils/gridColumns";
 
 interface Option {
   id: number;
@@ -78,7 +79,7 @@ export default function UserAccessManagement() {
   const [adding, setAdding] = useState(false);
 
   const rows = useMemo(() => tabularRows(access), [access]);
-  const columns = useMemo(() => resultColumns(access, columnHeaders), [access]);
+  const columns = useMemo(() => resultColumns(access, columnHeaders, gridColumns.userAccess), [access]);
 
   const loadAccess = useCallback(async () => {
     setLoading(true);
@@ -98,11 +99,6 @@ export default function UserAccessManagement() {
     })();
     void loadAccess();
   }, [loadAccess]);
-
-  // مانند DropDownList فرم ویندوزی: سایت پیش‌فرض اولین گزینه است
-  useEffect(() => {
-    if (siteId === null && sites.length > 0) setSiteId(sites[0].id);
-  }, [sites, siteId]);
 
   useEffect(() => {
     setLineIds([]);

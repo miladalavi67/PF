@@ -12,6 +12,7 @@ import { columnHeaders } from "../../utils/columnHeaders";
 import { firstOfMonthJalali, todayJalali } from "../../utils/dateUtility";
 import { resultColumns, tabularRows } from "../../utils/tabularUtility";
 import ActionBar from "../../components/ActionBar";
+import { gridColumns } from "../../utils/gridColumns";
 
 /**
  * گزارش ASN های در راه (frm_Rpt_Sap_Asn، رویه S_ASNReport): «نمایش قطعات بحرانی» (Type=1) یا «نمایش تمامی قطعات در راه» (Type=2)،
@@ -26,7 +27,7 @@ export default function MechAsnPanel() {
   const [result, setResult] = useState<ITabularResult | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const columns = useMemo(() => resultColumns(result, columnHeaders), [result]);
+  const columns = useMemo(() => resultColumns(result, columnHeaders, gridColumns.mechAsn), [result]);
   const rows = useMemo(() => tabularRows(result), [result]);
 
   const run = async () => {

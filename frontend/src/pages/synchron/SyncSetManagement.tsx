@@ -48,6 +48,7 @@ import MechCriticalSearchDialog from "../mechanical/dialogs/MechCriticalSearchDi
 import MechLicenseChangeDialog from "../mechanical/dialogs/MechLicenseChangeDialog";
 import SyncIndicatorCarsDialog from "./dialogs/SyncIndicatorCarsDialog";
 import ActionBar from "../../components/ActionBar";
+import { gridColumns, type IGridColumn } from "../../utils/gridColumns";
 
 const size = { xl: 3, lg: 3, md: 4, sm: 6, xs: 12 };
 const ALL = -1;
@@ -70,8 +71,8 @@ const flag = (row: Record<string, unknown> | undefined, key: string) => {
   return v === true || v === 1 || v === "1" || String(v).toLowerCase() === "true";
 };
 
-const Grid = ({ result, title }: { result: ITabularResult | null; title: string }) => {
-  const columns = useMemo(() => resultColumns(result, columnHeaders), [result]);
+const Grid = ({ result, title, spec }: { result: ITabularResult | null; title: string; spec: readonly IGridColumn[] }) => {
+  const columns = useMemo(() => resultColumns(result, columnHeaders, spec), [result, spec]);
   const rows = useMemo(() => tabularRows(result), [result]);
   return (
     <IkcoStack spacing={1}>
@@ -467,10 +468,10 @@ export default function SyncSetManagement({ editId: editIdProp, onDone }: Props 
       {isEdit && (
         <IkcoStack spacing={2}>
           {savedParts && savedParts.rows.length === 0 && <IkcoAlert status="warning" severity="warning">برای این بحران قطعه‌ای ثبت نشده است.</IkcoAlert>}
-          <Grid result={savedParts} title="قطعات" />
-          <Grid result={savedColors} title="رنگ‌ها" />
-          <Grid result={savedSaloons} title="سالن‌ها" />
-          <Grid result={savedProducts} title="محصولات" />
+          <Grid result={savedParts} title="قطعات" spec={gridColumns.syncSetParts} />
+          <Grid result={savedColors} title="رنگ‌ها" spec={gridColumns.syncSetColors} />
+          <Grid result={savedSaloons} title="سالن‌ها" spec={gridColumns.syncSetSaloons} />
+          <Grid result={savedProducts} title="محصولات" spec={gridColumns.syncSetProducts} />
           <IkcoButton onClick={() => setShowProducts(true)}>مشاهده محصولات در پنجره</IkcoButton>
         </IkcoStack>
       )}
@@ -498,8 +499,8 @@ export default function SyncSetManagement({ editId: editIdProp, onDone }: Props 
       />
       <SyncIndicatorCarsDialog open={dialog === "indicator"} close={() => setDialog(null)} setId={editId} />
       <MechLicenseChangeDialog open={dialog === "license"} close={() => setDialog(null)} criticalPartTypeId={1} criticalPartId={editId} />
-      <TabularDialog open={dialog === "log"} close={() => setDialog(null)} title="Log" load={() => getMechLicensesTrackingList({ criticalPartTypeId: 1, criticalPartId: editId })} />
-      <TabularDialog open={showProducts} close={() => setShowProducts(false)} title="محصولات بحران سنکرون" load={() => getSyncSetsProductDetails(editId)} />
+      <TabularDialog open={dialog === "log"} close={() => setDialog(null)} title="Log" columns={gridColumns.mechLicenseTrackingList} load={() => getMechLicensesTrackingList({ criticalPartTypeId: 1, criticalPartId: editId })} />
+      <TabularDialog open={showProducts} close={() => setShowProducts(false)} title="محصولات بحران سنکرون" columns={gridColumns.syncSetProducts} load={() => getSyncSetsProductDetails(editId)} />
       <ConfirmDialog open={confirmDelete} close={() => setConfirmDelete(false)} title="حذف بحران" message="این بحران سنکرون حذف منطقی شود؟" confirmText="حذف" loading={busy} onConfirm={remove} />
     </IkcoStack>
   );

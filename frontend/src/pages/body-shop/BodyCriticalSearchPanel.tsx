@@ -31,6 +31,7 @@ import { resultColumns, tabularRows, type IGridRow } from "../../utils/tabularUt
 import BodyLicenseDialog from "./BodyLicenseDialog";
 import PartNumberField from "../../components/PartNumberField";
 import ActionBar from "../../components/ActionBar";
+import { gridColumns } from "../../utils/gridColumns";
 
 interface Filters {
   typeId: number | null;
@@ -102,8 +103,8 @@ export default function BodyCriticalSearchPanel({ mode, onEdit, onPick, onExit }
   const [lastFilters, setLastFilters] = useState<Filters | null>(null);
 
   const rows = useMemo(() => tabularRows(result), [result]);
-  const columns = useMemo(() => resultColumns(result, columnHeaders).filter((c) => c.field !== "Id"), [result]);
-  const productColumns = useMemo(() => resultColumns(products, columnHeaders), [products]);
+  const columns = useMemo(() => resultColumns(result, columnHeaders, gridColumns.bodyCriticalSearch).filter((c) => c.field !== "Id"), [result]);
+  const productColumns = useMemo(() => resultColumns(products, columnHeaders, gridColumns.bodyCriticalProducts), [products]);
   const productRows = useMemo(() => tabularRows(products), [products]);
   const typeId = watch("typeId") ?? 0;
   const isSearch = mode === "search";
@@ -198,13 +199,13 @@ export default function BodyCriticalSearchPanel({ mode, onEdit, onPick, onExit }
             <Controller name="typeId" control={control} render={({ field }) => <LookupAutocomplete lookupKey="body-critical-part-types" label="نوع بحران" value={field.value} onChange={field.onChange} />} />
           </IkcoGrid>
           <IkcoGrid size={size}>
-            <Controller name="productionPossibilityId" control={control} render={({ field }) => <LookupAutocomplete allLabel="همه موارد" lookupKey="production-possibilities" label="وضعیت امکان تولید" value={field.value} onChange={field.onChange} />} />
+            <Controller name="productionPossibilityId" control={control} render={({ field }) => <LookupAutocomplete lookupKey="production-possibilities" label="وضعیت امکان تولید" value={field.value} onChange={field.onChange} />} />
           </IkcoGrid>
           <IkcoGrid size={size}>
             <Controller name="plantId" control={control} render={({ field }) => <LookupAutocomplete lookupKey="virtual-plants" label="سایت" value={field.value} onChange={(v) => { field.onChange(v); setValue("vinBiwSite", null); }} />} />
           </IkcoGrid>
           <IkcoGrid size={size}>
-            <Controller name="vinBiwSite" control={control} render={({ field }) => <LookupAutocomplete allLabel="همه موارد" lookupKey="body-saloons" label="سالن" value={field.value} parentId={watch("plantId")} onChange={field.onChange} />} />
+            <Controller name="vinBiwSite" control={control} render={({ field }) => <LookupAutocomplete lookupKey="body-saloons" label="سالن" value={field.value} parentId={watch("plantId")} onChange={field.onChange} />} />
           </IkcoGrid>
           <Controller
             name="partNumber"
@@ -344,8 +345,8 @@ export default function BodyCriticalSearchPanel({ mode, onEdit, onPick, onExit }
           setDeleting(true);
         }}
       />
-      <TabularDialog open={dialog === "events"} close={() => setDialog(null)} title="گزارش رویدادها" load={() => getBodyCriticalsEventLog({ eventTypeId: typeId, changedRecordId: activeId })} />
-      <TabularDialog open={dialog === "tracking"} close={() => setDialog(null)} title="ردیابی پارامترهای بحرانی" load={() => getBodyReportsShortageLicenseTracking({ criticalPartTypeId: typeId, criticalPartId: activeId })} />
+      <TabularDialog open={dialog === "events"} close={() => setDialog(null)} title="گزارش رویدادها" columns={gridColumns.eventLog} load={() => getBodyCriticalsEventLog({ eventTypeId: typeId, changedRecordId: activeId })} />
+      <TabularDialog open={dialog === "tracking"} close={() => setDialog(null)} title="ردیابی پارامترهای بحرانی" columns={gridColumns.licenseTracking} load={() => getBodyReportsShortageLicenseTracking({ criticalPartTypeId: typeId, criticalPartId: activeId })} />
       {dialog === "license" && <BodyLicenseDialog open close={() => setDialog(null)} criticalPartId={activeId} criticalPartTypeId={typeId} onSaved={() => lastFilters && void run(lastFilters)} />}
     </IkcoStack>
   );

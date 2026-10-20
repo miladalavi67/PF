@@ -24,6 +24,7 @@ import { mechLicensesChangeInputRules } from "../../../types/Mechanical";
 import { ApiPermissions } from "../../../types/permissions";
 import { columnHeaders } from "../../../utils/columnHeaders";
 import { resultColumns, tabularRows } from "../../../utils/tabularUtility";
+import { gridColumns } from "../../../utils/gridColumns";
 
 interface FormValues {
   productionPossibility: number | null;
@@ -77,7 +78,7 @@ export default function MechLicenseChangeDialog({ open, close, criticalPartTypeI
     void refresh();
   }, [open, refresh, reset]);
 
-  const columns = useMemo(() => resultColumns(history, columnHeaders), [history]);
+  const columns = useMemo(() => resultColumns(history, columnHeaders, gridColumns.licenseTracking), [history]);
   const rows = useMemo(() => tabularRows(history), [history]);
 
   const startNew = () => {
@@ -192,7 +193,7 @@ export default function MechLicenseChangeDialog({ open, close, criticalPartTypeI
           <IkcoDataGrid columns={columns} rows={rows} getRowId={(r) => r.__rowId} autoHeight />
         </IkcoStack>
       </FormDialog>
-      <TabularDialog open={showLog} close={setShowLog} title="Log" load={() => getMechLicensesTrackingList({ criticalPartTypeId, criticalPartId })} />
+      <TabularDialog open={showLog} close={setShowLog} title="Log" columns={gridColumns.mechLicenseTrackingList} load={() => getMechLicensesTrackingList({ criticalPartTypeId, criticalPartId })} />
     </>
   );
 }

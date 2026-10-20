@@ -5,6 +5,7 @@ import type { IFieldRules } from "../types/Common";
 import type { ITabularResult } from "../types/tabular";
 import { columnHeaders } from "../utils/columnHeaders";
 import { firstOfMonthJalali, todayJalali } from "../utils/dateUtility";
+import type { IGridColumn } from "../utils/gridColumns";
 import { resultColumns, tabularRows, type IGridRow } from "../utils/tabularUtility";
 import LookupAutocomplete from "./LookupAutocomplete";
 import LookupMultiSelect from "./LookupMultiSelect";
@@ -37,6 +38,8 @@ interface ReportPageProps<TInput extends object> {
   rules?: Partial<Record<string, IFieldRules>>;
   /** عنوان فارسی ستون‌ها (بر اساس نام ستون خروجی رویه) */
   headers?: Record<string, string>;
+  /** ستون‌های قابل نمایش مطابق تعریف گرید فرم ویندوزی (utils/gridColumns)؛ بدون آن همه ستون‌های خروجی رویه */
+  columns?: readonly IGridColumn[];
   /** اجرای خودکار هنگام باز شدن صفحه (برای گزارش‌های بدون پارامتر) */
   autoRun?: boolean;
   /** تشخیص تغییر داده: تابعی که رشته/عدد آخرین تغییر را برمی‌گرداند؛ با تغییر مقدار، گزارش دوباره اجرا می‌شود */
@@ -69,6 +72,7 @@ export default function ReportPage<TInput extends object>({
   run,
   rules,
   headers,
+  columns: spec,
   autoRun = false,
   poll,
   pollSeconds = 30,
@@ -82,7 +86,7 @@ export default function ReportPage<TInput extends object>({
   const lastInput = useRef<TInput | null>(null);
   const lastStamp = useRef<string | number | null>(null);
 
-  const columns: IkcoGridColDef[] = useMemo(() => resultColumns(result, { ...columnHeaders, ...headers }), [result, headers]);
+  const columns: IkcoGridColDef[] = useMemo(() => resultColumns(result, { ...columnHeaders, ...headers }, spec), [result, headers, spec]);
 
   const toInput = useCallback(
     (values: Record<string, unknown>): TInput => {

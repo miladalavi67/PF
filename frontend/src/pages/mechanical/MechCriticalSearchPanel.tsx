@@ -28,6 +28,7 @@ import { resultColumns, tabularRows, type IGridRow } from "../../utils/tabularUt
 import MechLicenseChangeDialog from "./dialogs/MechLicenseChangeDialog";
 import PartNumberField from "../../components/PartNumberField";
 import ActionBar from "../../components/ActionBar";
+import { gridColumns } from "../../utils/gridColumns";
 
 interface Props {
   /** دسته‌بندی اولیه قطعات: -1 همه موارد، 0 مکانیکی، 1 سنکرون */
@@ -71,8 +72,8 @@ export default function MechCriticalSearchPanel({ initialKind = -1, onEdit, onPi
   const [deleting, setDeleting] = useState(false);
 
   const rows = useMemo(() => tabularRows(result), [result]);
-  const columns = useMemo(() => resultColumns(result, columnHeaders), [result]);
-  const productColumns = useMemo(() => resultColumns(products, columnHeaders), [products]);
+  const columns = useMemo(() => resultColumns(result, columnHeaders, gridColumns.mechCriticalSearch), [result]);
+  const productColumns = useMemo(() => resultColumns(products, columnHeaders, active?.kind === 1 ? gridColumns.syncSetProducts : gridColumns.mechCriticalProducts), [products, active]);
   const productRows = useMemo(() => tabularRows(products), [products]);
 
   // GrvParts_RowsChanged: دکمه‌های تغییر/حذف/ردیابی فقط وقتی جدول ردیف دارد فعالند
@@ -201,7 +202,7 @@ export default function MechCriticalSearchPanel({ initialKind = -1, onEdit, onPi
         </ActionBar>
 
       {dialog === "license" && active && <MechLicenseChangeDialog open close={() => setDialog(null)} criticalPartTypeId={active.kind} criticalPartId={active.id} onSaved={() => void run()} />}
-      <TabularDialog open={dialog === "log"} close={() => setDialog(null)} title="Log" load={() => getMechLicensesTrackingList({ criticalPartTypeId: active?.kind ?? 0, criticalPartId: active?.id ?? 0 })} />
+      <TabularDialog open={dialog === "log"} close={() => setDialog(null)} title="Log" columns={gridColumns.mechLicenseTrackingList} load={() => getMechLicensesTrackingList({ criticalPartTypeId: active?.kind ?? 0, criticalPartId: active?.id ?? 0 })} />
       <ConfirmDialog
         open={dialog === "delete"}
         close={() => setDialog(null)}

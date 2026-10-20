@@ -3,6 +3,7 @@ import { Refresh } from "@mui/icons-material";
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { ITabularResult } from "../types/tabular";
 import { columnHeaders } from "../utils/columnHeaders";
+import type { IGridColumn } from "../utils/gridColumns";
 import { resultColumns, tabularRows } from "../utils/tabularUtility";
 import ExcelExportButton from "./ExcelExportButton";
 import FormDialog from "./FormDialog";
@@ -15,6 +16,8 @@ interface TabularDialogProps {
   load: () => Promise<ITabularResult>;
   /** عنوان فارسی اضافی ستون‌ها */
   headers?: Record<string, string>;
+  /** ستون‌های قابل نمایش مطابق تعریف گرید فرم ویندوزی (utils/gridColumns)؛ بدون آن همه ستون‌های خروجی رویه */
+  columns?: readonly IGridColumn[];
   /** محتوای اضافه بالای جدول (مثلاً شرح بحران) */
   header?: ReactNode;
   /** نمایش دکمه «بازخوانی» (فرم‌های گزارش رویدادها، خطاها و ردیابی) */
@@ -24,7 +27,7 @@ interface TabularDialogProps {
 }
 
 /** modal نمایش جدول خروجی یک رویه (جزئیات محصولات، گزارش رویدادها، گزارش خطاها، ردیابی پارامترها ...) با «بازخوانی»، اکسل و «خروج» */
-export default function TabularDialog({ open, close, title, load, headers, header, reload = true, excel = true }: TabularDialogProps) {
+export default function TabularDialog({ open, close, title, load, headers, columns: spec, header, reload = true, excel = true }: TabularDialogProps) {
   const [result, setResult] = useState<ITabularResult | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -54,7 +57,7 @@ export default function TabularDialog({ open, close, title, load, headers, heade
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
-  const columns = useMemo(() => resultColumns(result, { ...columnHeaders, ...headers }), [result, headers]);
+  const columns = useMemo(() => resultColumns(result, { ...columnHeaders, ...headers }, spec), [result, headers, spec]);
   const rows = useMemo(() => tabularRows(result), [result]);
 
   return (

@@ -42,6 +42,7 @@ import { resultColumns, tabularRows, type IGridRow } from "../../utils/tabularUt
 import MechCriticalSearchDialog from "./dialogs/MechCriticalSearchDialog";
 import MechTrimShopBodyCountDialog from "./dialogs/MechTrimShopBodyCountDialog";
 import ActionBar from "../../components/ActionBar";
+import { gridColumns } from "../../utils/gridColumns";
 
 /** شناسه سایت پیش‌فرض رویه‌های SFC (PlantId=1) */
 const PLANT_ID = 1;
@@ -154,9 +155,9 @@ export default function MechCriticalRegister({ editId: editIdProp, onDone }: Pro
 
   const trimShopId = watch("trimShopId");
   const candRows = useMemo(() => tabularRows(candidates) as Row[], [candidates]);
-  const candColumns = useMemo(() => resultColumns(candidates, columnHeaders), [candidates]);
+  const candColumns = useMemo(() => resultColumns(candidates, columnHeaders, gridColumns.mechProductCandidates), [candidates]);
   const existingRows = useMemo(() => tabularRows(existing), [existing]);
-  const existingColumns = useMemo(() => resultColumns(existing, columnHeaders), [existing]);
+  const existingColumns = useMemo(() => resultColumns(existing, columnHeaders, gridColumns.mechCriticalProducts), [existing]);
 
   useEffect(() => {
     if (!isEdit) return;
@@ -489,7 +490,7 @@ export default function MechCriticalRegister({ editId: editIdProp, onDone }: Pro
         }}
       />
       <MechTrimShopBodyCountDialog open={dialog === "count"} close={() => setDialog(null)} initialBodyNumber={getValues("bodyNo")} />
-      <TabularDialog open={dialog === "log"} close={() => setDialog(null)} title="LOG" load={() => getMechReportsStockLog({ partNo: getValues("partNo").trim() })} />
+      <TabularDialog open={dialog === "log"} close={() => setDialog(null)} title="LOG" columns={gridColumns.mechStockLog} load={() => getMechReportsStockLog({ partNo: getValues("partNo").trim() })} />
     </IkcoStack>
   );
 }

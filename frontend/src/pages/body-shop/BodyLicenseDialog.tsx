@@ -12,6 +12,7 @@ import { bodyCriticalsRegisterLicenseInputRules } from "../../types/BodyShop";
 import type { ITabularResult } from "../../types/tabular";
 import { columnHeaders } from "../../utils/columnHeaders";
 import { resultColumns, tabularRows } from "../../utils/tabularUtility";
+import { gridColumns } from "../../utils/gridColumns";
 
 interface BodyLicenseDialogProps {
   open: boolean;
@@ -51,7 +52,7 @@ export default function BodyLicenseDialog({ open, close, criticalPartId, critica
   const possibility = watch("productionPossibilityId");
   const unlimited = watch("unlimited");
 
-  const columns = useMemo(() => resultColumns(history, columnHeaders), [history]);
+  const columns = useMemo(() => resultColumns(history, columnHeaders, gridColumns.licenseTracking), [history]);
   const rows = useMemo(() => tabularRows(history), [history]);
 
   const refresh = useCallback(async () => {
@@ -176,7 +177,7 @@ export default function BodyLicenseDialog({ open, close, criticalPartId, critica
           <IkcoDataGrid columns={columns} rows={rows} getRowId={(r) => r.__rowId} autoHeight />
         </IkcoStack>
       </FormDialog>
-      <TabularDialog open={showLog} close={setShowLog} title="Log" load={() => getBodyCriticalsEventLog({ eventTypeId: criticalPartTypeId, changedRecordId: criticalPartId })} />
+      <TabularDialog open={showLog} close={setShowLog} title="Log" columns={gridColumns.eventLog} load={() => getBodyCriticalsEventLog({ eventTypeId: criticalPartTypeId, changedRecordId: criticalPartId })} />
     </>
   );
 }

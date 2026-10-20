@@ -7,6 +7,7 @@ import PartNumberField from "./PartNumberField";
 import type { ITabularResult } from "../types/tabular";
 import { columnHeaders } from "../utils/columnHeaders";
 import { firstOfMonthJalali, todayJalali } from "../utils/dateUtility";
+import type { IGridColumn } from "../utils/gridColumns";
 import { resultColumns, tabularRows } from "../utils/tabularUtility";
 import ExcelExportButton from "./ExcelExportButton";
 import ActionBar from "./ActionBar";
@@ -23,13 +24,15 @@ interface Props {
   listTitle: string;
   permission: string;
   run: (input: Input) => Promise<ITabularResult>;
+  /** ستون‌های قابل نمایش مطابق تعریف گرید فرم ویندوزی (utils/gridColumns)؛ بدون آن همه ستون‌های خروجی رویه */
+  columns?: readonly IGridColumn[];
 }
 
 /**
  * چیدمان مشترک گزارش‌های «پیش‌تخصیص بدنه‌های بحرانی» و «مغایرت پیش‌تخصیص» (frmRPTPreAssignCriticalBody / frmRPTNotPossibleProductsToStepAssign):
  * کلید «شرایط جستجو: بر اساس تاریخ / بر اساس شماره فنی»، شماره فنی با شرح، بازه تاریخ، جدول لیست بدنه‌ها، جستجو و اکسل.
  */
-export default function DateOrPartReport({ title, listTitle, permission, run }: Props) {
+export default function DateOrPartReport({ title, listTitle, permission, run, columns: spec }: Props) {
   const [byDate, setByDate] = useState(true);
   const [partNo, setPartNo] = useState("");
   const [fromDate, setFromDate] = useState<string | null>(firstOfMonthJalali());
@@ -37,7 +40,7 @@ export default function DateOrPartReport({ title, listTitle, permission, run }: 
   const [result, setResult] = useState<ITabularResult | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const columns = useMemo(() => resultColumns(result, columnHeaders), [result]);
+  const columns = useMemo(() => resultColumns(result, columnHeaders, spec), [result, spec]);
   const rows = useMemo(() => tabularRows(result), [result]);
 
   const search = async () => {

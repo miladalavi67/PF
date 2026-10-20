@@ -27,6 +27,7 @@ import { ApiPermissions } from "../../../types/permissions";
 import { columnHeaders } from "../../../utils/columnHeaders";
 import { downloadSampleExcel, readExcelRows } from "../../../utils/excelUtility";
 import { resultColumns, tabularRows, type IGridRow } from "../../../utils/tabularUtility";
+import { gridColumns } from "../../../utils/gridColumns";
 
 const kinds = [
   { id: 1, label: "موجود در SAP و ناموجود در SFC" },
@@ -51,7 +52,7 @@ export default function MechContrastDialog({ open, close }: { open: boolean; clo
   const [adding, setAdding] = useState<IGridRow | null>(null);
 
   const rows = useMemo(() => tabularRows(result), [result]);
-  const baseColumns = useMemo(() => resultColumns(result, columnHeaders), [result]);
+  const baseColumns = useMemo(() => resultColumns(result, columnHeaders, gridColumns.mechSubClassContrast), [result]);
 
   const columns: IkcoGridColDef[] = useMemo(
     () =>

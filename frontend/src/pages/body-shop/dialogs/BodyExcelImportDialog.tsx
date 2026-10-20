@@ -10,6 +10,7 @@ import { batchBodyCriticalsCreate } from "../../../server/services/bodyCriticals
 import type { IBatchCriticalPartRow } from "../../../types/BodyShop";
 import type { ITabularResult } from "../../../types/tabular";
 import { downloadSampleExcel, readExcelRows } from "../../../utils/excelUtility";
+import { gridColumns } from "../../../utils/gridColumns";
 
 interface Props {
   open: boolean;
@@ -127,7 +128,7 @@ export default function BodyExcelImportDialog({ open, close, defaultBiwSiteId, o
           </IkcoStack>
         </IkcoStack>
       </FormDialog>
-      <TabularDialog open={showErrors} close={setShowErrors} title="گزارش خطاها" load={() => Promise.resolve(errors ?? { columns: [], rows: [] })} />
+      <TabularDialog open={showErrors} close={setShowErrors} title="گزارش خطاها" columns={gridColumns.bodyExcelErrors} load={() => Promise.resolve(errors ?? { columns: [], rows: [] })} />
     </>
   );
 }

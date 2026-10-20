@@ -27,6 +27,7 @@ import { ApiPermissions } from "../../../types/permissions";
 import { columnHeaders } from "../../../utils/columnHeaders";
 import { resultColumns, tabularRows, type IGridRow } from "../../../utils/tabularUtility";
 import ActionBar from "../../../components/ActionBar";
+import { gridColumns } from "../../../utils/gridColumns";
 
 const PLANT_ID = 1;
 
@@ -70,7 +71,7 @@ export default function SyncIndicatorCarsDialog({ open, close, setId }: { open: 
   }, [open, load]);
 
   const rows = useMemo(() => tabularRows(saloons), [saloons]);
-  const baseColumns = useMemo(() => resultColumns(saloons, columnHeaders), [saloons]);
+  const baseColumns = useMemo(() => resultColumns(saloons, columnHeaders, gridColumns.syncSetSaloons), [saloons]);
   const headerRow = (header?.rows[0] ?? null) as Record<string, unknown> | null;
 
   const columns: IkcoGridColDef[] = useMemo(

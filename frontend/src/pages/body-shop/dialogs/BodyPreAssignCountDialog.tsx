@@ -8,6 +8,7 @@ import type { IBodyInfoRow } from "../../../types/BodyShop";
 import type { ITabularResult } from "../../../types/tabular";
 import { columnHeaders } from "../../../utils/columnHeaders";
 import { resultColumns, tabularRows } from "../../../utils/tabularUtility";
+import { gridColumns } from "../../../utils/gridColumns";
 
 interface Props {
   open: boolean;
@@ -22,7 +23,7 @@ export default function BodyPreAssignCountDialog({ open, close, initialBodyNumbe
   const [result, setResult] = useState<ITabularResult | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const columns = useMemo(() => resultColumns(result, columnHeaders), [result]);
+  const columns = useMemo(() => resultColumns(result, columnHeaders, gridColumns.bodyPreAssignCount), [result]);
   const rows = useMemo(() => tabularRows(result), [result]);
 
   // اطلاعات بدنه توسط BodyNumberField خوانده و نمایش داده می‌شود؛ اینجا فقط تعداد پیش‌تخصیص محصول آن

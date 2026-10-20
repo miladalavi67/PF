@@ -9,6 +9,7 @@ import { getMechReportsTrimShopBodyCount } from "../../../server/services/mechRe
 import type { ITabularResult } from "../../../types/tabular";
 import { columnHeaders } from "../../../utils/columnHeaders";
 import { resultColumns, tabularRows } from "../../../utils/tabularUtility";
+import { gridColumns } from "../../../utils/gridColumns";
 
 /** شناسه سایت پیش‌فرض رویه‌های SFC (PlantId=1) */
 const PLANT_ID = 1;
@@ -31,7 +32,7 @@ export default function MechTrimShopBodyCountDialog({ open, close, initialBodyNu
   const [result, setResult] = useState<ITabularResult | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const columns = useMemo(() => resultColumns(result, columnHeaders), [result]);
+  const columns = useMemo(() => resultColumns(result, columnHeaders, gridColumns.mechTrimShopBodyCount), [result]);
   const rows = useMemo(() => tabularRows(result), [result]);
 
   const search = async (value = bodyNumber) => {
